@@ -1,3 +1,4 @@
+// App.tsx
 import { useState } from 'react';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
@@ -6,20 +7,30 @@ import IntegrationCard from './components/IntegrationCard';
 import UnifiedDataTable from './components/UnifiedDataTable';
 import NewConnectionModal from './components/NewConnectionModal';
 import SchemaMatcherModal from './components/SchemaMatcherModal';
+import Login from './components/Login';
 import { integrations, unifiedRecords } from './data/mockData';
 
 type ModalType = 'none' | 'newConnection' | 'schemaMatcher';
 
 export default function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [modal, setModal] = useState<ModalType>('none');
 
+  // Si no está autenticado, mostrar login
+  if (!isAuthenticated) {
+    return <Login onLogin={() => setIsAuthenticated(true)} />;
+  }
+
+  // Si está autenticado, mostrar el dashboard
   return (
     <div className="flex h-screen bg-[#080d14] font-sans overflow-hidden">
       <Sidebar />
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <Header onNewIntegration={() => setModal('newConnection')} />
-
+        <Header 
+          onNewIntegration={() => setModal('newConnection')}
+          onLogout={() => setIsAuthenticated(false)}
+        />
         <main className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
           <StatsBar />
 

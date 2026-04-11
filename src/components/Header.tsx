@@ -1,10 +1,14 @@
 import { Bell, Plus, Search, User } from 'lucide-react';
 
+// interface HeaderProps {
+//   onNewIntegration: () => void;
+// }
 interface HeaderProps {
   onNewIntegration: () => void;
+  onLogout?: () => void;
 }
 
-export default function Header({ onNewIntegration }: HeaderProps) {
+export default function Header({ onNewIntegration,onLogout  }: HeaderProps) {
   return (
     <header className="flex items-center justify-between px-6 py-4 bg-[#0d1117] border-b border-[#1e2936]">
       <div>
@@ -34,7 +38,12 @@ export default function Header({ onNewIntegration }: HeaderProps) {
           <Plus size={16} />
           Nueva Integración
         </button>
-
+        <button
+          onClick={onLogout}
+          className="px-3 py-1.5 text-sm text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors"
+        >
+          Cerrar Sesión
+        </button>
         <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-blue-600 to-cyan-500 text-white cursor-pointer">
           <User size={16} />
         </div>

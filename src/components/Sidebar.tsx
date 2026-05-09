@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import {
   LayoutDashboard,
   Plug,
@@ -17,10 +18,6 @@ import {
 } from 'lucide-react';
 function cn(...classes: (string | undefined | null | false)[]): string {
   return classes.filter(Boolean).join(' ');
-}
-
-interface SidebarProps {
-  isAdminView: boolean;
 }
 
 const sidebarItems = {
@@ -41,14 +38,17 @@ const sidebarItems = {
   ],
 };
 
-export default function Sidebar({ isAdminView }: SidebarProps) {
+export default function Sidebar() {
+  const { isAdmin } = useAuth();
   const [collapsed, setCollapsed] = useState(false);
   const [isHoveringToggle, setIsHoveringToggle] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
-  const navItems = isAdminView ? sidebarItems.admin : sidebarItems.user;
-  const activeColor = isAdminView ? 'purple' : 'blue';
+  const showAdminItems = isAdmin;
+  console.log('Sidebar render - isAdmin:', isAdmin, 'showAdminItems:', showAdminItems);
+  const navItems = showAdminItems ? sidebarItems.admin : sidebarItems.user;
+  const activeColor = showAdminItems ? 'purple' : 'blue';
 
   return (
     <aside
@@ -75,13 +75,13 @@ export default function Sidebar({ isAdminView }: SidebarProps) {
         {!collapsed && (
           <div className="min-w-0">
             <span className="text-[var(--text-primary)] font-bold text-sm tracking-wide block truncate">
-              {isAdminView ? 'ETL ADMIN' : 'ETL AUTOMATE'}
+              {showAdminItems ? 'ETL ADMIN' : 'ETL AUTOMATE'}
             </span>
             <div className={cn(
               'text-[10px] tracking-widest font-medium truncate',
-              isAdminView ? 'text-purple-400' : 'text-blue-400'
+              showAdminItems ? 'text-purple-400' : 'text-blue-400'
             )}>
-              {isAdminView ? 'ADMIN CONSOLE' : 'DATA PLATFORM'}
+              {showAdminItems ? 'ADMIN CONSOLE' : 'DATA PLATFORM'}
             </div>
           </div>
         )}
@@ -108,7 +108,7 @@ export default function Sidebar({ isAdminView }: SidebarProps) {
         )}
       </button>
 
-      {collapsed && isAdminView && (
+      {collapsed && showAdminItems && (
         <div className="flex justify-center py-2" aria-hidden="true">
           <div className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse" />
         </div>
@@ -166,32 +166,32 @@ export default function Sidebar({ isAdminView }: SidebarProps) {
           <div className="flex justify-center" aria-hidden="true">
             <div className={cn(
               'w-2 h-2 rounded-full animate-pulse',
-              isAdminView ? 'bg-purple-400' : 'bg-emerald-400'
+              showAdminItems ? 'bg-purple-400' : 'bg-emerald-400'
             )} />
           </div>
         ) : (
           <div className="flex items-start gap-2">
             <Cpu size={14} className={cn(
               'mt-0.5 flex-shrink-0',
-              isAdminView ? 'text-purple-400' : 'text-emerald-400'
+              showAdminItems ? 'text-purple-400' : 'text-emerald-400'
             )} aria-hidden="true" />
             <div className="min-w-0">
               <div className={cn(
                 'text-[10px] font-semibold tracking-wider truncate',
-                isAdminView ? 'text-purple-400' : 'text-emerald-400'
+                showAdminItems ? 'text-purple-400' : 'text-emerald-400'
               )}>
-                {isAdminView ? 'MODO ADMINISTRADOR' : 'SISTEMA OPERATIVO'}
+                {showAdminItems ? 'MODO ADMINISTRADOR' : 'SISTEMA OPERATIVO'}
               </div>
               <div className="text-[10px] text-[var(--text-muted)] mt-0.5 truncate">
-                {isAdminView ? 'Privilegios totales' : 'Motor ML Activo'}
+                {showAdminItems ? 'Privilegios totales' : 'Motor ML Activo'}
               </div>
               <div className="flex items-center gap-1.5 mt-1.5">
                 <div className={cn(
                   'w-1.5 h-1.5 rounded-full animate-pulse',
-                  isAdminView ? 'bg-purple-400' : 'bg-emerald-400'
+                  showAdminItems ? 'bg-purple-400' : 'bg-emerald-400'
                 )} aria-hidden="true" />
                 <span className="text-[9px] text-[var(--text-muted)] truncate">
-                  {isAdminView ? 'v3.0.0 — admin' : 'v2.4.1 — online'}
+                  {showAdminItems ? 'v3.0.0 — admin' : 'v2.4.1 — online'}
                 </span>
               </div>
             </div>

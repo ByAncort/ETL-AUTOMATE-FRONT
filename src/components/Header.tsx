@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Bell, Plus, Search, User, LogOut, X, Loader2, Sun, Moon } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
 function cn(...classes: (string | undefined | null | false)[]): string {
   return classes.filter(Boolean).join(' ');
 }
@@ -21,6 +22,7 @@ export default function Header({ title = 'ETL Automate', subtitle = 'Plataforma 
   const searchRef = useRef<HTMLInputElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const { theme, toggleTheme } = useTheme();
+  const { userData } = useAuth();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -178,8 +180,8 @@ export default function Header({ title = 'ETL Automate', subtitle = 'Plataforma 
               aria-label="Menú de usuario"
             >
               <div className="px-3 py-2.5 border-b border-[var(--border-color)]">
-                <p className="text-sm font-medium text-[var(--text-primary)] truncate">Usuario</p>
-                <p className="text-xs text-[var(--text-muted)] truncate">usuario@etlautomate.com</p>
+                <p className="text-sm font-medium text-[var(--text-primary)] truncate">{userData?.name || userData?.username || 'Usuario'}</p>
+                <p className="text-xs text-[var(--text-muted)] truncate">{userData?.email || 'usuario@etlautomate.com'}</p>
               </div>
               <button
                 onClick={handleLogout}

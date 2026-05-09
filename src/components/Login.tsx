@@ -116,107 +116,106 @@ function GlobeCanvas() {
 
     let time = 0;
 
-    const draw = () => {
-      if (!prefersReduced) time += 0.002;
+const draw = () => {
+  if (!prefersReduced) time += 0.002;
 
-      const W = canvas.width, H = canvas.height;
-      const cx = W / 2, cy = H / 2;
-      const R = Math.min(W, H) * 0.38;
-      const rot = time * 0.28;
+  const W = canvas.width, H = canvas.height;
+  const cx = W / 2, cy = H / 2;
+  const R = Math.min(W, H) * 0.38;
+  const rot = time * 0.28;
 
-      ctx.clearRect(0, 0, W, H);
+  ctx.clearRect(0, 0, W, H);
 
-      // Ambient halo
-      const halo = ctx.createRadialGradient(cx, cy, R * 0.3, cx, cy, R * 2.4);
-      halo.addColorStop(0, 'rgba(6,24,60,0.55)');
-      halo.addColorStop(0.5, 'rgba(6,20,45,0.18)');
-      halo.addColorStop(1, 'transparent');
-      ctx.fillStyle = halo;
-      ctx.fillRect(0, 0, W, H);
+  // Ambient halo
+  const halo = ctx.createRadialGradient(cx, cy, R * 0.3, cx, cy, R * 2.4);
+  halo.addColorStop(0, 'rgba(6,24,60,0.55)');
+  halo.addColorStop(0.5, 'rgba(6,20,45,0.18)');
+  halo.addColorStop(1, 'transparent');
+  ctx.fillStyle = halo;
+  ctx.fillRect(0, 0, W, H);
 
-      // Grid lines
-      ctx.lineWidth = 0.5;
-      ctx.strokeStyle = 'rgba(56,189,248,0.1)';
-      for (let lat = -75; lat <= 75; lat += 15) {
-        const r2 = R * Math.cos((lat * Math.PI) / 180);
-        const yOff = R * Math.sin((lat * Math.PI) / 180);
-        ctx.beginPath();
-        ctx.ellipse(cx, cy + yOff, r2, r2 * 0.22, 0, 0, Math.PI * 2);
-        ctx.stroke();
-      }
-      for (let lon = 0; lon < 360; lon += 20) {
-        ctx.beginPath();
-        ctx.ellipse(cx, cy, R, R * 0.22, (lon * Math.PI) / 180, 0, Math.PI * 2);
-        ctx.stroke();
-      }
+  // Grid lines
+  ctx.lineWidth = 0.5;
+  ctx.strokeStyle = 'rgba(56,189,248,0.1)';
+  for (let lat = -75; lat <= 75; lat += 15) {
+    const r2 = R * Math.cos((lat * Math.PI) / 180);
+    const yOff = R * Math.sin((lat * Math.PI) / 180);
+    ctx.beginPath();
+    ctx.ellipse(cx, cy + yOff, r2, r2 * 0.22, 0, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  for (let lon = 0; lon < 360; lon += 20) {
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, R, R * 0.22, (lon * Math.PI) / 180, 0, Math.PI * 2);
+    ctx.stroke();
+  }
 
-      // Globe base
+  // Globe base
+  ctx.beginPath();
+  ctx.arc(cx, cy, R, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(4,8,22,0.82)';
+  ctx.fill();
+  ctx.lineWidth = 1.5;
+  ctx.strokeStyle = 'rgba(56,189,248,0.18)';
+  ctx.stroke();
+
+  // Arcs
+  if (!prefersReduced) {
+    arcs.forEach((arc) => {
+      const s3 = rotateY(latLng(arc.s[0], arc.s[1], R), rot);
+      const e3 = rotateY(latLng(arc.e[0], arc.e[1], R), rot);
+      const ss = 1 + s3.z / (R * 1.5);
+      const es = 1 + e3.z / (R * 1.5);
+      const sx = cx + s3.x * ss, sy = cy + s3.y * ss;
+      const ex = cx + e3.x * es, ey = cy + e3.y * es;
+      const p = (arc.progress + time * 0.38) % 1;
+      const mx = (sx + ex) / 2;
+      const my = (sy + ey) / 2 - R * 0.45 * Math.sin(p * Math.PI);
+      const alpha = Math.sin(p * Math.PI) * 0.85;
+      const { r, g, b } = hexToRgb(arc.color);
       ctx.beginPath();
-      ctx.arc(cx, cy, R, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(4,8,22,0.82)';
-      ctx.fill();
+      ctx.strokeStyle = `rgba(${r},${g},${b},${alpha})`;
       ctx.lineWidth = 1.5;
-      ctx.strokeStyle = 'rgba(56,189,248,0.18)';
+      ctx.moveTo(sx, sy);
+      ctx.quadraticCurveTo(mx, my, ex, ey);
       ctx.stroke();
-
-      // Arcs
-      if (!prefersReduced) {
-        arcs.forEach((arc) => {
-          const s3 = rotateY(latLng(arc.s[0], arc.s[1], R), rot);
-          const e3 = rotateY(latLng(arc.e[0], arc.e[1], R), rot);
-          const ss = 1 + s3.z / (R * 1.5);
-          const es = 1 + e3.z / (R * 1.5);
-          const sx = cx + s3.x * ss, sy = cy + s3.y * ss;
-          const ex = cx + e3.x * es, ey = cy + e3.y * es;
-          const p = (arc.progress + time * 0.38) % 1;
-          const mx = (sx + ex) / 2;
-          const my = (sy + ey) / 2 - R * 0.45 * Math.sin(p * Math.PI);
-          const alpha = Math.sin(p * Math.PI) * 0.85;
-          const { r, g, b } = hexToRgb(arc.color);
-          ctx.beginPath();
-          ctx.strokeStyle = `rgba(${r},${g},${b},${alpha})`;
-          ctx.lineWidth = 1.5;
-          ctx.moveTo(sx, sy);
-          ctx.quadraticCurveTo(mx, my, ex, ey);
-          ctx.stroke();
-          if (p > 0.05 && p < 0.95) {
-            const t = p;
-            const px = (1 - t) * (1 - t) * sx + 2 * (1 - t) * t * mx + t * t * ex;
-            const py = (1 - t) * (1 - t) * sy + 2 * (1 - t) * t * my + t * t * ey;
-            ctx.beginPath();
-            ctx.fillStyle = arc.color;
-            ctx.arc(px, py, 2.5, 0, Math.PI * 2);
-            ctx.fill();
-          }
-        });
-      }
-
-      // City dots
-      GLOBE_POINTS.forEach((pt, i) => {
-        const p3 = rotateY(latLng(pt.lat, pt.lng, R), rot);
-        if (p3.z < -R * 0.5) return;
-        const sc = 1 + p3.z / (R * 1.5);
-        ctx.globalAlpha = 0.4 + sc * 0.5;
+      if (p > 0.05 && p < 0.95) {
+        const t = p;
+        const px = (1 - t) * (1 - t) * sx + 2 * (1 - t) * t * mx + t * t * ex;
+        const py = (1 - t) * (1 - t) * sy + 2 * (1 - t) * t * my + t * t * ey;
         ctx.beginPath();
-        ctx.fillStyle = DOT_COLORS[i % DOT_COLORS.length];
-        ctx.arc(cx + p3.x * sc, cy + p3.y * sc, 2.5 * sc, 0, Math.PI * 2);
+        ctx.fillStyle = arc.color;
+        ctx.arc(px, py, 2.5, 0, Math.PI * 2);
         ctx.fill();
-        ctx.globalAlpha = 1;
-      });
+      }
+    });
+  }
+ // City dots
+  GLOBE_POINTS.forEach((pt, i) => {
+    const p3 = rotateY(latLng(pt.lat, pt.lng, R), rot);
+    if (p3.z < -R * 0.5) return;
+    const sc = 1 + p3.z / (R * 1.5);
+    ctx.globalAlpha = 0.4 + sc * 0.5;
+    ctx.beginPath();
+    ctx.fillStyle = DOT_COLORS[i % DOT_COLORS.length];
+    ctx.arc(cx + p3.x * sc, cy + p3.y * sc, 2.5 * sc, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  });
 
-      // Edge glow
-      const edge = ctx.createRadialGradient(cx, cy, R * 0.75, cx, cy, R * 1.05);
-      edge.addColorStop(0, 'transparent');
-      edge.addColorStop(1, 'rgba(56,189,248,0.2)');
-      ctx.beginPath();
-      ctx.arc(cx, cy, R * 1.05, 0, Math.PI * 2);
-      ctx.fillStyle = edge;
-      ctx.fill();
+  // Edge glow
+  const edge = ctx.createRadialGradient(cx, cy, R * 0.75, cx, cy, R * 1.05);
+  edge.addColorStop(0, 'transparent');
+  edge.addColorStop(1, 'rgba(56,189,248,0.2)');
+  ctx.beginPath();
+  ctx.arc(cx, cy, R * 1.05, 0, Math.PI * 2);
+  ctx.fillStyle = edge;
+  ctx.fill();
 
-      rafRef.current = requestAnimationFrame(draw);
-    };
+  rafRef.current = requestAnimationFrame(draw);
+};
 
-    draw();
+draw();
 
     return () => {
       window.removeEventListener('resize', resize);

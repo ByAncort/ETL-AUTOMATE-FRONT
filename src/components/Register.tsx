@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Lock, User, ArrowRight, Mail } from 'lucide-react';
+import { Lock, User, ArrowRight, Mail, UserPlus } from 'lucide-react';
 import api from '../services/api';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -8,7 +8,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 const registerSchema = z.object({
   username: z.string().min(3, 'Mínimo 3 caracteres'),
   email: z.string().email('Debe ser un email válido'),
-  password: z.string().min(6, 'Mínimo 6 caracteres')
+  password: z.string().min(6, 'Mínimo 6 caracteres'),
+  firstName: z.string().min(1, 'Nombre requerido'),
+  lastName: z.string().min(1, 'Apellido requerido')
 });
 
 type RegisterForm = z.infer<typeof registerSchema>;
@@ -32,7 +34,7 @@ export default function Register({ onToggleForm }: Props) {
     setLoading(true);
     
     try {
-      await api.post('/api/v1/auth/register', data);
+      await api.post('/api/users/register', data);
       setSuccess('Usuario creado exitosamente. Ya puedes iniciar sesión.');
       setTimeout(() => {
         onToggleForm();
@@ -78,6 +80,36 @@ export default function Register({ onToggleForm }: Props) {
                   />
                 </div>
                 {errors.username && <p className="text-red-400 text-xs mt-1">{errors.username.message}</p>}
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-2">Nombre</label>
+                  <div className="relative">
+                    <UserPlus className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                    <input
+                      type="text"
+                      {...register('firstName')}
+                      placeholder="Juan"
+                      className="w-full pl-10 pr-4 py-3 bg-[#1a1f3a] border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    />
+                  </div>
+                  {errors.firstName && <p className="text-red-400 text-xs mt-1">{errors.firstName.message}</p>}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-2">Apellido</label>
+                  <div className="relative">
+                    <UserPlus className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                    <input
+                      type="text"
+                      {...register('lastName')}
+                      placeholder="Pérez"
+                      className="w-full pl-10 pr-4 py-3 bg-[#1a1f3a] border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    />
+                  </div>
+                  {errors.lastName && <p className="text-red-400 text-xs mt-1">{errors.lastName.message}</p>}
+                </div>
               </div>
 
               <div>

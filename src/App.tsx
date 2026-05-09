@@ -5,12 +5,23 @@ import DashboardPage from './pages/DashboardPage';
 import AdminPage from './pages/AdminPage';
 import ConnectionsPage from './pages/ConnectionsPage';
 import Layout from './components/Layout';
+import UsersManagement from './components/UsersManagement';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
   
   if (!isAuthenticated) {
     return <Navigate to="/auth" replace />;
+  }
+  
+  return <>{children}</>;
+}
+
+function AdminRoute({ children }: { children: React.ReactNode }) {
+  const { isAdmin } = useAuth();
+  
+  if (!isAdmin) {
+    return <Navigate to="/dashboard" replace />;
   }
   
   return <>{children}</>;
@@ -32,7 +43,16 @@ export default function App() {
       }>
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/dashboard/connections" element={<ConnectionsPage />} />
-        <Route path="/admin" element={<AdminPage />} />
+        <Route path="/admin" element={
+          <AdminRoute>
+            <AdminPage />
+          </AdminRoute>
+        } />
+        <Route path="/admin/users" element={
+          <AdminRoute>
+            <UsersManagement />
+          </AdminRoute>
+        } />
       </Route>
       
       <Route path="*" element={<Navigate to={isAuthenticated ? "/dashboard" : "/auth"} replace />} />

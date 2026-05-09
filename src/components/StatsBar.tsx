@@ -13,15 +13,15 @@ export default function StatsBar() {
       {stats.map((stat) => (
         <div
           key={stat.label}
-          className="flex items-center gap-3 bg-[#111827] border border-[#1e2936] rounded-xl px-4 py-3.5 hover:border-[#2a3a50] transition-all"
+          className="flex items-center gap-3 bg-[var(--card-bg)] border border-[var(--border-color)] rounded-xl px-4 py-3.5 hover:border-[var(--border-hover)] transition-all"
         >
-          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#0d1117] border border-[#2a3a50] flex-shrink-0">
+          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[var(--bg-tertiary)] border border-[var(--border-color)] flex-shrink-0">
             {stat.icon}
           </div>
           <div>
-            <div className="text-lg font-bold text-white leading-tight tabular-nums">{stat.value}</div>
-            <div className="text-[10px] text-gray-500 leading-tight">{stat.label}</div>
-            <div className="text-[10px] text-gray-600 mt-0.5">{stat.sub}</div>
+            <div className="text-lg font-bold text-[var(--text-primary)] leading-tight tabular-nums">{stat.value}</div>
+            <div className="text-[10px] text-[var(--text-muted)] leading-tight">{stat.label}</div>
+            <div className="text-[10px] text-[var(--text-muted)] mt-0.5 opacity-70">{stat.sub}</div>
           </div>
         </div>
       ))}

@@ -37,7 +37,7 @@ function ConfidenceBar({ value }: { value: number }) {
     value >= 75 ? '#fbbf24' : '#f87171';
 
   return (
-    <div className="w-12 h-1 bg-[#1a2535] rounded-full overflow-hidden">
+    <div className="w-12 h-1 bg-[var(--bg-tertiary)] rounded-full overflow-hidden">
       <div className="h-full rounded-full" style={{ width: `${value}%`, background: color }} />
     </div>
   );
@@ -46,10 +46,10 @@ function ConfidenceBar({ value }: { value: number }) {
 export default function SchemaMatcherModal({ onClose }: Props) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-      <div className="relative w-full max-w-2xl bg-[#111827] border border-[#1e2936] rounded-2xl shadow-2xl overflow-hidden">
+      <div className="relative w-full max-w-2xl bg-[var(--card-bg)] border border-[var(--border-color)] rounded-2xl shadow-2xl overflow-hidden">
         <div className="absolute inset-x-0 top-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(139,92,246,0.7), rgba(59,130,246,0.7), transparent)' }} />
 
-        <div className="flex items-center justify-between px-6 py-5 border-b border-[#1e2936]">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-[var(--border-color)]">
           <div className="flex items-center gap-3">
             <div
               className="flex items-center justify-center w-8 h-8 rounded-lg"
@@ -58,13 +58,13 @@ export default function SchemaMatcherModal({ onClose }: Props) {
               <GitMerge size={15} style={{ color: '#a78bfa' }} />
             </div>
             <div>
-              <h2 className="text-white font-semibold text-sm">Vista de Mapeo Inteligente</h2>
-              <p className="text-xs text-gray-500">Schema Matcher · IA Semántica</p>
+              <h2 className="text-[var(--text-primary)] font-semibold text-sm">Vista de Mapeo Inteligente</h2>
+              <p className="text-xs text-[var(--text-muted)]">Schema Matcher · IA Semántica</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#1a2535] border border-[#2a3a50] text-gray-400 hover:text-white transition-all"
+            className="flex items-center justify-center w-8 h-8 rounded-lg bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-all"
           >
             <X size={15} />
           </button>
@@ -73,14 +73,14 @@ export default function SchemaMatcherModal({ onClose }: Props) {
         <div className="px-6 py-4">
           <div className="grid grid-cols-[1fr_auto_1fr] gap-4 mb-4">
             <div className="text-center">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#0d1117] border border-[#2a3a50] text-xs font-semibold text-gray-300">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border-color)] text-xs font-semibold text-[var(--text-secondary)]">
                 <span className="w-2 h-2 rounded-full bg-blue-400" />
                 API A — HubSpot CRM
               </div>
             </div>
             <div />
             <div className="text-center">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#0d1117] border border-[#2a3a50] text-xs font-semibold text-gray-300">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border-color)] text-xs font-semibold text-[var(--text-secondary)]">
                 <span className="w-2 h-2 rounded-full bg-cyan-400" />
                 API B — ERP MockAPI
               </div>
@@ -90,10 +90,10 @@ export default function SchemaMatcherModal({ onClose }: Props) {
           <div className="space-y-2.5">
             {fieldMatches.map((match, i) => (
               <div key={i} className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
-                <div className="flex items-center justify-between bg-[#0d1117] border border-[#1e2936] rounded-lg px-3 py-2.5 group hover:border-blue-500/30 transition-all">
+                <div className="flex items-center justify-between bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg px-3 py-2.5 group hover:border-blue-500/30 transition-all">
                   <div>
-                    <code className="text-xs text-gray-200 font-mono">{match.fieldA}</code>
-                    <div className={`text-[10px] font-semibold mt-0.5 ${typeColor[match.typeA] ?? 'text-gray-400'}`}>{match.typeA}</div>
+                    <code className="text-xs text-[var(--text-primary)] font-mono">{match.fieldA}</code>
+                    <div className={`text-[10px] font-semibold mt-0.5 ${typeColor[match.typeA] ?? 'text-[var(--text-muted)]'}`}>{match.typeA}</div>
                   </div>
                 </div>
 
@@ -110,22 +110,22 @@ export default function SchemaMatcherModal({ onClose }: Props) {
                     <div className="flex-1 h-px bg-gradient-to-r from-blue-500/40 via-purple-500/60 to-cyan-500/40" />
                     <div className="absolute left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-purple-400" />
                   </div>
-                  <span className="text-[9px] text-gray-600">{match.method}</span>
+                  <span className="text-[9px] text-[var(--text-muted)]">{match.method}</span>
                 </div>
 
-                <div className="flex items-center justify-between bg-[#0d1117] border border-[#1e2936] rounded-lg px-3 py-2.5 group hover:border-cyan-500/30 transition-all">
+                <div className="flex items-center justify-between bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg px-3 py-2.5 group hover:border-cyan-500/30 transition-all">
                   <div>
-                    <code className="text-xs text-gray-200 font-mono">{match.fieldB}</code>
-                    <div className={`text-[10px] font-semibold mt-0.5 ${typeColor[match.typeB] ?? 'text-gray-400'}`}>{match.typeB}</div>
+                    <code className="text-xs text-[var(--text-primary)] font-mono">{match.fieldB}</code>
+                    <div className={`text-[10px] font-semibold mt-0.5 ${typeColor[match.typeB] ?? 'text-[var(--text-muted)]'}`}>{match.typeB}</div>
                   </div>
                 </div>
               </div>
             ))}
           </div>
 
-          <div className="mt-4 flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0d1117] border border-[#1e2936]">
+          <div className="mt-4 flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-color)]">
             <Sparkles size={13} style={{ color: '#a78bfa' }} />
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-[var(--text-secondary)]">
               <span style={{ color: '#a78bfa' }} className="font-semibold">5 coincidencias detectadas</span>
               {' '}— Usando Embeddings Semánticos (modelo <code className="font-mono">etl-embed-v2</code>) para análisis de campos en idiomas mixtos.
             </p>
@@ -134,7 +134,7 @@ export default function SchemaMatcherModal({ onClose }: Props) {
 
         <div className="flex gap-3 px-6 pb-5">
           <button
-            className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border text-sm font-semibold transition-all active:scale-[0.98] hover:bg-[#1a2535]"
+            className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border text-sm font-semibold transition-all active:scale-[0.98] hover:bg-[var(--bg-tertiary)]"
             style={{ borderColor: 'rgba(139,92,246,0.4)', color: '#a78bfa' }}
             onClick={onClose}
           >

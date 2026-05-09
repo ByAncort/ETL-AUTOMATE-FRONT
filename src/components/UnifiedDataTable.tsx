@@ -13,7 +13,7 @@ function ConfidenceBadge({ value }: { value: number }) {
 
   return (
     <div className="flex items-center gap-2">
-      <div className="w-20 h-1.5 bg-[#1a2535] rounded-full overflow-hidden">
+      <div className="w-20 h-1.5 bg-[var(--bg-tertiary)] rounded-full overflow-hidden">
         <div
           className="h-full rounded-full transition-all"
           style={{
@@ -35,15 +35,15 @@ function ConfidenceBadge({ value }: { value: number }) {
 
 export default function UnifiedDataTable({ records }: Props) {
   return (
-    <div className="bg-[#111827] border border-[#1e2936] rounded-xl overflow-hidden">
-      <div className="flex items-center justify-between px-5 py-4 border-b border-[#1e2936]">
+    <div className="bg-[var(--card-bg)] border border-[var(--border-color)] rounded-xl overflow-hidden">
+      <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border-color)]">
         <div className="flex items-center gap-2.5">
           <div className="flex items-center justify-center w-7 h-7 rounded-lg bg-blue-600/20 border border-blue-500/30">
             <Link2 size={14} className="text-blue-400" />
           </div>
           <div>
-            <h2 className="text-sm font-semibold text-white">Vista Previa de Registros Unificados</h2>
-            <p className="text-xs text-gray-500">Record Linkage · Motor ML</p>
+            <h2 className="text-sm font-semibold text-[var(--text-primary)]">Vista Previa de Registros Unificados</h2>
+            <p className="text-xs text-[var(--text-muted)]">Record Linkage · Motor ML</p>
           </div>
         </div>
         <div className="flex items-center gap-1.5 text-xs text-blue-400 bg-blue-600/10 border border-blue-500/20 px-2.5 py-1 rounded-lg">
@@ -55,9 +55,9 @@ export default function UnifiedDataTable({ records }: Props) {
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-[#1a2535]">
+            <tr className="border-b border-[var(--border-color)]">
               {['ID Unificado', 'Nombre Entidad', 'Origen A', 'Origen B', 'Confianza ML'].map((col) => (
-                <th key={col} className="px-5 py-3 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                <th key={col} className="px-5 py-3 text-left text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-wider whitespace-nowrap">
                   {col}
                 </th>
               ))}
@@ -67,20 +67,20 @@ export default function UnifiedDataTable({ records }: Props) {
             {records.map((record, i) => (
               <tr
                 key={record.unifiedId}
-                className={`border-b border-[#1a2535]/60 transition-colors ${
+                className={`border-b border-[var(--border-color)]/60 transition-colors ${
                   record.highlight
                     ? 'bg-blue-600/5 hover:bg-blue-600/10'
-                    : 'hover:bg-[#1a2535]/40'
+                    : 'hover:bg-[var(--bg-tertiary)]'
                 } ${i === records.length - 1 ? 'border-b-0' : ''}`}
               >
                 <td className="px-5 py-3.5">
-                  <code className="text-xs text-cyan-400 font-mono bg-cyan-950/30 px-1.5 py-0.5 rounded">
+                  <code className="text-xs text-cyan-400 font-mono bg-cyan-950/30 px-1.5 py-0.5 rounded dark:bg-cyan-950/50">
                     {record.unifiedId}
                   </code>
                 </td>
                 <td className="px-5 py-3.5">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-200 font-medium">{record.entityName}</span>
+                    <span className="text-sm text-[var(--text-primary)] font-medium">{record.entityName}</span>
                     {record.highlight && (
                       <span
                         className="text-[10px] font-semibold px-1.5 py-0.5 rounded"
@@ -92,10 +92,10 @@ export default function UnifiedDataTable({ records }: Props) {
                   </div>
                 </td>
                 <td className="px-5 py-3.5">
-                  <code className="text-xs text-gray-400 font-mono">{record.originA}</code>
+                  <code className="text-xs text-[var(--text-muted)] font-mono">{record.originA}</code>
                 </td>
                 <td className="px-5 py-3.5">
-                  <code className="text-xs text-gray-400 font-mono">{record.originB}</code>
+                  <code className="text-xs text-[var(--text-muted)] font-mono">{record.originB}</code>
                 </td>
                 <td className="px-5 py-3.5">
                   <ConfidenceBadge value={record.confidence} />

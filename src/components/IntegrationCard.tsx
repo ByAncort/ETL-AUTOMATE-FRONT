@@ -17,7 +17,7 @@ export default function IntegrationCard({ integration, onSchemaMatch }: Props) {
   const status = statusConfig[integration.status];
 
   return (
-    <div className="relative flex flex-col bg-[#111827] border border-[#1e2936] rounded-xl overflow-hidden hover:border-blue-500/30 transition-all group">
+    <div className="relative flex flex-col bg-[var(--card-bg)] border border-[var(--border-color)] rounded-xl overflow-hidden hover:border-blue-500/30 transition-all group">
       {integration.jsonPreview && (
         <div className="absolute inset-0 opacity-[0.035] pointer-events-none overflow-hidden font-mono text-[9px] text-blue-300 leading-4 p-3 break-all select-none">
           {integration.jsonPreview.repeat(6)}
@@ -27,10 +27,10 @@ export default function IntegrationCard({ integration, onSchemaMatch }: Props) {
       <div className="relative p-5 flex-1">
         <div className="flex items-start justify-between mb-3">
           <div>
-            <h3 className="text-white font-semibold text-sm leading-tight">{integration.name}</h3>
-            <p className="text-gray-500 text-xs mt-0.5">{integration.source}</p>
+            <h3 className="text-[var(--text-primary)] font-semibold text-sm leading-tight">{integration.name}</h3>
+            <p className="text-[var(--text-muted)] text-xs mt-0.5">{integration.source}</p>
           </div>
-          <div className={`flex items-center gap-1.5 px-2 py-1 rounded-full bg-[#0d1117] border ${status.border}`}>
+          <div className={`flex items-center gap-1.5 px-2 py-1 rounded-full bg-[var(--bg-tertiary)] border ${status.border}`}>
             <span className={`w-1.5 h-1.5 rounded-full ${status.bg} ${integration.status === 'active' ? 'animate-pulse' : ''}`} />
             <span className={`text-xs font-medium ${status.color}`}>{status.label}</span>
           </div>
@@ -50,11 +50,11 @@ export default function IntegrationCard({ integration, onSchemaMatch }: Props) {
         )}
 
         <div className="grid grid-cols-2 gap-2 mt-3">
-          <div className="flex items-center gap-1.5 text-xs text-gray-500">
+          <div className="flex items-center gap-1.5 text-xs text-[var(--text-muted)]">
             <Clock size={11} className="flex-shrink-0" />
             <span>{integration.lastRun}</span>
           </div>
-          <div className="flex items-center gap-1.5 text-xs text-gray-500">
+          <div className="flex items-center gap-1.5 text-xs text-[var(--text-muted)]">
             <Database size={11} className="flex-shrink-0" />
             <span>{integration.recordsProcessed} registros</span>
           </div>
@@ -74,7 +74,7 @@ export default function IntegrationCard({ integration, onSchemaMatch }: Props) {
           Ejecutar Ahora
         </button>
         <button
-          className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-[#1a2535] border border-[#2a3a50] text-gray-400 text-xs font-medium hover:bg-[#243045] hover:text-gray-200 transition-all active:scale-95"
+          className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-secondary)] text-xs font-medium hover:border-[var(--border-hover)] hover:text-[var(--text-primary)] transition-all active:scale-95"
           onClick={onSchemaMatch}
         >
           <Settings size={12} />

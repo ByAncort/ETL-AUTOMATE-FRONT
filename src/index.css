@@ -3,9 +3,44 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8fafc;
+    --bg-tertiary: #f1f5f9;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #94a3b8;
+    --border-color: #e2e8f0;
+    --border-hover: #cbd5e1;
+    --card-bg: #ffffff;
+    --accent-color: #0ea5e9;
+    --accent-hover: #0284c7;
+  }
+
+  .dark {
+    --bg-primary: #080d14;
+    --bg-secondary: #0d1117;
+    --bg-tertiary: #161b22;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --border-color: #21262d;
+    --border-hover: #30363d;
+    --card-bg: #0d1117;
+    --accent-color: #0ea5e9;
+    --accent-hover: #38bdf8;
+  }
+
+  html {
+    color-scheme: light dark;
+  }
+
   body {
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
 }

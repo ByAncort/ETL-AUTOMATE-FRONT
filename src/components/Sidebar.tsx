@@ -1,5 +1,5 @@
-// components/Sidebar.tsx
 import { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
   Plug,
@@ -13,49 +13,74 @@ import {
   FileText,
   Activity,
   Shield,
+  ExternalLink,
 } from 'lucide-react';
+function cn(...classes: (string | undefined | null | false)[]): string {
+  return classes.filter(Boolean).join(' ');
+}
 
 interface SidebarProps {
   isAdminView: boolean;
 }
 
+const sidebarItems = {
+  admin: [
+    { icon: LayoutDashboard, label: 'Dashboard Admin', path: '/admin' },
+    { icon: Users, label: 'Gestión Usuarios', path: '/admin/users' },
+    { icon: Plug, label: 'Integraciones', path: '/admin/integrations' },
+    { icon: Activity, label: 'Monitoreo', path: '/admin/monitoring' },
+    { icon: FileText, label: 'Logs Sistema', path: '/admin/logs' },
+    { icon: Shield, label: 'Seguridad', path: '/admin/security' },
+    { icon: Settings, label: 'Configuración', path: '/admin/settings' },
+  ],
+  user: [
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
+    { icon: Plug, label: 'Conexiones', path: '/dashboard/connections' },
+    { icon: Database, label: 'Explorador de Datos', path: '/dashboard/explorer' },
+    { icon: Settings, label: 'Configuración', path: '/dashboard/settings' },
+  ],
+};
+
 export default function Sidebar({ isAdminView }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
+  const [isHoveringToggle, setIsHoveringToggle] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  // Items según el modo (usuario normal vs administrador)
-  const navItems = isAdminView
-    ? [
-        { icon: <LayoutDashboard size={20} />, label: 'Dashboard Admin', active: true },
-        { icon: <Users size={20} />, label: 'Gestión Usuarios', active: false },
-        { icon: <Plug size={20} />, label: 'Integraciones', active: false },
-        { icon: <Activity size={20} />, label: 'Monitoreo', active: false },
-        { icon: <FileText size={20} />, label: 'Logs Sistema', active: false },
-        { icon: <Shield size={20} />, label: 'Seguridad', active: false },
-        { icon: <Settings size={20} />, label: 'Configuración', active: false },
-      ]
-    : [
-        { icon: <LayoutDashboard size={20} />, label: 'Dashboard', active: true },
-        { icon: <Plug size={20} />, label: 'Conexiones', active: false },
-        { icon: <Database size={20} />, label: 'Explorador de Datos', active: false },
-        { icon: <Settings size={20} />, label: 'Configuración', active: false },
-      ];
+  const navItems = isAdminView ? sidebarItems.admin : sidebarItems.user;
+  const activeColor = isAdminView ? 'purple' : 'blue';
 
   return (
     <aside
-      className={`relative flex flex-col h-screen bg-[#0d1117] border-r border-[#1e2936] transition-all duration-300 ${
-        collapsed ? 'w-16' : 'w-60'
-      }`}
+      className={cn(
+        'relative flex flex-col h-screen bg-[var(--bg-secondary)] border-r border-[var(--border-color)] transition-all duration-300',
+        'focus-within:ring-2 focus-within:ring-blue-500/50'
+      )}
+      role="navigation"
+      aria-label="Navegación principal"
     >
-      <div className={`flex items-center gap-3 px-4 py-5 border-b border-[#1e2936] ${collapsed ? 'justify-center' : ''}`}>
-        <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-400 flex-shrink-0">
-          <Zap size={16} className="text-white" />
+      <div 
+        className={cn(
+          'flex items-center gap-3 px-4 py-4 border-b border-[var(--border-color)]',
+          collapsed ? 'justify-center px-2' : ''
+        )}
+      >
+        <div 
+          className="flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-400 shadow-lg shadow-blue-500/25 flex-shrink-0"
+          role="img"
+          aria-label="ETL Automate"
+        >
+          <Zap size={18} className="text-white" aria-hidden="true" />
         </div>
         {!collapsed && (
-          <div>
-            <span className="text-white font-bold text-sm tracking-wider">
+          <div className="min-w-0">
+            <span className="text-[var(--text-primary)] font-bold text-sm tracking-wide block truncate">
               {isAdminView ? 'ETL ADMIN' : 'ETL AUTOMATE'}
             </span>
-            <div className={`text-[10px] tracking-widest font-medium ${isAdminView ? 'text-purple-400' : 'text-blue-400'}`}>
+            <div className={cn(
+              'text-[10px] tracking-widest font-medium truncate',
+              isAdminView ? 'text-purple-400' : 'text-blue-400'
+            )}>
               {isAdminView ? 'ADMIN CONSOLE' : 'DATA PLATFORM'}
             </div>
           </div>
@@ -64,57 +89,108 @@ export default function Sidebar({ isAdminView }: SidebarProps) {
 
       <button
         onClick={() => setCollapsed(!collapsed)}
-        className="absolute -right-3 top-14 z-10 flex items-center justify-center w-6 h-6 rounded-full bg-[#1a2535] border border-[#2a3a50] text-gray-400 hover:text-white hover:bg-[#243045] transition-all"
+        onMouseEnter={() => setIsHoveringToggle(true)}
+        onMouseLeave={() => setIsHoveringToggle(false)}
+        className={cn(
+          'absolute -right-3 top-[4.5rem] z-20 flex items-center justify-center w-6 h-6 rounded-full',
+          'bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-muted)]',
+          'hover:text-[var(--text-primary)] hover:border-[var(--border-hover)] transition-all duration-200',
+          'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-[var(--bg-secondary)]',
+          isHoveringToggle && 'scale-110'
+        )}
+        aria-label={collapsed ? 'Expandir sidebar' : 'Colapsar sidebar'}
+        aria-expanded={!collapsed}
       >
-        {collapsed ? <ChevronRight size={12} /> : <ChevronLeft size={12} />}
+        {collapsed ? (
+          <ChevronRight size={12} aria-hidden="true" />
+        ) : (
+          <ChevronLeft size={12} aria-hidden="true" />
+        )}
       </button>
 
-      {/* Badge de modo admin cuando está colapsado */}
       {collapsed && isAdminView && (
-        <div className="flex justify-center mt-2">
+        <div className="flex justify-center py-2" aria-hidden="true">
           <div className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse" />
         </div>
       )}
 
-      <nav className="flex-1 px-2 py-4 space-y-1">
-        {navItems.map((item) => (
-          <button
-            key={item.label}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all group ${
-              item.active
-                ? isAdminView
-                  ? 'bg-purple-600/20 text-purple-400 border border-purple-500/30'
-                  : 'bg-blue-600/20 text-blue-400 border border-blue-500/30'
-                : 'text-gray-400 hover:bg-[#1a2535] hover:text-gray-200'
-            } ${collapsed ? 'justify-center' : ''}`}
-            title={collapsed ? item.label : undefined}
-          >
-            <span className="flex-shrink-0">{item.icon}</span>
-            {!collapsed && (
-              <span className="text-sm font-medium">{item.label}</span>
-            )}
-          </button>
-        ))}
+      <nav className="flex-1 px-2 py-3 space-y-1 overflow-y-auto">
+        {navItems.map((item) => {
+          const isActive = location.pathname === item.path || 
+            (item.path !== '/dashboard' && item.path !== '/admin' && location.pathname.startsWith(item.path));
+          const IconComponent = item.icon;
+          
+          return (
+            <button
+              key={item.path}
+              onClick={() => navigate(item.path)}
+              className={cn(
+                'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group',
+                'focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-2 focus:ring-offset-[var(--bg-secondary)]',
+                isActive
+                  ? activeColor === 'purple'
+                    ? 'bg-purple-500/15 text-purple-400 border border-purple-500/30 shadow-sm shadow-purple-500/10'
+                    : 'bg-blue-500/15 text-blue-400 border border-blue-500/30 shadow-sm shadow-blue-500/10'
+                  : 'text-[var(--text-muted)] hover:bg-[var(--bg-tertiary)] hover:text-[var(--text-primary)]',
+                collapsed ? 'justify-center px-2' : ''
+              )}
+              aria-current={isActive ? 'page' : undefined}
+              title={collapsed ? item.label : undefined}
+            >
+              <IconComponent 
+                size={20} 
+                className={cn(
+                  'flex-shrink-0 transition-colors duration-200',
+                  isActive 
+                    ? activeColor === 'purple' ? 'text-purple-400' : 'text-blue-400'
+                    : 'text-[var(--text-muted)] group-hover:text-[var(--text-secondary)]'
+                )}
+                aria-hidden="true"
+              />
+              {!collapsed && (
+                <span className="text-sm font-medium truncate">{item.label}</span>
+              )}
+              {isActive && !collapsed && (
+                <ExternalLink size={12} className="ml-auto text-gray-500" aria-hidden="true" />
+              )}
+            </button>
+          );
+        })}
       </nav>
 
-      <div className={`px-3 py-4 border-t border-[#1e2936] ${collapsed ? 'items-center' : ''}`}>
+      <div className={cn(
+        'px-3 py-4 border-t border-[var(--border-color)]',
+        collapsed ? 'items-center' : ''
+      )}>
         {collapsed ? (
-          <div className="flex justify-center">
-            <div className={`w-2 h-2 rounded-full animate-pulse ${isAdminView ? 'bg-purple-400' : 'bg-emerald-400'}`} />
+          <div className="flex justify-center" aria-hidden="true">
+            <div className={cn(
+              'w-2 h-2 rounded-full animate-pulse',
+              isAdminView ? 'bg-purple-400' : 'bg-emerald-400'
+            )} />
           </div>
         ) : (
           <div className="flex items-start gap-2">
-            <Cpu size={14} className={`${isAdminView ? 'text-purple-400' : 'text-emerald-400'} mt-0.5 flex-shrink-0`} />
-            <div>
-              <div className={`text-[10px] font-semibold tracking-wider ${isAdminView ? 'text-purple-400' : 'text-emerald-400'}`}>
+            <Cpu size={14} className={cn(
+              'mt-0.5 flex-shrink-0',
+              isAdminView ? 'text-purple-400' : 'text-emerald-400'
+            )} aria-hidden="true" />
+            <div className="min-w-0">
+              <div className={cn(
+                'text-[10px] font-semibold tracking-wider truncate',
+                isAdminView ? 'text-purple-400' : 'text-emerald-400'
+              )}>
                 {isAdminView ? 'MODO ADMINISTRADOR' : 'SISTEMA OPERATIVO'}
               </div>
-              <div className="text-[10px] text-gray-500 mt-0.5">
+              <div className="text-[10px] text-[var(--text-muted)] mt-0.5 truncate">
                 {isAdminView ? 'Privilegios totales' : 'Motor ML Activo'}
               </div>
               <div className="flex items-center gap-1.5 mt-1.5">
-                <div className={`w-1.5 h-1.5 rounded-full animate-pulse ${isAdminView ? 'bg-purple-400' : 'bg-emerald-400'}`} />
-                <span className="text-[9px] text-gray-500">
+                <div className={cn(
+                  'w-1.5 h-1.5 rounded-full animate-pulse',
+                  isAdminView ? 'bg-purple-400' : 'bg-emerald-400'
+                )} aria-hidden="true" />
+                <span className="text-[9px] text-[var(--text-muted)] truncate">
                   {isAdminView ? 'v3.0.0 — admin' : 'v2.4.1 — online'}
                 </span>
               </div>
@@ -122,6 +198,12 @@ export default function Sidebar({ isAdminView }: SidebarProps) {
           </div>
         )}
       </div>
+      <style>{`
+        @media (prefers-reduced-motion: reduce) {
+          .animate-pulse { animation: none; }
+          .transition-all { transition: none; }
+        }
+      `}</style>
     </aside>
   );
 }

@@ -46,8 +46,8 @@ export default function Register({ onToggleForm }: Props) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#080d14] via-[#0f172a] to-[#1a1f3a] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop')] opacity-5 bg-cover bg-center" />
+    <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop')] opacity-5 bg-cover bg-center dark:opacity-5 opacity-[0.03]" />
       
       <div className="relative w-full max-w-md">
         <div className="text-center mb-8">

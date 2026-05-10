@@ -12,10 +12,12 @@ interface AuthContextType {
   isAuthenticated: boolean;
   token: string | null;
   isAdmin: boolean;
+  viewAdmin: boolean;
   username: string | null;
   userData: UserData | null;
   login: (token: string) => void;
   logout: () => void;
+  setViewAdmin: (value: boolean) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -44,6 +46,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [token, setToken] = useState<string | null>(storedToken);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(!!storedToken);
   const [isAdmin, setIsAdmin] = useState<boolean>(initialAdmin);
+  const [viewAdmin, setViewAdmin] = useState<boolean>(initialAdmin);
   const [userData, setUserData] = useState<UserData | null>(null);
 
   const fetchUserData = async (username: string, authToken: string) => {
@@ -102,7 +105,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, token, isAdmin, username: storedUsername, userData, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, token, isAdmin, viewAdmin, username: storedUsername, userData, login, logout, setViewAdmin }}>
       {children}
     </AuthContext.Provider>
   );

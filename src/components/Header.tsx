@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Bell, Plus, Search, User, LogOut, X, Loader2, Sun, Moon, Shield } from 'lucide-react';
+import { Bell, Plus, Search, User, LogOut, X, Loader2, Sun, Moon, Shield, ShieldOff } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 function cn(...classes: (string | undefined | null | false)[]): string {
@@ -185,7 +185,7 @@ export default function Header({ title = 'ETL Automate', subtitle = 'Plataforma 
               </div>
               {isAdmin && (
                 <button
-                  onClick={() => setViewAdmin(!viewAdmin)}
+                  onClick={() => { setViewAdmin(!viewAdmin); setShowUserMenu(false); }}
                   className={cn(
                     'w-full flex items-center gap-2 px-3 py-2.5 text-sm',
                     viewAdmin
@@ -195,8 +195,8 @@ export default function Header({ title = 'ETL Automate', subtitle = 'Plataforma 
                   )}
                   role="menuitem"
                 >
-                  <Shield size={14} aria-hidden="true" />
-                  <span>{viewAdmin ? 'Ocultar Admin' : 'Ver Admin'}</span>
+                  {viewAdmin ? <ShieldOff size={14} aria-hidden="true" /> : <Shield size={14} aria-hidden="true" />}
+                  <span>{viewAdmin ? 'Salir del Admin' : 'Ver Panel Admin'}</span>
                 </button>
               )}
               <button

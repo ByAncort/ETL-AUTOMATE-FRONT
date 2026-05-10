@@ -15,6 +15,7 @@ import {
   Activity,
   Shield,
   ExternalLink,
+  GitMerge,
 } from 'lucide-react';
 function cn(...classes: (string | undefined | null | false)[]): string {
   return classes.filter(Boolean).join(' ');
@@ -27,14 +28,14 @@ const sidebarItems = {
     { icon: Plug, label: 'Integraciones', path: '/admin/integrations' },
     { icon: Activity, label: 'Monitoreo', path: '/admin/monitoring' },
     { icon: FileText, label: 'Logs Sistema', path: '/admin/logs' },
-    { icon: Shield, label: 'Seguridad', path: '/admin/security' },
+    // { icon: Shield, label: 'Seguridad', path: '/admin/security' },
     { icon: Settings, label: 'Configuración', path: '/admin/settings' },
   ],
-  user: [
+user: [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
     { icon: Plug, label: 'Conexiones', path: '/dashboard/connections' },
+    { icon: GitMerge, label: 'Integraciones', path: '/dashboard/integrations' },
     { icon: Database, label: 'Explorador de Datos', path: '/dashboard/explorer' },
-    { icon: Settings, label: 'Configuración', path: '/dashboard/settings' },
   ],
 };
 

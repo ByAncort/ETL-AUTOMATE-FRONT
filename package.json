@@ -13,9 +13,10 @@
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
     "@supabase/supabase-js": "^2.57.4",
+    "@types/three": "^0.184.1",
     "axios": "^1.16.0",
     "clsx": "^2.1.1",
-    "lucide-react": "^0.344.0",
+    "lucide-react": "^1.14.0",
     "motion": "^12.38.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
@@ -23,6 +24,7 @@
     "react-router-dom": "^7.15.0",
     "simplex-noise": "^4.0.3",
     "tailwind-merge": "^3.5.0",
+    "three": "^0.184.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {

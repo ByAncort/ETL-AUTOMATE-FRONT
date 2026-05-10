@@ -1,17 +1,16 @@
 import { useState, useEffect, useRef } from 'react';
-import { Lock, Mail, ArrowRight, Eye, EyeOff } from 'lucide-react';
+import { Lock, Mail, ArrowRight, Eye, EyeOff, User } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-
+import * as THREE from 'three';
+import cobeTextureUrl from '../assets/cobe-texture.png';
 // ─── Validation ───────────────────────────────────────────────────────────────
 
 const loginSchema = z.object({
-  username: z
-    .string()
-    .min(1, 'El nombre de usuario es requerido'),
+  username: z.string().min(1, 'El nombre de usuario es requerido'),
   password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres'),
 });
 
@@ -21,397 +20,359 @@ interface Props {
   onToggleForm?: () => void;
 }
 
-// ─── Globe data ───────────────────────────────────────────────────────────────
+// ─── Constants ────────────────────────────────────────────────────────────────
 
-const GLOBE_POINTS = [
-  { lat: 22.3193, lng: 114.1694 }, { lat: 28.6139, lng: 77.209 },
-  { lat: -1.3034, lng: 36.8524 }, { lat: 35.6762, lng: 139.6503 },
-  { lat: 51.5072, lng: -0.1276 }, { lat: 36.1628, lng: -115.1194 },
-  { lat: -33.8688, lng: 151.2093 }, { lat: 21.3099, lng: -157.8581 },
-  { lat: -6.2088, lng: 106.8456 }, { lat: 11.9866, lng: 8.5718 },
-  { lat: -34.6037, lng: -58.3816 }, { lat: 48.8566, lng: 2.3522 },
-  { lat: 14.5995, lng: 120.9842 }, { lat: 34.0522, lng: -118.2437 },
-  { lat: 37.5665, lng: 126.978 }, { lat: 41.9028, lng: 12.4964 },
-  { lat: 31.2304, lng: 121.4737 }, { lat: 49.2827, lng: -123.1207 },
-  { lat: 52.52, lng: 13.405 }, { lat: -22.9068, lng: -43.1729 },
+const GLOBE_RADIUS  = 150;
+const DEG2RAD       = Math.PI / 180;
+const DOT_DENSITY   = 9;        // dots per unit of circumference
+const DOT_ROWS      = 180;
+const DOT_SIZE      = 1;
+const DOT_SEGMENTS  = 5;
+const ROTATION_SPEED = 0.0006;  // rad/frame
+
+// Arc data: [fromLat, fromLng, toLat, toLng]
+const ARC_DATA: [number, number, number, number][] = [
+  [ 22.32,  114.17, -33.87,  151.21],  // HK → Sydney
+  [ 28.61,   77.21,  51.51,   -0.13],  // Delhi → London
+  [-33.87,  151.21,  34.05, -118.24],  // Sydney → LA
+  [ 51.51,   -0.13,  14.60,  120.98],  // London → Manila
+  [ 21.31, -157.86,  40.71,  -74.01],  // Honolulu → NY
+  [-34.60,  -58.38,  22.32,  114.17],  // Buenos Aires → HK
+  [ 11.99,    8.57, -22.91,  -43.17],  // Kano → Rio
+  [ 37.57,  126.98,  35.68,  139.65],  // Seoul → Tokyo
+  [ 52.52,   13.41,  34.05, -118.24],  // Berlin → LA
+  [ 48.86,    2.35,  34.05, -118.24],  // Paris → LA
+  [ 49.28, -123.12,  52.52,   13.41],  // Vancouver → Berlin
+  [ 31.23,  121.47,  34.05, -118.24],  // Shanghai → LA
+  [ 41.90,   12.50,  48.86,    2.35],  // Rome → Paris
+  [ 14.60,  120.98,  51.51,   -0.13],  // Manila → London
+  [-22.91,  -43.17,  28.61,   77.21],  // Rio → Delhi
 ];
 
-const ARC_DATA = [
-  { s: [22.3193, 114.1694], e: [-33.8688, 151.2093] },
-  { s: [28.6139, 77.209], e: [51.5072, -0.1276] },
-  { s: [-33.8688, 151.2093], e: [34.0522, -118.2437] },
-  { s: [51.5072, -0.1276], e: [14.5995, 120.9842] },
-  { s: [-15.4326, 28.3159], e: [36.1628, -115.1194] },
-  { s: [21.3099, -157.8581], e: [40.7128, -74.006] },
-  { s: [11.9866, 8.5718], e: [-22.9068, -43.1729] },
-  { s: [-34.6037, -58.3816], e: [22.3193, 114.1694] },
-  { s: [14.5995, 120.9842], e: [51.5072, -0.1276] },
-  { s: [34.0522, -118.2437], e: [48.8566, 2.3522] },
-  { s: [37.5665, 126.978], e: [35.6762, 139.6503] },
-  { s: [52.52, 13.405], e: [34.0522, -118.2437] },
-  { s: [49.2827, -123.1207], e: [52.52, 13.405] },
-  { s: [22.3193, 114.1694], e: [-22.9068, -43.1729] },
-  { s: [-22.9068, -43.1729], e: [28.6139, 77.209] },
-  { s: [31.2304, 121.4737], e: [34.0522, -118.2437] },
-  { s: [41.9028, 12.4964], e: [48.8566, 2.3522] },
+// City markers [lat, lng]
+const MARKERS: [number, number][] = [
+  [ 22.32,  114.17], [ 28.61,   77.21], [ -1.30,   36.85],
+  [ 35.68,  139.65], [ 51.51,   -0.13], [ 36.16, -115.12],
+  [-33.87,  151.21], [ 21.31, -157.86], [ -6.21,  106.85],
+  [ 11.99,    8.57], [-34.60,  -58.38], [ 48.86,    2.35],
+  [ 14.60,  120.98], [ 34.05, -118.24], [ 37.57,  126.98],
+  [ 41.90,   12.50], [ 31.23,  121.47], [ 49.28, -123.12],
+  [ 52.52,   13.41], [-22.91,  -43.17],
 ];
 
-const ARC_COLORS = ['#38bdf8', '#818cf8', '#6366f1', '#06b6d4', '#a78bfa'];
-const DOT_COLORS = ['#38bdf8', '#818cf8', '#34d399'];
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function hexToRgb(hex: string) {
-  const h = hex.replace('#', '');
-  return {
-    r: parseInt(h.substring(0, 2), 16),
-    g: parseInt(h.substring(2, 4), 16),
-    b: parseInt(h.substring(4, 6), 16),
-  };
-}
-const CONTINENT_DOTS: [number, number][] = [
-  // ── Norteamérica (costa oeste → este, aprox.) ────────
-  [65, -168], [64, -162], [62, -156], [60, -150], [58, -144],
-  [56, -138], [54, -134], [50, -128], [46, -124], [42, -124],
-  [38, -123], [34, -120], [30, -116], [26, -112], [22, -110],
-  [18, -105], [20, -98], [22, -92], [26, -86], [28, -82],
-  [30, -80], [32, -78], [34, -76], [36, -75], [38, -74],
-  [40, -73], [42, -70], [44, -68], [46, -64], [48, -60],
-  [50, -56], [52, -54], [54, -56], [56, -58], [58, -60],
-  [60, -64], [62, -68], [64, -72], [66, -76], [68, -84],
-  [70, -92], [72, -104], [72, -120], [70, -140], [68, -156],
-  [66, -164],
-  // Interior NA
-  [62, -150], [60, -140], [58, -130], [55, -120], [52, -110],
-  [50, -100], [48, -95], [46, -90], [44, -85], [42, -82],
-  [40, -85], [38, -90], [36, -95], [34, -100], [32, -105],
-  [30, -110], [35, -108], [38, -100], [42, -95], [46, -95],
-  [50, -92], [55, -100], [58, -105], [60, -110], [62, -120],
-
-  // ── Sudamérica ───────────────────────────────────────
-  [12, -72], [10, -75], [8, -77], [6, -77], [4, -77],
-  [2, -76], [0, -76], [-2, -76], [-4, -76], [-6, -76],
-  [-8, -77], [-10, -77], [-12, -77], [-14, -76], [-16, -74],
-  [-18, -72], [-20, -70], [-22, -68], [-24, -66], [-26, -64],
-  [-28, -62], [-30, -58], [-32, -54], [-34, -56], [-34, -58],
-  [-32, -60], [-30, -62], [-28, -64], [-26, -66], [-24, -68],
-  [-22, -70], [-20, -72], [-18, -74], [-16, -76], [-14, -76],
-  [-12, -74], [-10, -72], [-8, -70], [-6, -68], [-4, -66],
-  [-2, -64], [0, -62], [2, -60], [4, -58], [6, -56],
-  [8, -54], [10, -56], [12, -60], [10, -65],
-  // Interior SA
-  [8, -65], [5, -60], [0, -55], [-5, -50], [-10, -48],
-  [-15, -48], [-20, -50], [-25, -52], [-28, -55], [-30, -58],
-  [-25, -58], [-20, -58], [-15, -56], [-10, -55], [-5, -56],
-  [0, -60], [5, -62],
-
-  // ── Europa ───────────────────────────────────────────
-  [36, -5], [37, -1], [38, 0], [39, 2], [40, 3],
-  [41, 6], [42, 8], [43, 10], [44, 12], [45, 14],
-  [46, 18], [46, 22], [46, 26], [46, 30], [45, 34],
-  [44, 38], [42, 40], [40, 38], [38, 36], [36, 34],
-  [36, 30], [35, 26], [36, 22], [36, 18], [37, 14],
-  [36, 10], [36, 6], [36, 2], [36, -2],
-  // Interior EU
-  [42, 2], [44, 8], [46, 12], [48, 10], [50, 8],
-  [52, 6], [54, 10], [52, 14], [50, 16], [48, 18],
-  [46, 20], [44, 22], [42, 24], [40, 22], [42, 18],
-  [44, 14], [46, 10], [44, 6], [42, 4],
-
-  // ── África ───────────────────────────────────────────
-  [36, -2], [34, -4], [32, -8], [30, -10], [28, -12],
-  [26, -14], [24, -16], [22, -16], [20, -16], [18, -16],
-  [16, -16], [14, -16], [12, -16], [10, -14], [8, -12],
-  [6, -10], [4, -8], [2, -6], [0, 6], [-2, 14],
-  [-4, 22], [-6, 30], [-8, 36], [-10, 40], [-12, 42],
-  [-14, 42], [-16, 40], [-18, 36], [-20, 32], [-22, 28],
-  [-24, 24], [-26, 20], [-28, 16], [-30, 14], [-32, 16],
-  [-34, 18], [-34, 20], [-32, 20], [-30, 22], [-30, 24],
-  [-28, 26], [-26, 28], [-24, 28], [-22, 30], [-20, 32],
-  [-18, 34], [-16, 36], [-14, 38], [-12, 42], [-10, 44],
-  [-8, 46], [-6, 48], [-4, 50], [0, 50], [2, 50],
-  [4, 48], [6, 46], [8, 44], [10, 42], [12, 44],
-  [14, 42], [16, 40], [18, 36], [20, 32], [22, 28],
-  [24, 24], [26, 20], [28, 16], [30, 14], [32, 14],
-  [34, 10], [36, 6], [36, 2],
-  // Interior AF
-  [30, 0], [25, 0], [20, 5], [15, 10], [10, 15],
-  [5, 20], [0, 25], [-5, 28], [-10, 30], [-15, 28],
-  [-20, 25], [-25, 22], [-28, 20], [-28, 24], [-22, 28],
-  [-16, 30], [-10, 30], [-4, 28], [2, 24], [8, 20],
-  [14, 16], [20, 10], [26, 5], [30, 5],
-
-  // ── Asia ────────────────────────────────────────────
-  [42, 42], [44, 44], [46, 48], [46, 54], [48, 60],
-  [50, 68], [54, 72], [56, 80], [58, 88], [60, 100],
-  [62, 120], [64, 140], [66, 160], [68, 180], [66, -170],
-  [64, -165], [62, -162], [60, -160], [56, -162], [54, -160],
-  [50, -155], [48, -150], [44, -145], [42, -140], [38, -136],
-  [36, -130], [34, -128], [32, -126], [30, -124], [28, -120],
-  [26, -118], [24, -116], [22, -114], [20, -110], [18, -106],
-  [16, -100], [14, -94], [12, -88], [10, -82], [8, -78],
-  [6, -74], [4, -72], [2, -68], [0, -64], [-2, -60],
-  [-4, -56], [-6, -50], [-8, -46], [-4, -42], [0, -38],
-  [4, -36], [8, -34], [12, -32], [16, -28], [20, -24],
-  [24, -22], [28, -20], [32, -18], [36, -14], [38, -10],
-  [40, -6], [42, -2], [42, 6], [44, 14], [44, 22],
-  [44, 30], [44, 38],
-  // Interior AS
-  [50, 50], [54, 60], [58, 70], [60, 80], [62, 90],
-  [62, 100], [60, 110], [58, 115], [54, 110], [50, 100],
-  [48, 90], [46, 80], [44, 70], [42, 60], [40, 50],
-  [38, 38], [40, 40], [44, 46], [48, 52], [52, 58],
-  [56, 64], [58, 60], [56, 54], [52, 48], [48, 44],
-  [44, 42], [46, 50], [50, 56], [54, 62], [52, 60],
-
-  // ── Oceanía / Australia ─────────────────────────────
-  [-12, 130], [-14, 128], [-16, 126], [-18, 124], [-20, 122],
-  [-22, 124], [-24, 128], [-26, 132], [-28, 136], [-30, 140],
-  [-32, 144], [-34, 146], [-36, 146], [-38, 144], [-38, 140],
-  [-36, 138], [-34, 136], [-32, 134], [-30, 132], [-28, 130],
-  [-26, 128], [-24, 126], [-22, 124], [-20, 122], [-18, 124],
-  [-16, 126], [-14, 128], [-12, 130],
-  // Interior AU
-  [-18, 130], [-22, 130], [-24, 132], [-26, 134], [-28, 136],
-  [-30, 138], [-32, 140], [-33, 142], [-30, 142], [-28, 140],
-  [-26, 138], [-24, 136], [-22, 134], [-20, 132], [-18, 132],
-
-  // ── Japón / Islas ───────────────────────────────────
-  [42, 140], [40, 140], [38, 140], [36, 138], [34, 136],
-  [32, 134], [30, 132], [32, 132], [34, 134], [36, 136],
-  [38, 138], [40, 138],
-
-  // ── UK / Irlanda ────────────────────────────────────
-  [50, -6], [52, -4], [54, -2], [56, -2], [58, -4],
-  [56, -6], [54, -6], [52, -6], [50, -6],
-
-  // ── Madagascar ──────────────────────────────────────
-  [-12, 48], [-14, 48], [-16, 48], [-18, 48], [-20, 46],
-  [-22, 44], [-24, 44], [-26, 44], [-24, 46], [-22, 46],
-  [-20, 46], [-18, 48], [-16, 48], [-14, 48],
-
-  // ── Nueva Zelanda ───────────────────────────────────
-  [-34, 172], [-36, 174], [-38, 176], [-40, 174], [-42, 172],
-  [-42, 170], [-40, 168], [-38, 170], [-36, 170],
-  [-44, 168], [-46, 168], [-46, 166], [-44, 166],
-];
-
-// ─── Globe canvas ─────────────────────────────────────────────────────────────
-interface GlobeCanvasProps {
-  continentDots?: [number, number][];
+/** Convert lat/lng to a point on a sphere of given radius */
+function latLngToVec3(lat: number, lng: number, radius: number): THREE.Vector3 {
+  const phi   = (90 - lat) * DEG2RAD;
+  const theta = (lng + 180) * DEG2RAD;
+  return new THREE.Vector3(
+    -radius * Math.sin(phi) * Math.cos(theta),
+     radius * Math.cos(phi),
+     radius * Math.sin(phi) * Math.sin(theta),
+  );
 }
 
-function GlobeCanvas({ continentDots }: GlobeCanvasProps) {
+/** Cubic bezier control points that arc out into space */
+function arcControlPoints(
+  start: THREE.Vector3,
+  end: THREE.Vector3,
+  arcHeightFactor = 0.4,
+): [THREE.Vector3, THREE.Vector3] {
+  const dist  = start.distanceTo(end);
+  const mid   = start.clone().lerp(end, 0.5).normalize();
+  const lift  = GLOBE_RADIUS + dist * arcHeightFactor;
+  const midOut = mid.multiplyScalar(lift);
 
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const rafRef = useRef<number>(0);
-  const dots = continentDots ?? [];
+  const ctrl1 = start.clone().lerp(midOut, 0.5);
+  const ctrl2 = end.clone().lerp(midOut, 0.5);
+  return [ctrl1, ctrl2];
+}
+
+// ─── Globe Canvas ─────────────────────────────────────────────────────────────
+
+function GlobeCanvas() {
+  const mountRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!mountRef.current) return;
 
-    const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+    const container = mountRef.current;
+    const W = container.clientWidth;
+    const H = container.clientHeight;
+
+    // ── Renderer ──────────────────────────────────────────────────────────────
+    const renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(W, H);
+    renderer.setClearColor(0x000000, 0);
+    container.appendChild(renderer.domElement);
+
+    // ── Scene / Camera ────────────────────────────────────────────────────────
+    const scene  = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, W / H, 1, 2000);
+    camera.position.set(0, 0, 580);
+
+    // ── Globe group (everything rotates together) ─────────────────────────────
+    const globeGroup = new THREE.Group();
+
+    // Timezone-based starting rotation (like GitHub)
+    const tzOffset    = new Date().getTimezoneOffset() || 0;
+    const tzMaxOffset = 60 * 12;
+    globeGroup.rotation.y = Math.PI * (tzOffset / tzMaxOffset);
+
+    scene.add(globeGroup);
+
+    // ── Base sphere (dark) ────────────────────────────────────────────────────
+    const baseMesh = new THREE.Mesh(
+      new THREE.SphereGeometry(GLOBE_RADIUS, 64, 64),
+      new THREE.MeshPhongMaterial({
+        color:     0x040814,
+        shininess: 5,
+      }),
+    );
+    globeGroup.add(baseMesh);
+
+    // ── Lights ────────────────────────────────────────────────────────────────
+    scene.add(new THREE.AmbientLight(0x1a2a4a, 1.5));
+
+    const sunLight = new THREE.DirectionalLight(0x4488ff, 2.5);
+    sunLight.position.set(-400, 300, 300);
+    scene.add(sunLight);
+
+    const rimLight = new THREE.DirectionalLight(0x0066ff, 1.2);
+    rimLight.position.set(400, -200, -300);
+    scene.add(rimLight);
+
+    // ── Halo (GitHub technique: backside of slightly larger sphere) ────────────
+    const haloMat = new THREE.ShaderMaterial({
+      side: THREE.BackSide,
+      transparent: true,
+      uniforms: { c: { value: 0.4 }, p: { value: 4.5 } },
+      vertexShader: `
+        varying float intensity;
+        void main() {
+          vec3 vNormal   = normalize(normalMatrix * normal);
+          vec3 vNormel   = normalize(vec3(modelViewMatrix * vec4(position, 1.0)));
+          intensity      = pow(abs(dot(vNormal, vNormel)), ${4.5});
+          gl_Position    = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        varying float intensity;
+        void main() {
+          vec3 glow = vec3(0.05, 0.25, 0.65) * intensity;
+          gl_FragColor  = vec4(glow, intensity * 0.85);
+        }
+      `,
+    });
+    const halo = new THREE.Mesh(new THREE.SphereGeometry(GLOBE_RADIUS, 64, 64), haloMat);
+    halo.scale.multiplyScalar(1.18);
+    halo.rotateX(Math.PI * 0.03);
+    halo.rotateY(Math.PI * 0.03);
+    scene.add(halo); // NOT inside globeGroup — stays static
+
+    // ── Continent dots (GitHub technique: PNG map + getImageData) ─────────────
+    // We use an offscreen canvas to sample a simple equirectangular world map
+    // drawn as filled polygons via a data URI (avoids network requests).
+    // For production, replace this with an actual world map PNG fetch.
+    
+const buildDots = () => {
+  // Creamos un canvas offscreen con las mismas dimensiones que la textura (equirectangular)
+  const img = new Image();
+  img.crossOrigin = 'anonymous'; // por si la textura está servida con CORS
+  img.src = cobeTextureUrl;
+
+  img.onload = () => {
+    const offscreen = document.createElement('canvas');
+    // Ajusta el tamaño del canvas al de la imagen real (normalmente 2048 × 1024)
+    offscreen.width = img.width;
+    offscreen.height = img.height;
+    const octx = offscreen.getContext('2d')!;
+
+    // Dibujamos la textura tal cual
+    octx.drawImage(img, 0, 0);
+
+    const imgData = octx.getImageData(0, 0, offscreen.width, offscreen.height);
+
+    // Función que decide si un píxel es "tierra"
+    // Dependiendo de la textura, puede usar el canal alfa (si el océano es transparente)
+    // o el brillo (si el océano es oscuro y la tierra clara)
+    const isLand = (lat: number, lng: number): boolean => {
+      const ix  = Math.round(((lng + 180) / 360) * (offscreen.width - 1));
+      const iy  = Math.round(((90 - lat) / 180) * (offscreen.height - 1));
+      const idx = (iy * offscreen.width + ix) * 4;
+      const r   = imgData.data[idx];
+      const g   = imgData.data[idx + 1];
+      const b   = imgData.data[idx + 2];
+      const a   = imgData.data[idx + 3];
+
+      // Opción A: si el océano es transparente (la textura usa PNG con transparencia)
+      const brightness = (r + g + b) / 3;
+      return brightness > 40;
+
+      // Opción B: si la tierra es clara y el agua oscura (textura estilo sombreado)
+      // const brightness = (r + g + b) / 3;
+      // return brightness > 80; // umbral ajustable
     };
-    resize();
-    window.addEventListener('resize', resize);
 
-    const prefersReduced = window.matchMedia(
-      '(prefers-reduced-motion: reduce)'
-    ).matches;
+    // … el resto del código de construcción de puntos sigue igual …
+    const circleGeo = new THREE.CircleGeometry(DOT_SIZE, DOT_SEGMENTS);
+    const matrices: THREE.Matrix4[] = [];
+    const dummy = new THREE.Object3D();
 
-    const arcs = ARC_DATA.map((a, i) => ({
-      ...a,
-      progress: Math.random(), // fase inicial del dot viajero
-      color: ARC_COLORS[i % ARC_COLORS.length],
-      arcHeight: 0.35 + Math.random() * 0.3, // altura fija del arco (0.35–0.65)
-    }));
+    for (let lat = -90; lat <= 90; lat += 180 / DOT_ROWS) {
+      const radius = Math.cos(Math.abs(lat) * DEG2RAD) * GLOBE_RADIUS;
+      const circumference = radius * Math.PI * 2;
+      const dotsForLat = Math.round(circumference * DOT_DENSITY * 0.018);
 
-    function latLng(lat: number, lng: number, r: number) {
-      const phi = (90 - lat) * (Math.PI / 180);
-      const theta = (lng + 180) * (Math.PI / 180);
-      return {
-        x: -r * Math.sin(phi) * Math.cos(theta),
-        y: r * Math.cos(phi),
-        z: r * Math.sin(phi) * Math.sin(theta),
-      };
+      for (let x = 0; x < dotsForLat; x++) {
+        const lng = -180 + (x * 360) / dotsForLat;
+        if (!isLand(lat, lng)) continue;
+
+        const pos = latLngToVec3(lat, lng, GLOBE_RADIUS + 0.3);
+        dummy.position.copy(pos);
+        dummy.lookAt(pos.clone().multiplyScalar(2));
+        dummy.updateMatrix();
+        matrices.push(dummy.matrix.clone());
+      }
     }
 
-    function rotateY(
-      p: { x: number; y: number; z: number },
-      rot: number
-    ) {
-      const c = Math.cos(rot),
-        s = Math.sin(rot);
-      return { x: p.x * c - p.z * s, y: p.y, z: p.x * s + p.z * c };
+    // Elimina la malla de puntos anterior si existe (para evitar duplicados)
+    const existingDots = globeGroup.children.find(
+      (c) => c instanceof THREE.InstancedMesh && c.material.color.getHex() === 0x1e88e5
+    );
+    if (existingDots) globeGroup.remove(existingDots);
+
+    const dotMesh = new THREE.InstancedMesh(
+      circleGeo,
+      new THREE.MeshBasicMaterial({ color: 0x1e88e5, transparent: true, opacity: 0.75 }),
+      matrices.length,
+    );
+    matrices.forEach((m, i) => dotMesh.setMatrixAt(i, m));
+    dotMesh.instanceMatrix.needsUpdate = true;
+    globeGroup.add(dotMesh);
+  };
+};
+
+// Llama a buildDots (ya sin necesidad de ejecutar al inicio, se ejecutará al cargar la imagen)
+buildDots();
+
+    // ── City markers ──────────────────────────────────────────────────────────
+    const markerGeo = new THREE.RingGeometry(2.5, 4, 32);
+    const markerMat = new THREE.MeshBasicMaterial({
+      color: 0x38bdf8,
+      transparent: true,
+      opacity: 0.85,
+      side: THREE.DoubleSide, // importante para que se vea el anillo completo
+    });
+    const markerMesh = new THREE.InstancedMesh(markerGeo, markerMat, MARKERS.length);
+    const dummy = new THREE.Object3D();
+
+    MARKERS.forEach(([lat, lng], i) => {
+      const pos = latLngToVec3(lat, lng, GLOBE_RADIUS + 1.5);
+      dummy.position.copy(pos);
+      dummy.lookAt(pos.clone().multiplyScalar(2));
+      dummy.updateMatrix();
+      markerMesh.setMatrixAt(i, dummy.matrix);
+    });
+    markerMesh.instanceMatrix.needsUpdate = true;
+    globeGroup.add(markerMesh);
+
+    // ── Arcs (GitHub: CubicBezierCurve3 + TubeBufferGeometry + setDrawRange) ──
+const ARC_COLORS = [0x06b6d4, 0x3b82f6, 0x6366f1, 0x8b5cf6, 0x0ea5e9, 0x38bdf8];    interface ArcObj {
+      tube:     THREE.Mesh;
+      geo:      THREE.TubeGeometry;
+      progress: number; // 0..1 draw position
+      speed:    number;
+      maxDraw:  number; // total index count
     }
+    const arcObjects: ArcObj[] = [];
 
-    let time = 0;
+    ARC_DATA.forEach(([fLat, fLng, tLat, tLng], i) => {
+      const start  = latLngToVec3(fLat, fLng, GLOBE_RADIUS + 1);
+      const end    = latLngToVec3(tLat, tLng, GLOBE_RADIUS + 1);
+      const [c1, c2] = arcControlPoints(start, end);
 
-    const draw = () => {
-      if (!prefersReduced) time += 0.002;
-
-      const W = canvas.width, H = canvas.height;
-      const cx = W / 2, cy = H / 2;
-      const R = Math.min(W, H) * 0.38;
-      const rot = time * 0.28;
-
-      ctx.clearRect(0, 0, W, H);
-
-      // Ambient halo
-      const halo = ctx.createRadialGradient(cx, cy, R * 0.3, cx, cy, R * 2.4);
-      halo.addColorStop(0, 'rgba(6,24,60,0.55)');
-      halo.addColorStop(0.5, 'rgba(6,20,45,0.18)');
-      halo.addColorStop(1, 'transparent');
-      ctx.fillStyle = halo;
-      ctx.fillRect(0, 0, W, H);
-
-      // Grid lines
-      ctx.lineWidth = 0.5;
-      ctx.strokeStyle = 'rgba(56,189,248,0.12)';
-      for (let lat = -75; lat <= 75; lat += 15) {
-        const r2 = R * Math.cos((lat * Math.PI) / 180);
-        const yOff = R * Math.sin((lat * Math.PI) / 180);
-        ctx.beginPath();
-        ctx.ellipse(cx, cy + yOff, r2, r2 * 0.22, 0, 0, Math.PI * 2);
-        ctx.stroke();
-      }
-      for (let lon = 0; lon < 360; lon += 20) {
-        ctx.beginPath();
-        ctx.ellipse(cx, cy, R, R * 0.22, (lon * Math.PI) / 180, 0, Math.PI * 2);
-        ctx.stroke();
-      }
-      // Globe base
-      ctx.beginPath();
-      ctx.arc(cx, cy, R, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(4,8,22,0.88)';
-      ctx.fill();
-      ctx.lineWidth = 1.5;
-      ctx.strokeStyle = 'rgba(56,189,248,0.2)';
-      ctx.stroke();
-
-      CONTINENT_DOTS.forEach(([lat, lng]) => {
-        const p3 = rotateY(latLng(lat, lng, R), rot);
-        // Ocultar puntos en la cara trasera del globo
-        if (p3.z < -R * 0.55) return;
-        const sc = 1 + p3.z / (R * 1.5);
-        const alpha = 0.18 + sc * 0.55;
-        ctx.globalAlpha = alpha;
-        ctx.beginPath();
-        ctx.fillStyle = '#38bdf8';
-        ctx.arc(cx + p3.x * sc, cy + p3.y * sc, 1.3 * sc, 0, Math.PI * 2);
-        ctx.fill();
+      const curve  = new THREE.CubicBezierCurve3(start, c1, c2, end);
+      const geo    = new THREE.TubeGeometry(curve, 64, 0.6, 6, false);
+      const mat    = new THREE.MeshBasicMaterial({
+        color:       ARC_COLORS[i % ARC_COLORS.length],
+        transparent: true,
+        opacity:     0.85,
       });
-      ctx.globalAlpha = 1;
-      // Arcs
+      const tube = new THREE.Mesh(geo, mat);
+
+      // Start invisible — setDrawRange animates it in
+      const maxDraw = geo.index!.count;
+      geo.setDrawRange(0, 0);
+
+      globeGroup.add(tube);
+      arcObjects.push({
+        tube,
+        geo,
+        progress: Math.random(), // stagger start
+        speed:    0.004 + Math.random() * 0.003,
+        maxDraw,
+      });
+    });
+
+    // ── Animate arcs: draw in then draw out (like GitHub's setDrawRange) ───────
+    const updateArcs = () => {
+      arcObjects.forEach((arc) => {
+        arc.progress = (arc.progress + arc.speed) % 2; // 0→1 draw in, 1→2 draw out
+
+        let drawn: number;
+        if (arc.progress < 1) {
+          // Drawing in
+          drawn = Math.floor(arc.progress * arc.maxDraw);
+        } else {
+          // Drawing out from the start
+          const erase = arc.progress - 1;
+          const erased = Math.floor(erase * arc.maxDraw);
+          drawn = arc.maxDraw - erased;
+          arc.geo.setDrawRange(erased, drawn);
+          return;
+        }
+        arc.geo.setDrawRange(0, drawn);
+      });
+    };
+
+    // ── Animation loop ────────────────────────────────────────────────────────
+    let rafId: number;
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const animate = () => {
+      rafId = requestAnimationFrame(animate);
       if (!prefersReduced) {
-        arcs.forEach((arc) => {
-          const s3 = rotateY(latLng(arc.s[0], arc.s[1], R), rot);
-          const e3 = rotateY(latLng(arc.e[0], arc.e[1], R), rot);
-
-          // Proyección con profundidad
-          const ss = 1 + s3.z / (R * 1.5);
-          const es = 1 + e3.z / (R * 1.5);
-          const sx = cx + s3.x * ss,
-            sy = cy + s3.y * ss;
-          const ex = cx + e3.x * es,
-            ey = cy + e3.y * es;
-
-          // Punto medio en 2D
-          const midX = (sx + ex) / 2;
-          const midY = (sy + ey) / 2;
-
-          // Vector perpendicular para curvar el arco hacia afuera
-          const dx = ex - sx;
-          const dy = ey - sy;
-          const len = Math.sqrt(dx * dx + dy * dy) || 1;
-          const perpX = -dy / len;
-          const perpY = dx / len;
-
-          // Altura fija del arco (no pulsa con el tiempo)
-          const arcOffset = R * arc.arcHeight;
-
-          // Control point del arco (estable)
-          const mx = midX + perpX * arcOffset;
-          const my = midY + perpY * arcOffset;
-
-          // Progress del dot viajero (avanza con el tiempo)
-          const p = (arc.progress + time * 0.38) % 1;
-
-          // Alpha del arco (más intenso cuando el dot está visible)
-          const arcAlpha = 0.35 + Math.sin(p * Math.PI) * 0.45;
-
-          const { r, g, b } = hexToRgb(arc.color);
-
-          // Dibujar el arco
-          ctx.beginPath();
-          ctx.strokeStyle = `rgba(${r},${g},${b},${arcAlpha})`;
-          ctx.lineWidth = 1.3;
-          ctx.moveTo(sx, sy);
-          ctx.quadraticCurveTo(mx, my, ex, ey);
-          ctx.stroke();
-
-          // Dot viajero sobre la curva cuadrática
-          if (p > 0.03 && p < 0.97) {
-            const t = p;
-            const oneMinusT = 1 - t;
-            const px =
-              oneMinusT * oneMinusT * sx + 2 * oneMinusT * t * mx + t * t * ex;
-            const py =
-              oneMinusT * oneMinusT * sy + 2 * oneMinusT * t * my + t * t * ey;
-            ctx.beginPath();
-            ctx.fillStyle = arc.color;
-            ctx.shadowColor = arc.color;
-            ctx.shadowBlur = 6;
-            ctx.arc(px, py, 2.5, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.shadowBlur = 0;
-          }
-        });
+        globeGroup.rotation.y += ROTATION_SPEED;
+        updateArcs();
       }
-      // City dots
-      GLOBE_POINTS.forEach((pt, i) => {
-        const p3 = rotateY(latLng(pt.lat, pt.lng, R), rot);
-        if (p3.z < -R * 0.5) return;
-        const sc = 1 + p3.z / (R * 1.5);
-        ctx.globalAlpha = 0.45 + sc * 0.5;
-        ctx.beginPath();
-        ctx.fillStyle = DOT_COLORS[i % DOT_COLORS.length];
-        ctx.arc(cx + p3.x * sc, cy + p3.y * sc, 2.8 * sc, 0, Math.PI * 2);
-        ctx.fill();
-        // Brillo alrededor
-        ctx.globalAlpha = 0.15 + sc * 0.2;
-        ctx.beginPath();
-        ctx.fillStyle = DOT_COLORS[i % DOT_COLORS.length];
-        ctx.arc(cx + p3.x * sc, cy + p3.y * sc, 5 * sc, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.globalAlpha = 1;
-      });
-
-      // Edge glow
-      const edge = ctx.createRadialGradient(cx, cy, R * 0.75, cx, cy, R * 1.05);
-      edge.addColorStop(0, 'transparent');
-      edge.addColorStop(1, 'rgba(56,189,248,0.2)');
-      ctx.beginPath();
-      ctx.arc(cx, cy, R * 1.05, 0, Math.PI * 2);
-      ctx.fillStyle = edge;
-      ctx.fill();
-
-      rafRef.current = requestAnimationFrame(draw);
+      renderer.render(scene, camera);
     };
+    animate();
 
-    draw();
+    // ── Resize ────────────────────────────────────────────────────────────────
+    const onResize = () => {
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+    };
+    window.addEventListener('resize', onResize);
 
     return () => {
-      window.removeEventListener('resize', resize);
-      cancelAnimationFrame(rafRef.current);
+      cancelAnimationFrame(rafId);
+      window.removeEventListener('resize', onResize);
+      renderer.dispose();
+      container.removeChild(renderer.domElement);
     };
   }, []);
 
   return (
-    <canvas
-      ref={canvasRef}
+    <div
+      ref={mountRef}
       className="fixed inset-0 w-full h-full"
       aria-hidden="true"
     />
@@ -421,8 +382,8 @@ function GlobeCanvas({ continentDots }: GlobeCanvasProps) {
 // ─── Login page ───────────────────────────────────────────────────────────────
 
 export default function Login({ onToggleForm }: Props) {
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [error, setError]               = useState<string | null>(null);
+  const [loading, setLoading]           = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuth();
 
@@ -455,21 +416,21 @@ export default function Login({ onToggleForm }: Props) {
   };
 
   return (
-    <div className="relative min-h-screen bg-[var(--bg-primary)] overflow-hidden">
+    <div className="relative min-h-screen bg-[#060c18] overflow-hidden">
 
       {/* Skip link */}
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-sky-500 focus:text-white focus:rounded-lg"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-3 focus:z-50 focus:px-4 focus:py-2 focus:bg-sky-500 focus:text-white focus:rounded-lg"
       >
         Saltar al contenido principal
       </a>
 
-      {/* Globe — full-screen background */}
-      <GlobeCanvas />
+      {/* Globe — WebGL full-screen background */}
+      <GlobeCanvas/>
 
       {/* Brand */}
-      <div className="absolute top-8 left-10 z-20">
+      <div className="absolute top-18 left-10 z-20">
         <span className="font-['Space_Grotesk',sans-serif] text-xl font-semibold tracking-tight text-white">
           ETL<span className="text-sky-400">.</span>Automate
         </span>
@@ -482,16 +443,16 @@ export default function Login({ onToggleForm }: Props) {
         className="relative z-10 flex min-h-screen items-center justify-end px-4 sm:px-8 lg:pr-24 xl:pr-32"
       >
         <div
-          className="w-full max-w-sm animate-[fadeUp_0.55s_cubic-bezier(0.22,1,0.36,1)_both]"
-          style={{ animationName: 'fadeUp' }}
+          className="w-full max-w-sm"
+          style={{ animation: 'fadeUp 0.55s cubic-bezier(0.22,1,0.36,1) both' }}
         >
           <div
             className="rounded-2xl border p-8"
             style={{
-              background: 'rgba(10,16,35,0.72)',
-              backdropFilter: 'blur(28px) saturate(1.4)',
+              background:           'rgba(10,16,35,0.72)',
+              backdropFilter:       'blur(28px) saturate(1.4)',
               WebkitBackdropFilter: 'blur(28px) saturate(1.4)',
-              borderColor: 'rgba(56,189,248,0.15)',
+              borderColor:          'rgba(56,189,248,0.15)',
               boxShadow:
                 '0 0 0 1px rgba(255,255,255,0.04) inset, 0 40px 80px rgba(0,0,0,0.5)',
             }}
@@ -506,7 +467,7 @@ export default function Login({ onToggleForm }: Props) {
 
             <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-5">
 
-              {/* Email */}
+              {/* Username */}
               <div>
                 <label
                   htmlFor="username"
@@ -515,7 +476,7 @@ export default function Login({ onToggleForm }: Props) {
                   Nombre de usuario
                 </label>
                 <div className="relative">
-                  <Mail
+                  <User
                     className="pointer-events-none absolute left-3 top-1/2 h-[15px] w-[15px] -translate-y-1/2 text-slate-600"
                     aria-hidden="true"
                   />
@@ -529,7 +490,7 @@ export default function Login({ onToggleForm }: Props) {
                     {...register('username')}
                     className="w-full rounded-[10px] border py-[10px] pl-10 pr-4 text-[14px] text-slate-200 placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-sky-500/50"
                     style={{
-                      background: 'rgba(255,255,255,0.05)',
+                      background:  'rgba(255,255,255,0.05)',
                       borderColor: errors.username
                         ? 'rgba(248,113,113,0.5)'
                         : 'rgba(255,255,255,0.1)',
@@ -537,11 +498,7 @@ export default function Login({ onToggleForm }: Props) {
                   />
                 </div>
                 {errors.username && (
-                  <p
-                    id="username-error"
-                    role="alert"
-                    className="mt-1 text-[11px] text-red-400"
-                  >
+                  <p id="username-error" role="alert" className="mt-1 text-[11px] text-red-400">
                     {errors.username.message}
                   </p>
                 )}
@@ -570,7 +527,7 @@ export default function Login({ onToggleForm }: Props) {
                     {...register('password')}
                     className="w-full rounded-[10px] border py-[10px] pl-10 pr-11 text-[14px] text-slate-200 placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-sky-500/50"
                     style={{
-                      background: 'rgba(255,255,255,0.05)',
+                      background:  'rgba(255,255,255,0.05)',
                       borderColor: errors.password
                         ? 'rgba(248,113,113,0.5)'
                         : 'rgba(255,255,255,0.1)',
@@ -578,13 +535,13 @@ export default function Login({ onToggleForm }: Props) {
                   />
                   <button
                     type="button"
-                    onClick={() => setShowPassword(!showPassword)}
+                    onClick={() => setShowPassword((v) => !v)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 rounded text-slate-500 hover:text-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500"
                     aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                   >
                     {showPassword
                       ? <EyeOff className="h-4 w-4" aria-hidden="true" />
-                      : <Eye className="h-4 w-4" aria-hidden="true" />}
+                      : <Eye    className="h-4 w-4" aria-hidden="true" />}
                   </button>
                 </div>
                 {errors.password && (
@@ -610,11 +567,8 @@ export default function Login({ onToggleForm }: Props) {
                 type="submit"
                 disabled={loading}
                 className="group relative mt-1 flex w-full items-center justify-center gap-2 overflow-hidden rounded-[10px] py-[11px] text-[14px] font-semibold text-white transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
-                style={{
-                  background: 'linear-gradient(135deg, #0ea5e9, #6366f1)',
-                }}
+                style={{ background: 'linear-gradient(135deg, #0ea5e9, #6366f1)' }}
               >
-                {/* hover overlay */}
                 <span
                   className="absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100"
                   style={{ background: 'linear-gradient(135deg, #38bdf8, #818cf8)' }}
@@ -646,7 +600,7 @@ export default function Login({ onToggleForm }: Props) {
         </div>
       </div>
 
-      {/* Keyframe */}
+      {/* Keyframes */}
       <style>{`
         @keyframes fadeUp {
           from { opacity: 0; transform: translateY(18px); }

@@ -16,6 +16,15 @@ export interface Integration {
   jsonPreview?: string;
 }
 
+export interface IntegrationResponse {
+  id: number;
+  apiA: number;
+  apiB: number;
+  description: string;
+  status: 'pending' | 'active' | 'inactive' | 'error';
+  createdAt: string;
+}
+
 export interface UnifiedRecord {
   unifiedId: string;
   entityName: string;

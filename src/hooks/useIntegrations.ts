@@ -1,41 +1,82 @@
-import { useState, useEffect } from 'react';
-import { Integration, IntegrationStatus } from '../types';
+import { useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
+import { IntegrationResponse } from '../types';
+
+export interface Integration {
+  id: number;
+  apiA: number;
+  apiB: number;
+  description: string;
+  status: 'pending' | 'active' | 'inactive' | 'error';
+  createdAt: string;
+}
+
+export interface CreateIntegrationPayload {
+  apiA: number;
+  apiB: number;
+  description: string;
+}
+
+export interface UpdateIntegrationPayload {
+  description?: string;
+  status?: 'pending' | 'active' | 'inactive' | 'error';
+}
 
 export function useIntegrations() {
-  const [integrations, setIntegrations] = useState<Integration[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [integrations, setIntegrations] = useState<IntegrationResponse[]>([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchIntegrations();
-  }, []);
-
-  const fetchIntegrations = async () => {
+  const fetchIntegrations = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await api.get('/api/integrations/connections');
-      const data = response.data;
-      
-      const mappedData: Integration[] = data.map((item: any) => ({
-        id: item.id.toString(),
-        name: item.description || `Integración ${item.id}`,
-        source: `${item.apiA || 'API A'} -> ${item.apiB || 'API B'}`,
-        status: 'active' as IntegrationStatus,
-        lastRun: item.updatedAt ? new Date(item.updatedAt).toLocaleString() : 'N/A',
-        recordsProcessed: '0',
-        mlBadge: { label: 'Schema Matching', score: 95 }
-      }));
-      
-      setIntegrations(mappedData);
+      const response = await api.get<IntegrationResponse[]>('/api/integrations/connections');
+      setIntegrations(response.data);
       setError(null);
     } catch (err: any) {
-      console.error('Error fetching integrations', err);
-      setError('No se pudieron cargar las integraciones');
+      console.error('Error fetching integrations:', err);
+      setError(err.response?.data?.message || 'No se pudieron cargar las integraciones');
     } finally {
       setLoading(false);
     }
+  }, []);
+
+  useEffect(() => {
+    fetchIntegrations();
+  }, [fetchIntegrations]);
+
+  const createIntegration = async (payload: CreateIntegrationPayload) => {
+    try {
+      const response = await api.post<IntegrationResponse>('/api/integrations/connections', payload);
+      setIntegrations(prev => [response.data, ...prev]);
+      return { success: true, data: response.data };
+    } catch (err: any) {
+      console.error('Error creating integration:', err);
+      return { success: false, error: err.response?.data?.message || 'Error al crear integración' };
+    }
   };
 
-  return { integrations, loading, error, refetch: fetchIntegrations };
+  const updateIntegration = async (id: number, payload: UpdateIntegrationPayload) => {
+    try {
+      const response = await api.put<IntegrationResponse>(`/api/integrations/connections/${id}`, payload);
+      setIntegrations(prev => prev.map(i => i.id === id ? response.data : i));
+      return { success: true, data: response.data };
+    } catch (err: any) {
+      console.error('Error updating integration:', err);
+      return { success: false, error: err.response?.data?.message || 'Error al actualizar' };
+    }
+  };
+
+  const deleteIntegration = async (id: number) => {
+    try {
+      await api.delete(`/api/integrations/connections/${id}`);
+      setIntegrations(prev => prev.filter(i => i.id !== id));
+      return { success: true };
+    } catch (err: any) {
+      console.error('Error deleting integration:', err);
+      return { success: false, error: err.response?.data?.message || 'Error al eliminar' };
+    }
+  };
+
+  return { integrations, loading, error, refetch: fetchIntegrations, createIntegration, updateIntegration, deleteIntegration };
 }

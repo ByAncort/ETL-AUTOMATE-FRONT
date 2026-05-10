@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
+import api from '../services/api';
 
 export interface ApiConnection {
   id: number;
@@ -40,8 +40,6 @@ export interface CreateConnectionPayload {
   apiAuth?: ApiAuthConfig;
 }
 
-const REGISTRY_API = 'http://localhost:8083';
-
 export function useApiConnections() {
   const [connections, setConnections] = useState<ApiConnection[]>([]);
   const [loading, setLoading] = useState(true);
@@ -50,7 +48,7 @@ export function useApiConnections() {
   const fetchConnections = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await axios.get<ApiConnection[]>(`${REGISTRY_API}/api-registry/list`);
+      const response = await api.get<ApiConnection[]>('/api-registry/list');
       setConnections(response.data);
       setError(null);
     } catch (err: any) {
@@ -67,7 +65,7 @@ export function useApiConnections() {
 
   const deleteConnection = async (id: number) => {
     try {
-      await axios.delete(`${REGISTRY_API}/api-registry/${id}`);
+      await api.delete(`/api-registry/${id}`);
       setConnections(prev => prev.filter(c => c.id !== id));
       return { success: true };
     } catch (err: any) {
@@ -78,7 +76,7 @@ export function useApiConnections() {
 
   const createConnection = async (payload: CreateConnectionPayload) => {
     try {
-      const response = await axios.post<ApiConnection>(`${REGISTRY_API}/api-registry`, payload);
+      const response = await api.post<ApiConnection>('/api-registry', payload);
       setConnections(prev => [response.data, ...prev]);
       return { success: true, data: response.data };
     } catch (err: any) {
@@ -87,20 +85,9 @@ export function useApiConnections() {
     }
   };
 
-  const testConnection = async (connection: ApiConnection) => {
+const testConnection = async (connection: ApiConnection) => {
     try {
-      const requestBody = {
-        method: connection.method,
-        url: connection.url,
-        pathParams: connection.pathParams,
-        queryParams: connection.queryParams,
-        body: connection.body,
-        authType: connection.authType,
-        authHeader: connection.authHeader,
-        authValue: connection.authValue,
-      };
-
-      const response = await axios.post(`${REGISTRY_API}/api-registry/test`, requestBody, {
+      const response = await api.post(`/api-registry/${connection.id}/test`, {}, {
         validateStatus: () => true,
       });
 

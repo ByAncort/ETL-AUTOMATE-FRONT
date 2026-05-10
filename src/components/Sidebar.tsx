@@ -40,13 +40,13 @@ user: [
 };
 
 export default function Sidebar() {
-  const { isAdmin } = useAuth();
+  const { isAdmin, viewAdmin } = useAuth();
   const [collapsed, setCollapsed] = useState(false);
   const [isHoveringToggle, setIsHoveringToggle] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
-  const showAdminItems = isAdmin;
+  const showAdminItems = isAdmin && viewAdmin;
   console.log('Sidebar render - isAdmin:', isAdmin, 'showAdminItems:', showAdminItems);
   const navItems = showAdminItems ? sidebarItems.admin : sidebarItems.user;
   const activeColor = showAdminItems ? 'purple' : 'blue';

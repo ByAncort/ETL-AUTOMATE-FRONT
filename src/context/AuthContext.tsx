@@ -46,7 +46,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [token, setToken] = useState<string | null>(storedToken);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(!!storedToken);
   const [isAdmin, setIsAdmin] = useState<boolean>(initialAdmin);
-  const [viewAdmin, setViewAdmin] = useState<boolean>(initialAdmin);
+  const [viewAdmin, setViewAdmin] = useState<boolean>(false);
   const [userData, setUserData] = useState<UserData | null>(null);
 
   const fetchUserData = async (username: string, authToken: string) => {
@@ -87,6 +87,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const decoded = decodeToken(newToken);
     const adminRole = decoded?.roles?.includes('ROLE_ADMIN') || false;
     setIsAdmin(adminRole);
+    setViewAdmin(false);
     
     const username = decoded?.sub as string;
     if (username) {
@@ -101,6 +102,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setToken(null);
     setIsAuthenticated(false);
     setIsAdmin(false);
+    setViewAdmin(false);
     setUserData(null);
   };
 

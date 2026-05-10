@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Bell, Plus, Search, User, LogOut, X, Loader2, Sun, Moon } from 'lucide-react';
+import { Bell, Plus, Search, User, LogOut, X, Loader2, Sun, Moon, Shield, ShieldOff } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 function cn(...classes: (string | undefined | null | false)[]): string {
@@ -22,7 +22,7 @@ export default function Header({ title = 'ETL Automate', subtitle = 'Plataforma 
   const searchRef = useRef<HTMLInputElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const { theme, toggleTheme } = useTheme();
-  const { userData } = useAuth();
+  const { userData, isAdmin, viewAdmin, setViewAdmin } = useAuth();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -183,6 +183,23 @@ export default function Header({ title = 'ETL Automate', subtitle = 'Plataforma 
                 <p className="text-sm font-medium text-[var(--text-primary)] truncate">{userData?.name || userData?.username || 'Usuario'}</p>
                 <p className="text-xs text-[var(--text-muted)] truncate">{userData?.email || 'usuario@etlautomate.com'}</p>
               </div>
+              {isAdmin && (
+                <button
+                  onClick={() => setViewAdmin(!viewAdmin)}
+                  className={cn(
+                    'w-full flex items-center gap-2 px-3 py-2.5 text-sm',
+                    viewAdmin 
+                      ? 'text-purple-400 bg-purple-500/10' 
+                      : 'text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] hover:text-[var(--text-primary)]',
+                    'transition-colors duration-200',
+                    'focus:outline-none focus:bg-[var(--bg-tertiary)]'
+                  )}
+                  role="menuitem"
+                >
+                  {viewAdmin ? <ShieldOff size={14} aria-hidden="true" /> : <Shield size={14} aria-hidden="true" />}
+                  <span>{viewAdmin ? 'Cambiar a Usuario' : 'Cambiar a Admin'}</span>
+                </button>
+              )}
               <button
                 onClick={handleLogout}
                 disabled={isLoggingOut}

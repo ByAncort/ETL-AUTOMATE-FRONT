@@ -41,12 +41,13 @@ function decodeToken(token: string): { roles?: string[]; sub?: string } | null {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const storedToken = localStorage.getItem('token');
   const storedUsername = localStorage.getItem('username');
+  const storedViewAdmin = localStorage.getItem('viewAdmin') === 'true';
   const initialAdmin = storedToken ? (decodeToken(storedToken)?.roles?.includes('ROLE_ADMIN') || false) : false;
   
   const [token, setToken] = useState<string | null>(storedToken);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(!!storedToken);
   const [isAdmin, setIsAdmin] = useState<boolean>(initialAdmin);
-  const [viewAdmin, setViewAdmin] = useState<boolean>(false);
+  const [viewAdmin, setViewAdmin] = useState<boolean>(storedViewAdmin);
   const [userData, setUserData] = useState<UserData | null>(null);
 
   const fetchUserData = async (username: string, authToken: string) => {
@@ -80,6 +81,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [token]);
 
+  useEffect(() => {
+    localStorage.setItem('viewAdmin', String(viewAdmin));
+  }, [viewAdmin]);
+
+  const handleSetViewAdmin = (value: boolean) => {
+    if (isAdmin || !value) {
+      setViewAdmin(value);
+    }
+  };
+
   const login = (newToken: string) => {
     localStorage.setItem('token', newToken);
     setToken(newToken);
@@ -107,7 +118,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, token, isAdmin, viewAdmin, username: storedUsername, userData, login, logout, setViewAdmin }}>
+    <AuthContext.Provider value={{ isAuthenticated, token, isAdmin, viewAdmin, username: storedUsername, userData, login, logout, setViewAdmin: handleSetViewAdmin }}>
       {children}
     </AuthContext.Provider>
   );

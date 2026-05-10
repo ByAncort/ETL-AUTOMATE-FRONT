@@ -1,16 +1,19 @@
 import { useState } from 'react';
-import { Lock, User, ArrowRight, Mail, UserPlus } from 'lucide-react';
+import { Lock, User, ArrowRight, Mail, Eye, EyeOff } from 'lucide-react';
 import api from '../services/api';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import GlobeCanvas from './ui/GlobeCanvas';
+
+// ─── Validation ───────────────────────────────────────────────────────────────
 
 const registerSchema = z.object({
   username: z.string().min(3, 'Mínimo 3 caracteres'),
   email: z.string().email('Debe ser un email válido'),
   password: z.string().min(6, 'Mínimo 6 caracteres'),
   firstName: z.string().min(1, 'Nombre requerido'),
-  lastName: z.string().min(1, 'Apellido requerido')
+  lastName: z.string().min(1, 'Apellido requerido'),
 });
 
 type RegisterForm = z.infer<typeof registerSchema>;
@@ -19,27 +22,31 @@ interface Props {
   onToggleForm: () => void;
 }
 
+// ─── Register page ────────────────────────────────────────────────────────────
+
 export default function Register({ onToggleForm }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
-  const { register, handleSubmit, formState: { errors } } = useForm<RegisterForm>({
-    resolver: zodResolver(registerSchema)
-  });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RegisterForm>({ resolver: zodResolver(registerSchema) });
 
   const onSubmit = async (data: RegisterForm) => {
     setError(null);
     setSuccess(null);
     setLoading(true);
-    
     try {
       await api.post('/api/users/register', data);
       setSuccess('Usuario creado exitosamente. Ya puedes iniciar sesión.');
       setTimeout(() => {
         onToggleForm();
       }, 2000);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error registering', err);
       setError('No se pudo registrar. Quizás el usuario/email ya existe.');
     } finally {
@@ -48,122 +55,306 @@ export default function Register({ onToggleForm }: Props) {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop')] opacity-5 bg-cover bg-center dark:opacity-5 opacity-[0.03]" />
-      
-      <div className="relative w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 shadow-lg shadow-emerald-500/20 mb-4">
-            <User className="w-8 h-8 text-white" />
-          </div>
-          <h1 className="text-3xl font-bold text-white mb-2">Registro</h1>
-          <p className="text-gray-400 text-sm">Crea una nueva cuenta</p>
-        </div>
+    <div className="relative min-h-screen bg-[#060c18] overflow-hidden">
 
-        <div className="bg-[#0f172a]/80 backdrop-blur-xl rounded-2xl border border-gray-800 shadow-2xl p-8">
-          
-          {success ? (
-            <div className="p-4 bg-green-500/10 border border-green-500/50 rounded-lg text-green-400 text-sm text-center">
-              {success}
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-              <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">Usuario</label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
-                  <input
-                    type="text"
-                    {...register('username')}
-                    placeholder="nuevo_usuario"
-                    className="w-full pl-10 pr-4 py-3 bg-[#1a1f3a] border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                  />
-                </div>
-                {errors.username && <p className="text-red-400 text-xs mt-1">{errors.username.message}</p>}
+      {/* Skip link */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-emerald-500 focus:text-white focus:rounded-lg"
+      >
+        Saltar al contenido principal
+      </a>
+
+      {/* Globe — WebGL full-screen background */}
+      <GlobeCanvas />
+
+      {/* Brand */}
+      <div className="absolute top-18 left-10 z-20">
+        <span className="font-['Space_Grotesk',sans-serif] text-xl font-semibold tracking-tight text-white">
+          ETL<span className="text-emerald-400">.</span>Automate
+        </span>
+      </div>
+
+      {/* Page layout — card docked to the right */}
+      <div
+        id="main-content"
+        role="main"
+        className="relative z-10 flex min-h-screen items-center justify-end px-4 sm:px-8 lg:pr-24 xl:pr-32"
+      >
+        <div
+          className="w-full max-w-sm"
+          style={{ animation: 'fadeUp 0.55s cubic-bezier(0.22,1,0.36,1) both' }}
+        >
+          <div
+            className="rounded-2xl border p-8"
+            style={{
+              background: 'rgba(10,16,35,0.72)',
+              backdropFilter: 'blur(28px) saturate(1.4)',
+              WebkitBackdropFilter: 'blur(28px) saturate(1.4)',
+              borderColor: 'rgba(52,211,153,0.15)',
+              boxShadow:
+                '0 0 0 1px rgba(255,255,255,0.04) inset, 0 40px 80px rgba(0,0,0,0.5)',
+            }}
+          >
+            {/* Header */}
+            <p className="mb-1 text-[11px] font-medium uppercase tracking-widest text-emerald-400">
+              Nuevo usuario
+            </p>
+            <h1 className="mb-7 font-['Space_Grotesk',sans-serif] text-[1.6rem] font-semibold -tracking-tight text-white">
+              Crear Cuenta
+            </h1>
+
+            {success ? (
+              <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-3 text-[13px] text-emerald-400 text-center">
+                {success}
               </div>
+            ) : (
+              <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-5">
 
-              <div className="grid grid-cols-2 gap-4">
+                {/* Username */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Nombre</label>
+                  <label
+                    htmlFor="reg-username"
+                    className="mb-1.5 block text-[12px] font-medium tracking-wide text-slate-400"
+                  >
+                    Nombre de usuario
+                  </label>
                   <div className="relative">
-                    <UserPlus className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                    <User
+                      className="pointer-events-none absolute left-3 top-1/2 h-[15px] w-[15px] -translate-y-1/2 text-slate-600"
+                      aria-hidden="true"
+                    />
                     <input
+                      id="reg-username"
                       type="text"
+                      autoComplete="username"
+                      aria-invalid={errors.username ? 'true' : 'false'}
+                      aria-describedby={errors.username ? 'reg-username-error' : undefined}
+                      placeholder="nombre de usuario"
+                      {...register('username')}
+                      className="w-full rounded-[10px] border py-[10px] pl-10 pr-4 text-[14px] text-slate-200 placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-emerald-500/50"
+                      style={{
+                        background: 'rgba(255,255,255,0.05)',
+                        borderColor: errors.username
+                          ? 'rgba(248,113,113,0.5)'
+                          : 'rgba(255,255,255,0.1)',
+                      }}
+                    />
+                  </div>
+                  {errors.username && (
+                    <p id="reg-username-error" role="alert" className="mt-1 text-[11px] text-red-400">
+                      {errors.username.message}
+                    </p>
+                  )}
+                </div>
+
+                {/* First & Last Name */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label
+                      htmlFor="reg-firstname"
+                      className="mb-1.5 block text-[12px] font-medium tracking-wide text-slate-400"
+                    >
+                      Nombre
+                    </label>
+                    <input
+                      id="reg-firstname"
+                      type="text"
+                      autoComplete="given-name"
+                      aria-invalid={errors.firstName ? 'true' : 'false'}
+                      aria-describedby={errors.firstName ? 'reg-firstname-error' : undefined}
+                      placeholder="Nombre"
                       {...register('firstName')}
-                      placeholder="Juan"
-                      className="w-full pl-10 pr-4 py-3 bg-[#1a1f3a] border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      className="w-full rounded-[10px] border py-[10px] px-4 text-[14px] text-slate-200 placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-emerald-500/50"
+                      style={{
+                        background: 'rgba(255,255,255,0.05)',
+                        borderColor: errors.firstName
+                          ? 'rgba(248,113,113,0.5)'
+                          : 'rgba(255,255,255,0.1)',
+                      }}
                     />
+                    {errors.firstName && (
+                      <p id="reg-firstname-error" role="alert" className="mt-1 text-[11px] text-red-400">
+                        {errors.firstName.message}
+                      </p>
+                    )}
                   </div>
-                  {errors.firstName && <p className="text-red-400 text-xs mt-1">{errors.firstName.message}</p>}
-                </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Apellido</label>
-                  <div className="relative">
-                    <UserPlus className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                  <div>
+                    <label
+                      htmlFor="reg-lastname"
+                      className="mb-1.5 block text-[12px] font-medium tracking-wide text-slate-400"
+                    >
+                      Apellido
+                    </label>
                     <input
+                      id="reg-lastname"
                       type="text"
+                      autoComplete="family-name"
+                      aria-invalid={errors.lastName ? 'true' : 'false'}
+                      aria-describedby={errors.lastName ? 'reg-lastname-error' : undefined}
+                      placeholder="Apellido"
                       {...register('lastName')}
-                      placeholder="Pérez"
-                      className="w-full pl-10 pr-4 py-3 bg-[#1a1f3a] border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      className="w-full rounded-[10px] border py-[10px] px-4 text-[14px] text-slate-200 placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-emerald-500/50"
+                      style={{
+                        background: 'rgba(255,255,255,0.05)',
+                        borderColor: errors.lastName
+                          ? 'rgba(248,113,113,0.5)'
+                          : 'rgba(255,255,255,0.1)',
+                      }}
+                    />
+                    {errors.lastName && (
+                      <p id="reg-lastname-error" role="alert" className="mt-1 text-[11px] text-red-400">
+                        {errors.lastName.message}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Email */}
+                <div>
+                  <label
+                    htmlFor="reg-email"
+                    className="mb-1.5 block text-[12px] font-medium tracking-wide text-slate-400"
+                  >
+                    Email
+                  </label>
+                  <div className="relative">
+                    <Mail
+                      className="pointer-events-none absolute left-3 top-1/2 h-[15px] w-[15px] -translate-y-1/2 text-slate-600"
+                      aria-hidden="true"
+                    />
+                    <input
+                      id="reg-email"
+                      type="email"
+                      autoComplete="email"
+                      aria-invalid={errors.email ? 'true' : 'false'}
+                      aria-describedby={errors.email ? 'reg-email-error' : undefined}
+                      placeholder="email@ejemplo.com"
+                      {...register('email')}
+                      className="w-full rounded-[10px] border py-[10px] pl-10 pr-4 text-[14px] text-slate-200 placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-emerald-500/50"
+                      style={{
+                        background: 'rgba(255,255,255,0.05)',
+                        borderColor: errors.email
+                          ? 'rgba(248,113,113,0.5)'
+                          : 'rgba(255,255,255,0.1)',
+                      }}
                     />
                   </div>
-                  {errors.lastName && <p className="text-red-400 text-xs mt-1">{errors.lastName.message}</p>}
+                  {errors.email && (
+                    <p id="reg-email-error" role="alert" className="mt-1 text-[11px] text-red-400">
+                      {errors.email.message}
+                    </p>
+                  )}
                 </div>
-              </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">Email</label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
-                  <input
-                    type="email"
-                    {...register('email')}
-                    placeholder="email@ejemplo.com"
-                    className="w-full pl-10 pr-4 py-3 bg-[#1a1f3a] border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                {/* Password */}
+                <div>
+                  <label
+                    htmlFor="reg-password"
+                    className="mb-1.5 block text-[12px] font-medium tracking-wide text-slate-400"
+                  >
+                    Contraseña
+                  </label>
+                  <div className="relative">
+                    <Lock
+                      className="pointer-events-none absolute left-3 top-1/2 h-[15px] w-[15px] -translate-y-1/2 text-slate-600"
+                      aria-hidden="true"
+                    />
+                    <input
+                      id="reg-password"
+                      type={showPassword ? 'text' : 'password'}
+                      autoComplete="new-password"
+                      aria-invalid={errors.password ? 'true' : 'false'}
+                      aria-describedby={errors.password ? 'reg-pw-error' : undefined}
+                      placeholder="••••••••"
+                      {...register('password')}
+                      className="w-full rounded-[10px] border py-[10px] pl-10 pr-11 text-[14px] text-slate-200 placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-emerald-500/50"
+                      style={{
+                        background: 'rgba(255,255,255,0.05)',
+                        borderColor: errors.password
+                          ? 'rgba(248,113,113,0.5)'
+                          : 'rgba(255,255,255,0.1)',
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((v) => !v)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 rounded text-slate-500 hover:text-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                    >
+                      {showPassword
+                        ? <EyeOff className="h-4 w-4" aria-hidden="true" />
+                        : <Eye className="h-4 w-4" aria-hidden="true" />}
+                    </button>
+                  </div>
+                  {errors.password && (
+                    <p id="reg-pw-error" role="alert" className="mt-1 text-[11px] text-red-400">
+                      {errors.password.message}
+                    </p>
+                  )}
+                </div>
+
+                {/* Server error */}
+                {error && (
+                  <div
+                    role="alert"
+                    aria-live="polite"
+                    className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2.5 text-[13px] text-red-400"
+                  >
+                    {error}
+                  </div>
+                )}
+
+                {/* Submit */}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="group relative mt-1 flex w-full items-center justify-center gap-2 overflow-hidden rounded-[10px] py-[11px] text-[14px] font-semibold text-white transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                  style={{ background: 'linear-gradient(135deg, #10b981, #059669)' }}
+                >
+                  <span
+                    className="absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100"
+                    style={{ background: 'linear-gradient(135deg, #34d399, #10b981)' }}
+                    aria-hidden="true"
                   />
-                </div>
-                {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email.message}</p>}
-              </div>
+                  <span className="relative z-10">
+                    {loading ? 'Creando cuenta…' : 'Crear Cuenta'}
+                  </span>
+                  {!loading && (
+                    <ArrowRight
+                      className="relative z-10 h-4 w-4 transition-transform group-hover:translate-x-1"
+                      aria-hidden="true"
+                    />
+                  )}
+                </button>
+              </form>
+            )}
 
-              <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">Contraseña</label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
-                  <input
-                    type="password"
-                    {...register('password')}
-                    placeholder="••••••••"
-                    className="w-full pl-10 pr-4 py-3 bg-[#1a1f3a] border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                  />
-                </div>
-                {errors.password && <p className="text-red-400 text-xs mt-1">{errors.password.message}</p>}
-              </div>
-              
-              {error && (
-                <div className="p-3 bg-red-500/10 border border-red-500/50 rounded-lg text-red-400 text-sm">
-                  {error}
-                </div>
-              )}
-
+            {/* Footer */}
+            <p className="mt-6 text-center text-[12px] text-slate-600">
+              ¿Ya tienes cuenta?{' '}
               <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-3 px-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-medium rounded-lg hover:from-green-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-[#0f172a] transition-all transform hover:scale-[1.02] flex items-center justify-center gap-2 group disabled:opacity-70 disabled:hover:scale-100 disabled:cursor-not-allowed"
+                onClick={onToggleForm}
+                className="text-emerald-400 hover:text-emerald-300 hover:underline focus:outline-none focus:ring-2 focus:ring-emerald-500 rounded"
               >
-                <span>{loading ? 'Registrando...' : 'Registrar Cuenta'}</span>
-                {!loading && <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />}
+                Inicia Sesión
               </button>
-            </form>
-          )}
-
-          <div className="mt-6 text-center space-y-2">
-            <p className="text-xs text-gray-500">
-              ¿Ya tienes cuenta? <button onClick={onToggleForm} className="text-blue-400 hover:underline">Inicia Sesión</button>
             </p>
           </div>
         </div>
       </div>
+
+      {/* Keyframes */}
+      <style>{`
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(18px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          * { animation: none !important; transition: none !important; }
+        }
+      `}</style>
     </div>
   );
 }

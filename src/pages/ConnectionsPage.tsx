@@ -281,8 +281,8 @@ function CreateConnectionModal({ isOpen, onClose, onSubmit }: CreateModalProps) 
     setIsSubmitting(false);
   };
 
-  const inputClass = "w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2 text-sm text-gray-300 placeholder-gray-600 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all";
-  const labelClass = "block text-xs font-medium text-gray-400 mb-1.5";
+  const inputClass = "w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg px-3 py-2 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all";
+  const labelClass = "block text-xs font-medium text-[var(--text-secondary)] mb-1.5";
 
   if (!isOpen) return null;
 
@@ -409,13 +409,13 @@ function CreateConnectionModal({ isOpen, onClose, onSubmit }: CreateModalProps) 
                 type="checkbox"
                 checked={formData.hasApiAuth}
                 onChange={(e) => setFormData({ ...formData, hasApiAuth: e.target.checked })}
-                className="w-4 h-4 rounded border-[#30363d] bg-[#0d1117] text-blue-500 focus:ring-blue-500/50"
+                className="w-4 h-4 rounded border-[#30363d] text-blue-500 focus:ring-blue-500/50"
               />
               <span className="text-sm text-gray-300">Configurar Auth API (para obtener token)</span>
             </label>
 
             {formData.hasApiAuth && (
-              <div className="mt-4 p-4 bg-[#0d1117] rounded-lg space-y-4">
+              <div className="mt-4 p-4  rounded-lg space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className={labelClass}>Método Auth</label>
@@ -567,8 +567,8 @@ export default function ConnectionsPage() {
   const methods = ['all', ...Array.from(new Set(connections.map(c => c.method)))];
 
   return (
-    <div className="min-h-screen bg-[#0d1117]">
-      <div className="border-b border-[#21262d] bg-[#0d1117] sticky top-0 z-30">
+    <div className="min-h-screen ">
+      <div className="border-b bg-[#0d1117]/50 border-[#21262d]  sticky top-0 z-30">
         <div className="px-6 py-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
@@ -702,7 +702,7 @@ export default function ConnectionsPage() {
 
                   <div>
                     <h3 className="text-sm font-medium text-gray-400 mb-2">Response Body</h3>
-                    <pre className="bg-[#0d1117] border border-[#30363d] rounded-lg p-4 text-xs text-gray-300 overflow-x-auto max-h-64 font-mono">
+                    <pre className=" border border-[#30363d] rounded-lg p-4 text-xs text-gray-300 overflow-x-auto max-h-64 font-mono">
                       {testResult.result.data 
                         ? JSON.stringify(testResult.result.data, null, 2)
                         : testResult.result.error || 'Sin respuesta'}
@@ -712,7 +712,7 @@ export default function ConnectionsPage() {
                   {testResult.result.response && (
                     <div>
                       <h3 className="text-sm font-medium text-gray-400 mb-2">Error Details</h3>
-                      <pre className="bg-[#0d1117] border border-[#30363d] rounded-lg p-4 text-xs text-red-400 overflow-x-auto max-h-40 font-mono">
+                      <pre className=" border border-[#30363d] rounded-lg p-4 text-xs text-red-400 overflow-x-auto max-h-40 font-mono">
                         {JSON.stringify(testResult.result.response, null, 2)}
                       </pre>
                     </div>

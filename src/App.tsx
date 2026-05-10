@@ -4,6 +4,7 @@ import AuthPage from './pages/AuthPage';
 import DashboardPage from './pages/DashboardPage';
 import AdminPage from './pages/AdminPage';
 import ConnectionsPage from './pages/ConnectionsPage';
+import IntegrationsPage from './pages/IntegrationsPage';
 import Layout from './components/Layout';
 import UsersManagement from './components/UsersManagement';
 
@@ -43,6 +44,7 @@ export default function App() {
       }>
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/dashboard/connections" element={<ConnectionsPage />} />
+        <Route path="/dashboard/integrations" element={<IntegrationsPage />} />
         <Route path="/admin" element={
           <AdminRoute>
             <AdminPage />

@@ -25,7 +25,7 @@ const sidebarItems = {
   admin: [
     { icon: LayoutDashboard, label: 'Dashboard Admin', path: '/admin' },
     { icon: Users, label: 'Gestión Usuarios', path: '/admin/users' },
-    { icon: Plug, label: 'Integraciones', path: '/admin/integrations' },
+    { icon: Plug, label: 'Integraciones', path: '/dashboard/integrations' },
     { icon: Activity, label: 'Monitoreo', path: '/admin/monitoring' },
     { icon: FileText, label: 'Logs Sistema', path: '/admin/logs' },
     // { icon: Shield, label: 'Seguridad', path: '/admin/security' },

@@ -43,3 +43,16 @@ export interface ApiField {
   name: string;
   type: string;
 }
+
+export interface SchemaMatch {
+  id: number;
+  integrationId: number;
+  sourceField: string;
+  targetField: string;
+  confidence: number;
+  status: 'PENDING' | 'CONFIRMED' | 'REJECTED';
+  transformation: string | null;
+  reviewedBy: string | null;
+  reviewedAt: string | null;
+  createdAt: string;
+}

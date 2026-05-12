@@ -11,6 +11,7 @@ type ModalType = 'none' | 'newConnection' | 'schemaMatcher';
 
 export default function DashboardPage() {
   const [modal, setModal] = useState<ModalType>('none');
+  const [selectedIntegrationId, setSelectedIntegrationId] = useState<number | null>(null);
   const { integrations, loading: loadingIntegrations } = useIntegrations();
   const { records, loading: loadingRecords } = useUnifiedRecords();
 
@@ -33,7 +34,10 @@ export default function DashboardPage() {
               <IntegrationCard
                 key={integration.id}
                 integration={integration}
-                onSchemaMatch={() => setModal('schemaMatcher')}
+                onSchemaMatch={() => {
+                  setSelectedIntegrationId(Number(integration.id));
+                  setModal('schemaMatcher');
+                }}
               />
             ))}
           </div>
@@ -53,8 +57,11 @@ export default function DashboardPage() {
         />
       )}
 
-      {modal === 'schemaMatcher' && (
-        <SchemaMatcherModal onClose={() => setModal('none')} />
+      {modal === 'schemaMatcher' && selectedIntegrationId && (
+        <SchemaMatcherModal
+          integrationId={selectedIntegrationId}
+          onClose={() => setModal('none')}
+        />
       )}
     </>
   );

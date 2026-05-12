@@ -3,59 +3,51 @@ import { useIntegrations } from '../hooks/useIntegrations';
 import { useUnifiedRecords } from '../hooks/useUnifiedRecords';
 import StatsBar from '../components/StatsBar';
 import IntegrationCard from '../components/IntegrationCard';
-import UnifiedDataTable from '../components/UnifiedDataTable';
-import NewConnectionModal from '../components/NewConnectionModal';
 import SchemaMatcherModal from '../components/SchemaMatcherModal';
-
-type ModalType = 'none' | 'newConnection' | 'schemaMatcher';
+import UnifiedDataTable from '../components/UnifiedDataTable';
+import LoadingState from '../components/ui/LoadingState';
 
 export default function DashboardPage() {
-  const [modal, setModal] = useState<ModalType>('none');
   const { integrations, loading: loadingIntegrations } = useIntegrations();
   const { records, loading: loadingRecords } = useUnifiedRecords();
+  const [schemaMatchId, setSchemaMatchId] = useState<number | null>(null);
 
   return (
-    <>
-      <div className="mb-5">
-        <StatsBar />
-      </div>
-      
-      <div className="mb-5">
+    <div className="p-6 space-y-6">
+      <StatsBar />
+
+      <div>
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-semibold text-[var(--text-secondary)]">Integraciones Configuradas</h2>
-          <span className="text-xs text-[var(--text-muted)]">{integrations.length} pipelines</span>
+          <h2 className="text-sm font-semibold text-slate-600">Integraciones Configuradas</h2>
+          <span className="text-xs text-slate-400">{integrations.length} pipelines</span>
         </div>
         {loadingIntegrations ? (
-          <p className="text-[var(--text-muted)] text-sm">Cargando integraciones...</p>
+          <LoadingState message="Cargando integraciones..." />
         ) : (
           <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
             {integrations.map((integration) => (
               <IntegrationCard
                 key={integration.id}
                 integration={integration}
-                onSchemaMatch={() => setModal('schemaMatcher')}
+                onSchemaMatch={(id) => setSchemaMatchId(id)}
               />
             ))}
           </div>
         )}
       </div>
-      
+
       {loadingRecords ? (
-        <p className="text-[var(--text-muted)] text-sm mt-4">Cargando registros...</p>
+        <LoadingState message="Cargando registros..." />
       ) : (
         <UnifiedDataTable records={records} />
       )}
 
-      {modal === 'newConnection' && (
-        <NewConnectionModal
-          onClose={() => setModal('none')}
-          onSuccess={() => setModal('schemaMatcher')}
+      {schemaMatchId !== null && (
+        <SchemaMatcherModal
+          integrationId={schemaMatchId}
+          onClose={() => setSchemaMatchId(null)}
         />
       )}
-
-      {modal === 'schemaMatcher' && (
-        <SchemaMatcherModal onClose={() => setModal('none')} />
-      )}
-    </>
+    </div>
   );
 }

@@ -1,95 +1,74 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import {
-  GitMerge,
-  Plus,
-  Search,
-  Trash2,
-  Edit3,
-  X,
-  Save,
-  Loader2,
-  RefreshCw,
-  AlertCircle,
-  CheckCircle,
-  Clock,
-  ExternalLink,
-  MoreVertical,
-  ArrowRight
-} from 'lucide-react';
+import { GitMerge, RefreshCw } from 'lucide-react';
 import { useIntegrations } from '../hooks/useIntegrations';
 import { useApiConnections } from '../hooks/useApiConnections';
 import { IntegrationResponse } from '../types';
+import PageHeader from '../components/ui/PageHeader';
+import LoadingState from '../components/ui/LoadingState';
+import ErrorState from '../components/ui/ErrorState';
+import EmptyState from '../components/ui/EmptyState';
+import Modal from '../components/ui/Modal';
+import SchemaMatcherModal from '../components/SchemaMatcherModal';
+import { cn } from '../lib/utils';
 
-const statusConfig: Record<string, { color: string; bg: string; border: string; label: string }> = {
-  active: { color: 'text-emerald-400', bg: 'bg-emerald-400', border: 'border-emerald-500/30', label: 'Activo' },
-  pending: { color: 'text-amber-400', bg: 'bg-amber-400', border: 'border-amber-500/30', label: 'Pendiente' },
-  error: { color: 'text-red-400', bg: 'bg-red-400', border: 'border-red-500/30', label: 'Error' },
-  inactive: { color: 'text-gray-500', bg: 'bg-gray-500', border: 'border-gray-600/30', label: 'Inactivo' },
+const statusConfig: Record<string, { color: string; bg: string; label: string }> = {
+  active: { color: 'text-emerald-700', bg: 'bg-emerald-100', label: 'Activo' },
+  pending: { color: 'text-amber-700', bg: 'bg-amber-100', label: 'Pendiente' },
+  error: { color: 'text-red-700', bg: 'bg-red-100', label: 'Error' },
+  inactive: { color: 'text-slate-500', bg: 'bg-slate-100', label: 'Inactivo' },
 };
 
 function formatDate(dateStr: string): string {
-  const date = new Date(dateStr);
-  return date.toLocaleDateString('es-ES', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
+  return new Date(dateStr).toLocaleDateString('es-ES', {
+    day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
   });
 }
 
-interface IntegrationCardProps {
+function IntegrationCard({ integration, connections, onEdit, onDelete, onSchemaMatch }: {
   integration: IntegrationResponse;
   connections: { id: number; description: string; method: string }[];
-  onEdit: (integration: IntegrationResponse) => void;
+  onEdit: (i: IntegrationResponse) => void;
   onDelete: (id: number) => void;
-}
-
-function IntegrationCard({ integration, connections, onEdit, onDelete }: IntegrationCardProps) {
+  onSchemaMatch: (id: number) => void;
+}) {
   const [showMenu, setShowMenu] = useState(false);
   const status = statusConfig[integration.status] || statusConfig.inactive;
-
-  const apiAConn = connections.find(c => c.id === integration.apiA);
-  const apiBConn = connections.find(c => c.id === integration.apiB);
+  const apiA = connections.find(c => c.id === integration.apiA);
+  const apiB = connections.find(c => c.id === integration.apiB);
 
   return (
-    <div className="group relative bg-[var(--card-bg)] border border-[var(--border-color)] rounded-xl overflow-hidden hover:border-blue-500/30 transition-all">
+    <div className="bg-white border border-slate-200 rounded-xl overflow-hidden hover:border-blue-300 transition-all">
       <div className="relative p-5">
         <div className="flex items-start justify-between mb-4">
           <div className="min-w-0 flex-1">
-            <h3 className="text-[var(--text-primary)] font-semibold text-sm leading-tight truncate">
+            <h3 className="text-slate-900 font-semibold text-sm truncate">
               {integration.description || `Integración ${integration.id}`}
             </h3>
             <div className="flex items-center gap-2 mt-1.5">
-              <span className={`px-2 py-0.5 rounded text-[10px] font-semibold ${status.color} ${status.bg}/20 ${status.border}`}>
+              <span className={cn('px-2 py-0.5 rounded text-[10px] font-semibold', status.bg, status.color)}>
                 {status.label}
               </span>
             </div>
           </div>
-
           <div className="relative">
-            <button
-              onClick={() => setShowMenu(!showMenu)}
-              className="p-1.5 rounded-lg text-gray-500 hover:text-gray-300 hover:bg-[var(--bg-tertiary)] transition-colors"
-            >
-              <MoreVertical size={14} />
+            <button onClick={() => setShowMenu(!showMenu)}
+              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>
+              </svg>
             </button>
-
             {showMenu && (
-              <div className="absolute right-0 top-full mt-1 w-36 bg-[var(--card-bg)] border border-[var(--border-color)] rounded-lg shadow-xl overflow-hidden z-20">
-                <button
-                  onClick={() => { onEdit(integration); setShowMenu(false); }}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] hover:text-[var(--text-primary)] transition-colors"
-                >
-                  <Edit3 size={12} />
+              <div className="absolute right-0 top-full mt-1 w-36 bg-white border border-slate-200 rounded-lg shadow-lg z-20 overflow-hidden">
+                <button onClick={() => { onSchemaMatch(integration.id); setShowMenu(false); }}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50">
+                  Ver Mapeo
+                </button>
+                <button onClick={() => { onEdit(integration); setShowMenu(false); }}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50">
                   Editar
                 </button>
-                <button
-                  onClick={() => { onDelete(integration.id); setShowMenu(false); }}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-400 hover:bg-red-500/10 transition-colors"
-                >
-                  <Trash2 size={12} />
+                <button onClick={() => { onDelete(integration.id); setShowMenu(false); }}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-500 hover:bg-red-50">
                   Eliminar
                 </button>
               </div>
@@ -97,32 +76,30 @@ function IntegrationCard({ integration, connections, onEdit, onDelete }: Integra
           </div>
         </div>
 
-        <div className="flex items-center gap-3 p-3 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border-color)]">
+        <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 border border-slate-200">
           <div className="flex-1 min-w-0">
-            <div className="text-[10px] text-[var(--text-muted)] mb-1">ORIGEN (A)</div>
+            <div className="text-[10px] text-slate-500 mb-1">ORIGEN (A)</div>
             <div className="flex items-center gap-1.5">
-              <span className="text-xs font-semibold text-blue-400">{apiAConn?.method || 'API'}</span>
-              <span className="text-xs text-[var(--text-secondary)] truncate">
-                {apiAConn?.description || `ID: ${integration.apiA}`}
-              </span>
+              <span className="text-xs font-semibold text-blue-600">{apiA?.method || 'API'}</span>
+              <span className="text-xs text-slate-500 truncate">{apiA?.description || `ID: ${integration.apiA}`}</span>
             </div>
           </div>
-
-          <ArrowRight size={14} className="text-[var(--text-muted)] flex-shrink-0" />
-
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-slate-400 flex-shrink-0">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
           <div className="flex-1 min-w-0">
-            <div className="text-[10px] text-[var(--text-muted)] mb-1">DESTINO (B)</div>
+            <div className="text-[10px] text-slate-500 mb-1">DESTINO (B)</div>
             <div className="flex items-center gap-1.5">
-              <span className="text-xs font-semibold text-cyan-400">{apiBConn?.method || 'API'}</span>
-              <span className="text-xs text-[var(--text-secondary)] truncate">
-                {apiBConn?.description || `ID: ${integration.apiB}`}
-              </span>
+              <span className="text-xs font-semibold text-cyan-600">{apiB?.method || 'API'}</span>
+              <span className="text-xs text-slate-500 truncate">{apiB?.description || `ID: ${integration.apiB}`}</span>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5 mt-3 text-xs text-[var(--text-muted)]">
-          <Clock size={10} />
+        <div className="flex items-center gap-1.5 mt-3 text-xs text-slate-400">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+          </svg>
           <span>{formatDate(integration.createdAt)}</span>
         </div>
       </div>
@@ -130,152 +107,66 @@ function IntegrationCard({ integration, connections, onEdit, onDelete }: Integra
   );
 }
 
-interface EditModalProps {
+function EditModal({ integration, connections, onClose, onSave }: {
   integration: IntegrationResponse;
+  connections: { id: number; description: string; method: string }[];
   onClose: () => void;
-  onSave: (id: number, data: { description: string; status: string }) => Promise<void>;
-}
-
-function EditIntegrationModal({ integration, onClose, onSave }: EditModalProps) {
+  onSave: (id: number, data: { apiA: number; apiB: number; description: string }) => Promise<void>;
+}) {
+  const [apiA, setApiA] = useState(integration.apiA);
+  const [apiB, setApiB] = useState(integration.apiB);
   const [description, setDescription] = useState(integration.description);
-  const [status, setStatus] = useState(integration.status);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    try {
-      await onSave(integration.id, { description, status });
-    } finally {
-      setLoading(false);
-    }
+    try { await onSave(integration.id, { apiA, apiB, description }); } finally { setLoading(false); }
   };
 
+  const otherConnections = connections.filter(c => c.id !== apiA);
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-      <div className="relative w-full max-w-md bg-[var(--card-bg)] border border-[var(--border-color)] rounded-2xl shadow-2xl overflow-hidden">
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-blue-500/60 to-transparent" />
-
-        <div className="flex items-center justify-between px-6 py-5 border-b border-[var(--border-color)]">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-600/20 border border-blue-500/30">
-              <Edit3 size={15} className="text-blue-400" />
-            </div>
-            <div>
-              <h2 className="text-[var(--text-primary)] font-semibold text-sm">Editar Integración</h2>
-              <p className="text-xs text-[var(--text-muted)]">ID: {integration.id}</p>
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            className="flex items-center justify-center w-8 h-8 rounded-lg bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-all"
-          >
-            <X size={15} />
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="px-6 py-5 space-y-4">
-          <div>
-            <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Descripción</label>
-            <input
-              type="text"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--text-primary)] focus:outline-none focus:border-blue-500/60 transition-all"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Estado</label>
-            <select
-              value={status}
-              onChange={(e) => setStatus(e.target.value as any)}
-              className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--text-primary)] focus:outline-none focus:border-blue-500/60 transition-all cursor-pointer"
-            >
-              <option value="active">Activo</option>
-              <option value="pending">Pendiente</option>
-              <option value="inactive">Inactivo</option>
-              <option value="error">Error</option>
-            </select>
-          </div>
-        </form>
-
-        <div className="flex gap-3 px-6 pb-5">
-          <button
-            type="button"
-            onClick={onClose}
-            className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-[var(--border-color)] text-[var(--text-secondary)] text-sm font-medium hover:bg-[var(--bg-tertiary)] transition-all"
-          >
+    <Modal isOpen onClose={onClose} title="Editar Integración" subtitle={`ID: ${integration.id}`}
+      icon={<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>}
+      footer={
+        <>
+          <button type="button" onClick={onClose}
+            className="flex-1 py-2.5 rounded-lg border border-slate-200 text-slate-600 text-sm font-medium hover:bg-slate-50 transition-colors">
             Cancelar
           </button>
-          <button
-            onClick={handleSubmit}
-            disabled={loading}
-            className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold transition-all shadow-lg shadow-blue-900/40 active:scale-[0.98]"
-          >
-            {loading ? (
-              <>
-                <Loader2 size={15} className="animate-spin" />
-                Guardando...
-              </>
-            ) : (
-              <>
-                <Save size={15} />
-                Guardar
-              </>
-            )}
+          <button onClick={handleSubmit} disabled={loading}
+            className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold transition-colors">
+            {loading ? 'Guardando...' : 'Guardar'}
           </button>
+        </>
+      }>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block text-xs font-medium text-slate-600 mb-1.5">API Origen (A)</label>
+          <select value={apiA} onChange={(e) => { const val = Number(e.target.value); setApiA(val); }}
+            className="w-full bg-white border border-slate-200 rounded-lg px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all cursor-pointer">
+            {connections.map(c => (
+              <option key={c.id} value={c.id}>{c.description} ({c.method})</option>
+            ))}
+          </select>
         </div>
-      </div>
-    </div>
-  );
-}
-
-function LoadingState() {
-  return (
-    <div className="flex flex-col items-center justify-center py-20">
-      <Loader2 size={32} className="text-blue-400 animate-spin" />
-      <p className="text-[var(--text-muted)] mt-4 text-sm">Cargando integraciones...</p>
-    </div>
-  );
-}
-
-function ErrorState({ message, onRetry }: { message: string; onRetry: () => void }) {
-  return (
-    <div className="flex flex-col items-center justify-center py-20">
-      <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mb-4">
-        <AlertCircle className="text-red-400" size={32} />
-      </div>
-      <p className="text-[var(--text-secondary)] text-sm mb-4">{message}</p>
-      <button
-        onClick={onRetry}
-        className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition-colors"
-      >
-        <RefreshCw size={14} />
-        Reintentar
-      </button>
-    </div>
-  );
-}
-
-function EmptyState({ onAddNew }: { onAddNew: () => void }) {
-  return (
-    <div className="flex flex-col items-center justify-center py-20">
-      <div className="w-20 h-20 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border-color)] flex items-center justify-center mb-6">
-        <GitMerge className="text-[var(--text-muted)]" size={40} />
-      </div>
-      <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">Sin integraciones</h3>
-      <p className="text-[var(--text-muted)] text-sm mb-6 text-center max-w-sm">
-        Crea tu primera integración para conectar APIs y comenzar a sincronizar datos.
-      </p>
-      <button
-        onClick={onAddNew}
-        className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition-colors"
-      >
-        <Plus size={16} />
-        Nueva Integración
-      </button>
-    </div>
+        <div>
+          <label className="block text-xs font-medium text-slate-600 mb-1.5">API Destino (B)</label>
+          <select value={apiB} onChange={(e) => setApiB(Number(e.target.value))}
+            className="w-full bg-white border border-slate-200 rounded-lg px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all cursor-pointer">
+            {otherConnections.map(c => (
+              <option key={c.id} value={c.id}>{c.description} ({c.method})</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-slate-600 mb-1.5">Descripción</label>
+          <input type="text" value={description} onChange={(e) => setDescription(e.target.value)}
+            className="w-full bg-white border border-slate-200 rounded-lg px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all" />
+        </div>
+      </form>
+    </Modal>
   );
 }
 
@@ -284,11 +175,11 @@ export default function IntegrationsPage() {
   const { connections } = useApiConnections();
   const [searchQuery, setSearchQuery] = useState('');
   const [editingIntegration, setEditingIntegration] = useState<IntegrationResponse | null>(null);
+  const [schemaMatchId, setSchemaMatchId] = useState<number | null>(null);
 
-  const filteredIntegrations = integrations.filter(conn => {
-    const matchesSearch = conn.description?.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesSearch;
-  });
+  const filtered = integrations.filter(i =>
+    i.description?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const handleDelete = async (id: number) => {
     if (window.confirm('¿Estás seguro de eliminar esta integración?')) {
@@ -296,85 +187,60 @@ export default function IntegrationsPage() {
     }
   };
 
-  const handleSave = async (id: number, data: { description: string; status: string }) => {
-    const result = await updateIntegration(id, { description: data.description, status: data.status as any });
-    if (result.success) {
-      setEditingIntegration(null);
-    }
+  const handleSave = async (id: number, data: { apiA: number; apiB: number; description: string }) => {
+    const result = await updateIntegration(id, {
+      apiA: data.apiA, apiB: data.apiB, description: data.description,
+    });
+    if (result.success) setEditingIntegration(null);
   };
 
-  const connectionsMap = connections.map(c => ({
-    id: c.id,
-    description: c.description || `API ${c.id}`,
-    method: c.method
-  }));
+  const connMap = connections.map(c => ({ id: c.id, description: c.description || `API ${c.id}`, method: c.method }));
 
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)]">
-      <div className="border-b border-[var(--border-color)] bg-[var(--bg-secondary)] sticky top-0 z-30">
-        <div className="px-6 py-4">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <h1 className="text-2xl font-bold text-[var(--text-primary)] flex items-center gap-3">
-                <GitMerge className="text-blue-400" size={28} />
-                Integraciones
-              </h1>
-              <p className="text-sm text-[var(--text-muted)] mt-1">
-                {integrations.length} {integrations.length === 1 ? 'integración' : 'integraciones'} configuradas
-              </p>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <div className="relative">
-                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Buscar integraciones..."
-                  className="bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-lg pl-9 pr-4 py-2 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-blue-500/50 w-48 transition-all"
-                />
-              </div>
-
-              <button
-                onClick={refetch}
-                className="p-2 rounded-lg bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-colors"
-                aria-label="Actualizar"
-              >
-                <RefreshCw size={16} />
-              </button>
-            </div>
-          </div>
+    <div>
+      <PageHeader icon={<GitMerge size={16} />} title="Integraciones"
+        description={`${integrations.length} ${integrations.length === 1 ? 'integración' : 'integraciones'} configuradas`}>
+        <div className="relative">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+          </svg>
+          <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Buscar..." className="bg-slate-50 border border-slate-200 rounded-lg pl-9 pr-4 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 w-44 transition-all" />
         </div>
-      </div>
+        <button onClick={refetch}
+          className="p-2 rounded-lg bg-slate-50 border border-slate-200 text-slate-500 hover:text-slate-700 hover:bg-white transition-colors">
+          <RefreshCw size={16} />
+        </button>
+      </PageHeader>
 
       <div className="p-6">
-        {loading ? (
-          <LoadingState />
-        ) : error ? (
-          <ErrorState message={error} onRetry={refetch} />
-        ) : filteredIntegrations.length === 0 ? (
-          <EmptyState onAddNew={() => {}} />
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-            {filteredIntegrations.map(integration => (
-              <IntegrationCard
-                key={integration.id}
-                integration={integration}
-                connections={connectionsMap}
-                onEdit={setEditingIntegration}
-                onDelete={handleDelete}
-              />
-            ))}
-          </div>
-        )}
+        {loading ? <LoadingState message="Cargando integraciones..." /> :
+         error ? <ErrorState message={error} onRetry={refetch} /> :
+         filtered.length === 0 ? (
+           <EmptyState icon={<GitMerge size={40} className="text-slate-300" />}
+             title="Sin integraciones" description="Crea tu primera integración para conectar APIs."
+             actionLabel="Nueva Integración" onAction={() => {}} />
+         ) : (
+           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+             {filtered.map(i => (
+               <IntegrationCard key={i.id} integration={i} connections={connMap}
+                 onEdit={setEditingIntegration} onDelete={handleDelete}
+                 onSchemaMatch={setSchemaMatchId} />
+             ))}
+           </div>
+         )}
       </div>
 
       {editingIntegration && (
-        <EditIntegrationModal
-          integration={editingIntegration}
-          onClose={() => setEditingIntegration(null)}
-          onSave={handleSave}
+        <EditModal integration={editingIntegration} connections={connMap}
+          onClose={() => setEditingIntegration(null)} onSave={handleSave} />
+      )}
+
+      {schemaMatchId !== null && (
+        <SchemaMatcherModal
+          integrationId={schemaMatchId}
+          onClose={() => setSchemaMatchId(null)}
         />
       )}
     </div>

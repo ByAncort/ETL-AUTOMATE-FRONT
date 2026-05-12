@@ -6,29 +6,30 @@ import { useState } from 'react';
 import NewIntegrationModal from './NewIntegrationModal';
 import { useApiConnections } from '../hooks/useApiConnections';
 import { useIntegrations, CreateIntegrationPayload } from '../hooks/useIntegrations';
-import SchemaMatcherModal from './SchemaMatcherModal';
 import { addNotification } from '../services/notificationService';
+
+const pageMeta: Record<string, { title: string; subtitle: string }> = {
+  '/dashboard': { title: 'Dashboard', subtitle: 'Resumen de integraciones' },
+  '/dashboard/connections': { title: 'Conexiones API', subtitle: 'Gestión de conexiones' },
+  '/dashboard/explorer': { title: 'Explorador de Datos', subtitle: 'Explora tus fuentes de datos' },
+  '/dashboard/settings': { title: 'Configuración', subtitle: 'Ajustes del sistema' },
+  '/dashboard/integrations': { title: 'Integraciones', subtitle: 'Pipelines de datos' },
+  '/admin': { title: 'Panel de Administración', subtitle: 'Administración del sistema' },
+  '/admin/users': { title: 'Gestión de Usuarios', subtitle: 'Administra usuarios' },
+  '/admin/integrations': { title: 'Integraciones', subtitle: 'Configuración global' },
+  '/admin/monitoring': { title: 'Monitoreo', subtitle: 'Estado del sistema' },
+  '/admin/logs': { title: 'Logs del Sistema', subtitle: 'Registros de actividad' },
+  '/admin/settings': { title: 'Configuración Admin', subtitle: 'Ajustes administrativos' },
+};
 
 export default function Layout() {
   const location = useLocation();
   const { logout } = useAuth();
-  const { connections, refetch: refetchConnections } = useApiConnections();
+  const { connections } = useApiConnections();
   const { createIntegration, refetch: refetchIntegrations } = useIntegrations();
   const [showIntegrationModal, setShowIntegrationModal] = useState(false);
 
-  const currentPage = {
-    '/dashboard': { title: 'Dashboard', subtitle: 'Resumen de integraciones' },
-    '/dashboard/connections': { title: 'Conexiones API', subtitle: 'Gestión de conexiones' },
-    '/dashboard/explorer': { title: 'Explorador de Datos', subtitle: 'Explora tus fuentes de datos' },
-    '/dashboard/settings': { title: 'Configuración', subtitle: 'Ajustes del sistema' },
-    '/admin': { title: 'Panel de Administración', subtitle: 'Administración del sistema' },
-    '/admin/users': { title: 'Gestión de Usuarios', subtitle: 'Administra usuarios' },
-    '/admin/integrations': { title: 'Integraciones', subtitle: 'Configuración global' },
-    '/admin/monitoring': { title: 'Monitoreo', subtitle: 'Estado del sistema' },
-    '/admin/logs': { title: 'Logs del Sistema', subtitle: 'Registros de actividad' },
-    '/admin/security': { title: 'Seguridad', subtitle: 'Configuración de seguridad' },
-    '/admin/settings': { title: 'Configuración Admin', subtitle: 'Ajustes administrativos' },
-  }[location.pathname] || { title: 'ETL Automate', subtitle: 'Plataforma de Integración' };
+  const currentPage = pageMeta[location.pathname] || { title: 'ETL Automate', subtitle: 'Plataforma de Integración' };
 
   const handleCreateIntegration = async (payload: CreateIntegrationPayload) => {
     const result = await createIntegration(payload);
@@ -40,9 +41,8 @@ export default function Layout() {
   };
 
   return (
-    <div className="flex h-screen bg-[var(--bg-primary)] font-sans overflow-hidden">
+    <div className="flex h-screen bg-slate-50 overflow-hidden">
       <Sidebar />
-
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <Header
           title={currentPage.title}
@@ -50,13 +50,10 @@ export default function Layout() {
           onNewIntegration={() => setShowIntegrationModal(true)}
           onLogout={logout}
         />
-
-        <main className="flex-1 overflow-y-auto px-6 py-5">
+        <main className="flex-1 overflow-y-auto">
           <Outlet />
-          <div className="h-4" />
         </main>
       </div>
-
       {showIntegrationModal && (
         <NewIntegrationModal
           connections={connections}

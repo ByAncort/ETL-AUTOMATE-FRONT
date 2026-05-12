@@ -1,124 +1,112 @@
-import { Play, Settings, Clock, Database, Plug, ArrowRight, Trash2, MoreVertical, AlertCircle } from 'lucide-react';
+import { Clock, Plug, Trash2, MoreVertical, AlertCircle, Settings } from 'lucide-react';
 import { Integration } from '../types';
 import { IntegrationResponse } from '../types';
+import { useState } from 'react';
+import { cn } from '../lib/utils';
 
-interface IntegrationDisplay {
-  id: string | number;
-  name: string;
-  source: string;
-  status: 'active' | 'pending' | 'error' | 'inactive';
-  lastRun?: string;
-  recordsProcessed?: string;
-}
-
-const statusConfig: Record<string, { color: string; bg: string; border: string; label: string }> = {
-  active: { color: 'text-emerald-400', bg: 'bg-emerald-400', border: 'border-emerald-500/30', label: 'Activo' },
-  pending: { color: 'text-amber-400', bg: 'bg-amber-400', border: 'border-amber-500/30', label: 'Pendiente' },
-  error: { color: 'text-red-400', bg: 'bg-red-400', border: 'border-red-500/30', label: 'Error' },
-  inactive: { color: 'text-gray-500', bg: 'bg-gray-500', border: 'border-gray-600/30', label: 'Inactivo' },
+const statusConfig: Record<string, { dot: string; label: string }> = {
+  active: { dot: 'bg-emerald-500', label: 'Activo' },
+  pending: { dot: 'bg-amber-500', label: 'Pendiente' },
+  error: { dot: 'bg-red-500', label: 'Error' },
+  inactive: { dot: 'bg-slate-300', label: 'Inactivo' },
 };
 
-type IntegrationCardProps = {
-  integration: IntegrationDisplay | IntegrationResponse;
-  onSchemaMatch?: () => void;
+type Props = {
+  integration: Integration | IntegrationResponse;
+  onSchemaMatch?: (id: number) => void;
   onDelete?: (id: number) => void;
 };
 
-function isIntegrationResponse(item: any): item is IntegrationResponse {
+function isResponse(item: Integration | IntegrationResponse): item is IntegrationResponse {
   return 'apiA' in item && 'apiB' in item;
 }
 
 function formatDate(dateStr: string): string {
-  const date = new Date(dateStr);
-  return date.toLocaleDateString('es-ES', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
+  return new Date(dateStr).toLocaleDateString('es-ES', {
+    day: '2-digit', month: 'short', year: 'numeric',
   });
 }
 
-export default function IntegrationCard({ integration, onSchemaMatch, onDelete }: IntegrationCardProps) {
+export default function IntegrationCard({ integration, onSchemaMatch, onDelete }: Props) {
+  const [showMenu, setShowMenu] = useState(false);
   const statusKey = integration.status || 'inactive';
   const status = statusConfig[statusKey] || statusConfig.inactive;
 
-  const displayName = isIntegrationResponse(integration)
+  const displayName = isResponse(integration)
     ? integration.description || `Integración ${integration.id}`
     : integration.name;
 
-  const displaySource = isIntegrationResponse(integration)
+  const displaySource = isResponse(integration)
     ? `API ${integration.apiA} → API ${integration.apiB}`
     : integration.source;
 
-  const displayLastRun = isIntegrationResponse(integration)
+  const displayLastRun = isResponse(integration)
     ? formatDate(integration.createdAt)
     : integration.lastRun || 'Nunca';
 
-  const displayRecords = isIntegrationResponse(integration)
-    ? '—'
-    : integration.recordsProcessed || '0';
-
-  const cardId = isIntegrationResponse(integration) ? integration.id : integration.id;
+  const cardId = integration.id;
 
   return (
-    <div className="relative flex flex-col bg-[var(--card-bg)] border border-[var(--border-color)] rounded-xl overflow-hidden hover:border-blue-500/30 transition-all group">
+    <div className="relative flex flex-col bg-white border border-slate-200 rounded-xl overflow-hidden hover:border-blue-300 transition-all group">
       <div className="relative p-5 flex-1">
         <div className="flex items-start justify-between mb-3">
           <div className="min-w-0 flex-1">
-            <h3 className="text-[var(--text-primary)] font-semibold text-sm leading-tight truncate">{displayName}</h3>
+            <h3 className="text-slate-900 font-semibold text-sm leading-tight truncate">{displayName}</h3>
             <div className="flex items-center gap-1.5 mt-1">
-              <Plug size={10} className="text-[var(--text-muted)] flex-shrink-0" />
-              <span className="text-[var(--text-muted)] text-xs truncate">{displaySource}</span>
+              <Plug size={10} className="text-slate-400 flex-shrink-0" />
+              <span className="text-slate-500 text-xs truncate">{displaySource}</span>
             </div>
           </div>
-          <div className={`flex items-center gap-1.5 px-2 py-1 rounded-full bg-[var(--bg-tertiary)] border ${status.border}`}>
-            <span className={`w-1.5 h-1.5 rounded-full ${status.bg} ${statusKey === 'active' ? 'animate-pulse' : ''}`} />
-            <span className={`text-xs font-medium ${status.color}`}>{status.label}</span>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2 mt-4">
-          <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[var(--bg-tertiary)] border border-[var(--border-color)]">
-            <ArrowRight size={10} className="text-blue-400" />
-            <span className="text-xs text-[var(--text-muted)]">Origen</span>
-          </div>
-          <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[var(--bg-tertiary)] border border-[var(--border-color)]">
-            <ArrowRight size={10} className="text-cyan-400 -rotate-90" />
-            <span className="text-xs text-[var(--text-muted)]">Destino</span>
+          <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-slate-50 border border-slate-200">
+            <span className={cn('w-1.5 h-1.5 rounded-full', status.dot)} />
+            <span className="text-xs font-medium text-slate-600">{status.label}</span>
           </div>
         </div>
 
         {statusKey === 'error' && (
-          <div className="mt-3 flex items-center gap-1.5 text-xs text-red-400 bg-red-950/30 border border-red-500/20 rounded-lg px-2.5 py-1.5">
+          <div className="mt-3 flex items-center gap-1.5 text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg px-2.5 py-1.5">
             <AlertCircle size={11} />
             <span>Fallo en conexión</span>
           </div>
         )}
       </div>
 
-      <div className="px-5 py-3 border-t border-[var(--border-color)] flex items-center justify-between">
-        <div className="flex items-center gap-1.5 text-xs text-[var(--text-muted)]">
+      <div className="px-5 py-3 border-t border-slate-100 flex items-center justify-between">
+        <div className="flex items-center gap-1.5 text-xs text-slate-400">
           <Clock size={10} />
           <span>{displayLastRun}</span>
         </div>
         <div className="flex items-center gap-1">
-          {onSchemaMatch && (
+          <div className="relative">
             <button
-              onClick={onSchemaMatch}
-              className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] transition-all"
-              title="Configurar"
+              onClick={() => setShowMenu(!showMenu)}
+              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
             >
-              <Settings size={12} />
+              <MoreVertical size={14} />
             </button>
-          )}
-          {onDelete && typeof cardId === 'number' && (
-            <button
-              onClick={() => onDelete(cardId as number)}
-              className="p-1.5 rounded-lg text-red-400/70 hover:text-red-400 hover:bg-red-950/30 transition-all"
-              title="Eliminar"
-            >
-              <Trash2 size={12} />
-            </button>
-          )}
+            {showMenu && (
+              <div className="absolute right-0 bottom-full mb-1 w-36 bg-white border border-slate-200 rounded-lg shadow-lg z-20 overflow-hidden">
+                {onSchemaMatch && (
+                  <button
+                    onClick={() => { onSchemaMatch(cardId as number); setShowMenu(false); }}
+                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 transition-colors"
+                  >
+                    <Settings size={12} />
+                    Configurar
+                  </button>
+                )}
+                {onDelete && (
+                  <button
+                    onClick={() => { onDelete(cardId as number); setShowMenu(false); }}
+                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-500 hover:bg-red-50 transition-colors"
+                  >
+                    <Trash2 size={12} />
+                    Eliminar
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

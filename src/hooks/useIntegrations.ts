@@ -18,6 +18,8 @@ export interface CreateIntegrationPayload {
 }
 
 export interface UpdateIntegrationPayload {
+  apiA?: number;
+  apiB?: number;
   description?: string;
   status?: 'pending' | 'active' | 'inactive' | 'error';
 }
@@ -58,7 +60,7 @@ export function useIntegrations() {
 
   const updateIntegration = async (id: number, payload: UpdateIntegrationPayload) => {
     try {
-      const response = await api.put<IntegrationResponse>(`/api/integrations/connections/${id}`, payload);
+      const response = await api.post<IntegrationResponse>(`/api/integrations/connections/${id}`, payload);
       setIntegrations(prev => prev.map(i => i.id === id ? response.data : i));
       return { success: true, data: response.data };
     } catch (err: any) {

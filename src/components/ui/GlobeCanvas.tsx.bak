@@ -9,7 +9,7 @@ const DEG2RAD        = Math.PI / 180;
 const DOT_DENSITY    = 9;
 const DOT_ROWS       = 180;
 const DOT_SIZE       = 0.7;
-const DOT_SEGMENTS   = 52;
+const DOT_SEGMENTS   = 32;
 const ROTATION_SPEED = 0.0006;
 
 const ARC_DATA: [number, number, number, number][] = [
@@ -40,7 +40,7 @@ const MARKERS: [number, number][] = [
   [ 52.52,   13.41], [-22.91,  -43.17],
 ];
 
-const ARC_COLORS = [0x2563eb, 0x3b82f6, 0x60a5fa, 0x0ea5e9, 0x06b6d4, 0x0284c7];
+const ARC_COLORS = [0x06b6d4, 0x3b82f6, 0x6366f1, 0x8b5cf6, 0x0ea5e9, 0x38bdf8];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -71,6 +71,7 @@ function arcControlPoints(
 // ─── Props ────────────────────────────────────────────────────────────────────
 
 interface GlobeCanvasProps {
+  /** Extra Tailwind / CSS classes applied to the wrapper div */
   className?: string;
 }
 
@@ -96,117 +97,63 @@ export default function GlobeCanvas({ className = 'fixed inset-0 w-full h-full' 
       45,
       container.clientWidth / container.clientHeight,
       1,
-      3000,
+      2000,
     );
     camera.position.set(0, 0, 580);
 
-    // ── Globe group (centered on Latin America, longitude ~-70°) ──────────────
+    // ── Globe group ──────────────────────────────────────────────────────────
     const globeGroup = new THREE.Group();
-    globeGroup.rotation.y = 2.8;
+    const tzOffset   = new Date().getTimezoneOffset() || 0;
+    globeGroup.rotation.y = Math.PI * (tzOffset / (60 * 12));
     scene.add(globeGroup);
 
-    // ── Base sphere (BLANCO con material que recibe sombras) ─────────────────
-    const globeMaterial = new THREE.MeshStandardMaterial({ 
-      color: 0xffffff,      // Blanco puro
-      roughness: 0.2,       // Superficie semi-mate
-      metalness: 0,       // Ligero efecto metálico
-      emissive: 0xffffff,   // Muy leve emisión para suavizar
-      emissiveIntensity: 0.15
-    });
-    
-    const globeMesh = new THREE.Mesh(
-      new THREE.SphereGeometry(GLOBE_RADIUS, 128, 128),
-      globeMaterial
+    // ── Base sphere ──────────────────────────────────────────────────────────
+    globeGroup.add(
+      new THREE.Mesh(
+        new THREE.SphereGeometry(GLOBE_RADIUS, 64, 64),
+        new THREE.MeshPhongMaterial({ color: 0x0c1e2e, shininess: 10 }),
+      ),
     );
-    globeMesh.castShadow = true;    // El globo proyecta sombra
-    globeMesh.receiveShadow = true; // El globo recibe sombra
-    globeGroup.add(globeMesh);
 
-    // ── Lights para crear el efecto de sombra ────────────────────────────────
-    // Luz ambiental suave
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-    scene.add(ambientLight);
-    
-    // Luz principal desde arriba/derecha (crea el sombreado principal)
-    const mainLight = new THREE.DirectionalLight(0xffffff, 1.4);
-    mainLight.position.set(-300, 400, 200);
-    mainLight.castShadow = true;
-    mainLight.receiveShadow = false;
-    mainLight.shadow.mapSize.width = 1024;
-    mainLight.shadow.mapSize.height = 1024;
-    scene.add(mainLight);
-    
-    // Luz de relleno desde abajo (para suavizar sombras muy duras)
-    const fillLight = new THREE.DirectionalLight(0xccddff, 0.4);
-    fillLight.position.set(0, -300, 0);
-    scene.add(fillLight);
-    
-    // Luz de contra (rim light) para resaltar los bordes
-    const rimLight = new THREE.DirectionalLight(0xaaccff, 0.6);
-    rimLight.position.set(200, -100, -300);
-    scene.add(rimLight);
+    // ── Lights ───────────────────────────────────────────────────────────────
+    scene.add(new THREE.AmbientLight(0x1a2a4a, 1.5));
+    const sun = new THREE.DirectionalLight(0x4488ff, 2.5);
+    sun.position.set(-400, 300, 300);
+    scene.add(sun);
+    const rim = new THREE.DirectionalLight(0x0066ff, 1.2);
+    rim.position.set(400, -200, -300);
+    scene.add(rim);
 
-    // ── EFECTO ATMÓSFERA (glow exterior) ─────────────────────────────────────
-    const atmosphereMaterial = new THREE.ShaderMaterial({
-      side: THREE.BackSide,
-      transparent: true,
-      uniforms: {
-        glowIntensity: { value: 0.4 }
-      },
-      vertexShader: `
-        varying vec3 vNormal;
-        void main() {
-          vNormal = normalize(normalMatrix * normal);
-          gl_PointSize = 1.0;
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-        }
-      `,
-      fragmentShader: `
-        uniform float glowIntensity;
-        varying vec3 vNormal;
-        void main() {
-          float intensity = pow(0.7 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.0);
-          vec3 glowColor = vec3(0.85, 0.9, 1.0);
-          gl_FragColor = vec4(glowColor, intensity * glowIntensity);
-        }
-      `,
-    });
-    
-    const atmosphere = new THREE.Mesh(
-      new THREE.SphereGeometry(GLOBE_RADIUS + 8, 64, 64),
-      atmosphereMaterial
+    // ── Halo (GitHub technique: shader on BackSide of larger sphere) ─────────
+    const halo = new THREE.Mesh(
+      new THREE.SphereGeometry(GLOBE_RADIUS, 64, 64),
+      new THREE.ShaderMaterial({
+        side: THREE.BackSide,
+        transparent: true,
+        uniforms: {},
+        vertexShader: `
+          varying float intensity;
+          void main() {
+            vec3 vN = normalize(normalMatrix * normal);
+            vec3 vE = normalize(vec3(modelViewMatrix * vec4(position, 1.0)));
+            intensity = pow(abs(dot(vN, vE)), 4.5);
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }
+        `,
+        fragmentShader: `
+          varying float intensity;
+          void main() {
+            gl_FragColor = vec4(vec3(0.05, 0.25, 0.65) * intensity, intensity * 0.85);
+          }
+        `,
+      }),
     );
-    scene.add(atmosphere);
-    
-    // Capa adicional de atmósfera más difusa
-    const outerGlowMaterial = new THREE.MeshPhongMaterial({
-      color: 0xaaccff,
-      transparent: true,
-      opacity: 0.08,
-      side: THREE.BackSide
-    });
-    
-    const outerGlow = new THREE.Mesh(
-      new THREE.SphereGeometry(GLOBE_RADIUS + 15, 64, 64),
-      outerGlowMaterial
-    );
-    scene.add(outerGlow);
+    halo.scale.multiplyScalar(1.18);
+    halo.rotateX(Math.PI * 0.03);
+    halo.rotateY(Math.PI * 0.03);
+    scene.add(halo);
 
-    // ── Halo sutil alrededor del globo ───────────────────────────────────────
-    const haloMaterial = new THREE.MeshBasicMaterial({
-      color: 0x88aaff,
-      transparent: true,
-      opacity: 0.05,
-      side: THREE.BackSide
-    });
-    
-    const haloGlow = new THREE.Mesh(
-      new THREE.SphereGeometry(GLOBE_RADIUS + 25, 64, 64),
-      haloMaterial
-    );
-    scene.add(haloGlow);
-
-    // ── Continent dots (grises sutiles sobre el globo blanco) ────────────────
+    // ── Continent dots (GitHub technique: PNG → getImageData → InstancedMesh) ─
     const img    = new Image();
     img.crossOrigin = 'anonymous';
     img.src = cobeTextureUrl;
@@ -236,7 +183,7 @@ export default function GlobeCanvas({ className = 'fixed inset-0 w-full h-full' 
         for (let x = 0; x < n; x++) {
           const lng = -180 + (x * 360) / n;
           if (!isLand(lat, lng)) continue;
-          const pos = latLngToVec3(lat, lng, GLOBE_RADIUS + 0.5);
+          const pos = latLngToVec3(lat, lng, GLOBE_RADIUS + 0.3);
           dummy.position.copy(pos);
           dummy.lookAt(pos.clone().multiplyScalar(2));
           dummy.updateMatrix();
@@ -246,13 +193,7 @@ export default function GlobeCanvas({ className = 'fixed inset-0 w-full h-full' 
 
       const dotMesh = new THREE.InstancedMesh(
         circleGeo,
-        new THREE.MeshStandardMaterial({ 
-          color: 0x666666,      // Gris medio
-          emissive: 0x333333,   // Ligera emisión para suavizar
-          emissiveIntensity: 0.2,
-          roughness: 0.5,
-          metalness: 0.1
-        }),
+        new THREE.MeshBasicMaterial({ color: 0x1e88e5, transparent: true, opacity: 0.75 }),
         matrices.length,
       );
       matrices.forEach((m, i) => dotMesh.setMatrixAt(i, m));
@@ -260,30 +201,24 @@ export default function GlobeCanvas({ className = 'fixed inset-0 w-full h-full' 
       globeGroup.add(dotMesh);
     };
 
-    // ── City markers (grises oscuros para contraste) ─────────────────────────
+    // ── City markers ─────────────────────────────────────────────────────────
     const markerMesh = new THREE.InstancedMesh(
       new THREE.RingGeometry(2.5, 4, 32),
-      new THREE.MeshStandardMaterial({ 
-        color: 0x444444, 
-        emissive: 0x222222,
-        emissiveIntensity: 0.3,
-        transparent: true,
-        side: THREE.DoubleSide
-      }),
+      new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.85, side: THREE.DoubleSide }),
       MARKERS.length,
     );
-    const dummyMarker = new THREE.Object3D();
+    const dummy = new THREE.Object3D();
     MARKERS.forEach(([lat, lng], i) => {
-      const pos = latLngToVec3(lat, lng, GLOBE_RADIUS + 2);
-      dummyMarker.position.copy(pos);
-      dummyMarker.lookAt(pos.clone().multiplyScalar(2));
-      dummyMarker.updateMatrix();
-      markerMesh.setMatrixAt(i, dummyMarker.matrix);
+      const pos = latLngToVec3(lat, lng, GLOBE_RADIUS + 1.5);
+      dummy.position.copy(pos);
+      dummy.lookAt(pos.clone().multiplyScalar(2));
+      dummy.updateMatrix();
+      markerMesh.setMatrixAt(i, dummy.matrix);
     });
     markerMesh.instanceMatrix.needsUpdate = true;
     globeGroup.add(markerMesh);
 
-    // ── Arcs (manteniendo colores originales) ────────────────────────────────
+    // ── Arcs (GitHub: CubicBezierCurve3 + TubeGeometry + setDrawRange) ───────
     interface ArcObj {
       geo:      THREE.TubeGeometry;
       progress: number;
@@ -293,8 +228,8 @@ export default function GlobeCanvas({ className = 'fixed inset-0 w-full h-full' 
     const arcObjects: ArcObj[] = [];
 
     ARC_DATA.forEach(([fLat, fLng, tLat, tLng], i) => {
-      const start        = latLngToVec3(fLat, fLng, GLOBE_RADIUS + 1.5);
-      const end          = latLngToVec3(tLat, tLng, GLOBE_RADIUS + 1.5);
+      const start        = latLngToVec3(fLat, fLng, GLOBE_RADIUS + 1);
+      const end          = latLngToVec3(tLat, tLng, GLOBE_RADIUS + 1);
       const [c1, c2]     = arcControlPoints(start, end);
       const geo          = new THREE.TubeGeometry(
         new THREE.CubicBezierCurve3(start, c1, c2, end), 64, 0.6, 6, false,
@@ -303,13 +238,7 @@ export default function GlobeCanvas({ className = 'fixed inset-0 w-full h-full' 
       globeGroup.add(
         new THREE.Mesh(
           geo,
-          new THREE.MeshStandardMaterial({ 
-            color: ARC_COLORS[i % ARC_COLORS.length], 
-            emissive: 0x2244aa,
-            emissiveIntensity: 0.3,
-            transparent: true,
-            opacity: 0.85
-          }),
+          new THREE.MeshBasicMaterial({ color: ARC_COLORS[i % ARC_COLORS.length], transparent: true, opacity: 0.85 }),
         ),
       );
       arcObjects.push({ geo, progress: Math.random(), speed: 0.004 + Math.random() * 0.003, maxDraw: geo.index!.count });

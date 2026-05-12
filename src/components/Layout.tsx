@@ -7,6 +7,7 @@ import NewIntegrationModal from './NewIntegrationModal';
 import { useApiConnections } from '../hooks/useApiConnections';
 import { useIntegrations, CreateIntegrationPayload } from '../hooks/useIntegrations';
 import SchemaMatcherModal from './SchemaMatcherModal';
+import { addNotification } from '../services/notificationService';
 
 export default function Layout() {
   const location = useLocation();
@@ -34,6 +35,7 @@ export default function Layout() {
     if (result.success) {
       setShowIntegrationModal(false);
       refetchIntegrations();
+      addNotification('integration', 'Integración creada', payload.description || `Conexión entre API #${payload.apiA} y #${payload.apiB}`);
     }
   };
 

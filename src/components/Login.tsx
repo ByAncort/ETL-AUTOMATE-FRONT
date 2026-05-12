@@ -72,9 +72,9 @@ import GlobeCanvas from './ui/GlobeCanvas';
         <GlobeCanvas/>
 
         {/* Brand */}
-        <div className="absolute top-18 left-10 z-20">
+        <div className="absolute top-18 left-10 z-20 mt-4">
           <span className="font-['Space_Grotesk',sans-serif] text-xl font-semibold tracking-tight text-white">
-            ETL<span className="text-sky-400">.</span>Automate
+            Necro<span className="text-sky-400">.</span>DataForge
           </span>
         </div>
 

@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
-import { Bell, Plus, Search, User, LogOut, X, Loader2, Sun, Moon, Shield, ShieldOff } from 'lucide-react';
-import { useTheme } from '../context/ThemeContext';
+import { Plus, Search, User, LogOut, X, Loader2, Shield, ShieldOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import NotificationBell from './NotificationBell';
 function cn(...classes: (string | undefined | null | false)[]): string {
   return classes.filter(Boolean).join(' ');
 }
@@ -21,7 +21,6 @@ export default function Header({ title = 'ETL Automate', subtitle = 'Plataforma 
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
-  const { theme, toggleTheme } = useTheme();
   const { userData, isAdmin, viewAdmin, setViewAdmin } = useAuth();
 
   useEffect(() => {
@@ -106,36 +105,7 @@ export default function Header({ title = 'ETL Automate', subtitle = 'Plataforma 
           )}
         </form>
 
-        <button
-          onClick={toggleTheme}
-          className={cn(
-            'flex items-center justify-center w-9 h-9 rounded-lg',
-            'bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-secondary)]',
-            'hover:text-[var(--text-primary)] hover:border-[var(--border-hover)]',
-            'transition-all duration-200',
-            'focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-2 focus:ring-offset-[var(--bg-secondary)]'
-          )}
-          aria-label={theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
-        >
-          {theme === 'dark' ? <Sun size={16} aria-hidden="true" /> : <Moon size={16} aria-hidden="true" />}
-        </button>
-
-        <button
-          className={cn(
-            'relative flex items-center justify-center w-9 h-9 rounded-lg',
-            'bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-secondary)]',
-            'hover:text-[var(--text-primary)] hover:border-[var(--border-hover)]',
-            'transition-all duration-200',
-            'focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-2 focus:ring-offset-[var(--bg-secondary)]'
-          )}
-          aria-label="Notificaciones"
-        >
-          <Bell size={16} aria-hidden="true" />
-          <span 
-            className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-blue-500" 
-            aria-hidden="true"
-          />
-        </button>
+        <NotificationBell />
 
         <button
           onClick={onNewIntegration}

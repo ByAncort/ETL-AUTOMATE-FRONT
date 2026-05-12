@@ -22,6 +22,7 @@ import {
   XCircle
 } from 'lucide-react';
 import { useApiConnections, ApiConnection, CreateConnectionPayload } from '../hooks/useApiConnections';
+import { addNotification } from '../services/notificationService';
 
 const methodColors: Record<string, string> = {
   GET: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
@@ -35,6 +36,7 @@ const authTypeColors: Record<string, { bg: string; text: string }> = {
   BEARER: { bg: 'bg-blue-500/10', text: 'text-blue-400' },
   BASIC: { bg: 'bg-amber-500/10', text: 'text-amber-400' },
   API_KEY: { bg: 'bg-purple-500/10', text: 'text-purple-400' },
+  NONE: { bg: 'bg-gray-500/10', text: 'text-gray-400' },
 };
 
 function formatDate(dateStr: string): string {
@@ -329,6 +331,7 @@ function CreateConnectionModal({ isOpen, onClose, onSubmit }: CreateModalProps) 
                 onChange={(e) => setFormData({ ...formData, authType: e.target.value })}
                 className={inputClass}
               >
+                <option value="NONE">NONE</option>
                 <option value="BEARER">BEARER</option>
                 <option value="BASIC">BASIC</option>
               </select>
@@ -369,28 +372,30 @@ function CreateConnectionModal({ isOpen, onClose, onSubmit }: CreateModalProps) 
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className={labelClass}>Auth Header</label>
-              <input
-                type="text"
-                value={formData.authHeader}
-                onChange={(e) => setFormData({ ...formData, authHeader: e.target.value })}
-                placeholder="Authorization"
-                className={inputClass}
-              />
+          {formData.authType !== 'NONE' && (
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className={labelClass}>Auth Header</label>
+                <input
+                  type="text"
+                  value={formData.authHeader}
+                  onChange={(e) => setFormData({ ...formData, authHeader: e.target.value })}
+                  placeholder="Authorization"
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className={labelClass}>Auth Value</label>
+                <input
+                  type="text"
+                  value={formData.authValue}
+                  onChange={(e) => setFormData({ ...formData, authValue: e.target.value })}
+                  placeholder="Bearer token o Basic creds"
+                  className={inputClass}
+                />
+              </div>
             </div>
-            <div>
-              <label className={labelClass}>Auth Value</label>
-              <input
-                type="text"
-                value={formData.authValue}
-                onChange={(e) => setFormData({ ...formData, authValue: e.target.value })}
-                placeholder="Bearer token o Basic creds"
-                className={inputClass}
-              />
-            </div>
-          </div>
+          )}
 
           <div>
             <label className={labelClass}>Body (JSON)</label>
@@ -435,6 +440,7 @@ function CreateConnectionModal({ isOpen, onClose, onSubmit }: CreateModalProps) 
                       onChange={(e) => setFormData({ ...formData, apiAuthAuthType: e.target.value })}
                       className={inputClass}
                     >
+                      <option value="NONE">NONE</option>
                       <option value="BEARER">BEARER</option>
                       <option value="BASIC">BASIC</option>
                     </select>
@@ -470,28 +476,30 @@ function CreateConnectionModal({ isOpen, onClose, onSubmit }: CreateModalProps) 
                     className={inputClass}
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className={labelClass}>Auth Header</label>
-                    <input
-                      type="text"
-                      value={formData.apiAuthAuthHeader}
-                      onChange={(e) => setFormData({ ...formData, apiAuthAuthHeader: e.target.value })}
-                      placeholder="Authorization"
-                      className={inputClass}
-                    />
+                {formData.apiAuthAuthType !== 'NONE' && (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className={labelClass}>Auth Header</label>
+                      <input
+                        type="text"
+                        value={formData.apiAuthAuthHeader}
+                        onChange={(e) => setFormData({ ...formData, apiAuthAuthHeader: e.target.value })}
+                        placeholder="Authorization"
+                        className={inputClass}
+                      />
+                    </div>
+                    <div>
+                      <label className={labelClass}>Auth Value</label>
+                      <input
+                        type="text"
+                        value={formData.apiAuthAuthValue}
+                        onChange={(e) => setFormData({ ...formData, apiAuthAuthValue: e.target.value })}
+                        placeholder="Basic base64creds"
+                        className={inputClass}
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <label className={labelClass}>Auth Value</label>
-                    <input
-                      type="text"
-                      value={formData.apiAuthAuthValue}
-                      onChange={(e) => setFormData({ ...formData, apiAuthAuthValue: e.target.value })}
-                      placeholder="Basic base64creds"
-                      className={inputClass}
-                    />
-                  </div>
-                </div>
+                )}
               </div>
             )}
           </div>
@@ -559,6 +567,7 @@ export default function ConnectionsPage() {
     if (result.success) {
       setIsModalOpen(false);
       refetch();
+      addNotification('connection', 'API conectada', payload.description || payload.url);
     } else {
       setCreateError(result.error || 'Error al crear conexión');
     }

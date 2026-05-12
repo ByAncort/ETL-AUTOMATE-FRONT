@@ -76,99 +76,112 @@ function ConnectionCard({ connection, onDelete, onTest }: ConnectionCardProps) {
   const fullUrl = connection.url + (connection.pathParams || '');
 
   return (
-    <div 
-      className="group relative bg-[#161b22] border border-[#30363d] rounded-xl p-5 hover:border-[#484f58] transition-all duration-200 hover:shadow-lg hover:shadow-black/20"
-      role="article"
-      aria-label={`Conexión ${connection.description || connection.id}`}
-    >
-      <div className="flex items-start justify-between gap-4 mb-4">
-        <div className="flex items-center gap-3 min-w-0">
-          <span className={`flex-shrink-0 px-2.5 py-1 rounded-md text-xs font-semibold border ${methodClass}`}>
-            {connection.method}
-          </span>
-          <div className="min-w-0">
-            <h3 className="text-sm font-semibold text-white truncate group-hover:text-blue-400 transition-colors">
-              {connection.description || `Conexión ${connection.id}`}
-            </h3>
-            <p className="text-xs text-gray-500 truncate mt-0.5" title={fullUrl}>
-              {truncateUrl(fullUrl)}
-            </p>
-          </div>
-        </div>
+<div 
+  className="group relative bg-gradient-to-br from-[#0d1117] to-[#161b22] border border-[#30363d] rounded-xl overflow-hidden hover:border-[#58a6ff]/40 transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/10 hover:-translate-y-0.5"
+  role="article"
+  aria-label={`Conexión ${connection.description || connection.id}`}
+>
+  {/* Gradient accent line on top */}
+  <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-        <div className="relative">
-          <button
-            onClick={() => setShowMenu(!showMenu)}
-            className="p-1.5 rounded-lg text-gray-500 hover:text-gray-300 hover:bg-[#21262d] transition-colors"
-            aria-label="Más opciones"
-          >
-            <MoreVertical size={16} />
-          </button>
-          
-          {showMenu && (
-            <div className="absolute right-0 top-full mt-1 w-40 bg-[#161b22] border border-[#30363d] rounded-lg shadow-xl overflow-hidden z-20">
-              <button
-                onClick={() => { onTest(connection); setShowMenu(false); }}
-                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-300 hover:bg-[#21262d] hover:text-white transition-colors"
-              >
-                <ExternalLink size={14} />
-                Probar
-              </button>
-              <button
-                onClick={() => { copyUrl(); setShowMenu(false); }}
-                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-300 hover:bg-[#21262d] hover:text-white transition-colors"
-              >
-                {copied ? <Check size={14} /> : <Copy size={14} />}
-                {copied ? 'Copiado' : 'Copiar URL'}
-              </button>
-              <button
-                onClick={() => { onDelete(connection.id); setShowMenu(false); }}
-                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-400 hover:bg-red-500/10 transition-colors"
-              >
-                <Trash2 size={14} />
-                Eliminar
-              </button>
-            </div>
-          )}
+  <div className="p-5">
+    {/* Header Section */}
+    <div className="flex items-start justify-between gap-4 mb-4">
+      <div className="flex items-center gap-3 min-w-0 flex-1">
+        <div className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-mono font-bold border-2 transition-all duration-200 ${methodClass} shadow-sm`}>
+          {connection.method}
+        </div>
+        <div className="min-w-0 flex-1">
+          <h3 className="text-sm font-semibold text-white group-hover:text-blue-400 transition-colors duration-200 truncate">
+            {connection.description || `Conexión ${connection.id}`}
+          </h3>
+          <p className="text-xs text-gray-400 truncate mt-1 font-mono" title={fullUrl}>
+            {truncateUrl(fullUrl)}
+          </p>
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-3 text-xs">
-        {connection.authType && (
-          <div className={`flex items-center gap-1.5 px-2 py-1 rounded-md ${authStyle.bg}`}>
-            <Key size={12} className={authStyle.text} />
-            <span className={authStyle.text}>{connection.authType}</span>
-          </div>
-        )}
+      {/* Actions Menu */}
+      <div className="relative">
+        <button
+          onClick={() => setShowMenu(!showMenu)}
+          className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-[#21262d] transition-all duration-200 hover:scale-105"
+          aria-label="Más opciones"
+        >
+          <MoreVertical size={16} />
+        </button>
         
-        {connection.authHeader && (
-          <div className="flex items-center gap-1.5 text-gray-500">
-            <Globe size={12} />
-            <span>{connection.authHeader}</span>
-          </div>
-        )}
-
-        {connection.body && (
-          <div className="flex items-center gap-1.5 text-gray-500">
-            <span className="text-amber-400">Body</span>
-          </div>
-        )}
-      </div>
-
-      <div className="flex items-center justify-between mt-4 pt-4 border-t border-[#21262d]">
-        <div className="flex items-center gap-1.5 text-xs text-gray-500">
-          <Clock size={12} />
-          <span>{formatDate(connection.createdAt)}</span>
-        </div>
-
-        {connection.authApiId && (
-          <div className="flex items-center gap-1.5 text-xs text-purple-400">
-            <ExternalLink size={12} />
-            <span>Ref: #{connection.authApiId}</span>
+        {showMenu && (
+          <div className="absolute right-0 top-full mt-2 w-44 bg-[#0d1117] border border-[#30363d] rounded-lg shadow-2xl overflow-hidden z-20 animate-in fade-in slide-in-from-top-2 duration-200">
+            <button
+              onClick={() => { onTest(connection); setShowMenu(false); }}
+              className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-[#1f242f] hover:text-white transition-colors group/item"
+            >
+              <ExternalLink size={14} className="group-hover/item:scale-110 transition-transform" />
+              Probar conexión
+            </button>
+            <button
+              onClick={() => { copyUrl(); setShowMenu(false); }}
+              className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-[#1f242f] hover:text-white transition-colors group/item"
+            >
+              {copied ? <Check size={14} className="text-green-400" /> : <Copy size={14} className="group-hover/item:scale-110 transition-transform" />}
+              {copied ? '¡Copiado!' : 'Copiar URL'}
+            </button>
+            <div className="h-px bg-[#21262d] my-1" />
+            <button
+              onClick={() => { onDelete(connection.id); setShowMenu(false); }}
+              className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-colors group/item"
+            >
+              <Trash2 size={14} className="group-hover/item:scale-110 transition-transform" />
+              Eliminar
+            </button>
           </div>
         )}
       </div>
     </div>
+
+    {/* Tags Section */}
+    <div className="flex flex-wrap items-center gap-2 mb-4">
+      {connection.authType && (
+        <div className={`group/tag flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium ${authStyle.bg} ${authStyle.text} shadow-sm transition-all duration-200 hover:scale-105`}>
+          <Key size={12} className="flex-shrink-0" />
+          <span>{connection.authType}</span>
+        </div>
+      )}
+      
+      {connection.authHeader && (
+        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-[#1c2128] text-gray-300 border border-[#30363d]">
+          <Globe size={12} className="flex-shrink-0" />
+          <span className="truncate max-w-[150px]">{connection.authHeader}</span>
+        </div>
+      )}
+
+      {connection.body && (
+        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+          <span>Con Body</span>
+        </div>
+      )}
+    </div>
+
+    {/* Footer Section */}
+    <div className="flex items-center justify-between pt-3 border-t border-[#21262d]">
+      <div className="flex items-center gap-2 text-xs text-gray-500">
+        <div className="flex items-center gap-1.5 bg-[#1c2128] px-2 py-1 rounded-md">
+          <Clock size={11} />
+          <span className="font-mono">{formatDate(connection.createdAt)}</span>
+        </div>
+      </div>
+
+      {connection.authApiId && (
+        <div className="flex items-center gap-1.5 text-xs px-2 py-1 rounded-md bg-purple-500/10 text-purple-400 border border-purple-500/20">
+          <ExternalLink size={11} />
+          <span className="font-mono">API #{connection.authApiId}</span>
+        </div>
+      )}
+    </div>
+  </div>
+</div>
   );
 }
 
@@ -577,7 +590,7 @@ export default function ConnectionsPage() {
 
   return (
     <div className="min-h-screen ">
-      <div className="border-b bg-[#0d1117]/50 border-[#21262d]  sticky top-0 z-30">
+      <div className="border-b border-[#21262d] top-0 z-30">
         <div className="px-6 py-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>

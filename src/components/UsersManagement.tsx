@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Users, Search, Trash2, Shield, Mail, MailCheck, X, Loader2, Plus } from 'lucide-react';
+import { Users, Search, Trash2, Shield, Mail, MailCheck, X, Loader2, Plus, Pencil } from 'lucide-react';
 import api from '../services/api';
 import LoadingState from './ui/LoadingState';
 
@@ -29,8 +29,13 @@ export default function UsersManagement() {
     try { setLoading(true); const r = await api.get('/api/users'); setUsers(r.data); } catch { setError('No se pudieron cargar los usuarios'); } finally { setLoading(false); }
   };
 
-  const updateUser = async (userId: number, data: Partial<User>) => {
-    try { await api.put(`/api/users/${userId}`, data); setUsers(users.map(u => u.id === userId ? { ...u, ...data } : u)); } catch { setError('No se pudo actualizar el usuario'); }
+  const updateUser = async (userId: number, data: { username: string; email: string; password: string; firstName: string; lastName: string }) => {
+    try {
+      const body: Record<string, string> = { username: data.username, email: data.email, firstName: data.firstName, lastName: data.lastName };
+      if (data.password) body.password = data.password;
+      await api.put(`/api/users/${userId}`, body);
+      setUsers(users.map(u => u.id === userId ? { ...u, username: data.username, email: data.email, firstName: data.firstName, lastName: data.lastName } : u));
+    } catch { setError('No se pudo actualizar el usuario'); }
   };
 
   const deleteUser = async (userId: number) => {
@@ -121,10 +126,16 @@ export default function UsersManagement() {
                     {new Date(user.createdAt).toLocaleDateString()}
                   </td>
                   <td className="px-4 py-3">
-                    <button onClick={() => deleteUser(user.id)}
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors">
-                      <Trash2 size={14} />
-                    </button>
+                    <div className="flex items-center gap-1">
+                      <button onClick={() => { setEditingUser(user); setFormData({ username: user.username, email: user.email, password: '', firstName: user.firstName || '', lastName: user.lastName || '' }); }}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-violet-500 hover:bg-violet-50 transition-colors">
+                        <Pencil size={14} />
+                      </button>
+                      <button onClick={() => deleteUser(user.id)}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors">
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

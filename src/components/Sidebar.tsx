@@ -11,7 +11,6 @@ import {
   Cpu,
   Zap,
   Users,
-  FileText,
   Activity,
   Shield,
   GitMerge,
@@ -24,7 +23,6 @@ const sidebarItems = {
     { icon: Users, label: 'Gestión Usuarios', path: '/admin/users' },
     { icon: Plug, label: 'Integraciones', path: '/admin/integrations' },
     { icon: Activity, label: 'Monitoreo', path: '/admin/monitoring' },
-    { icon: FileText, label: 'Logs Sistema', path: '/admin/logs' },
     { icon: Settings, label: 'Configuración', path: '/admin/settings' },
   ],
   user: [

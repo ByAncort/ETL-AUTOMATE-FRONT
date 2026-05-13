@@ -5,6 +5,10 @@ import DashboardPage from './pages/DashboardPage';
 import AdminPage from './pages/AdminPage';
 import ConnectionsPage from './pages/ConnectionsPage';
 import IntegrationsPage from './pages/IntegrationsPage';
+import DataExplorerPage from './pages/DataExplorerPage';
+import AdminIntegrationsPage from './pages/AdminIntegrationsPage';
+import MonitoringPage from './pages/MonitoringPage';
+import AdminSettingsPage from './pages/AdminSettingsPage';
 import Layout from './components/Layout';
 import UsersManagement from './components/UsersManagement';
 
@@ -32,8 +36,12 @@ export default function App() {
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/dashboard/connections" element={<ConnectionsPage />} />
         <Route path="/dashboard/integrations" element={<IntegrationsPage />} />
+        <Route path="/dashboard/explorer" element={<DataExplorerPage />} />
         <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
         <Route path="/admin/users" element={<AdminRoute><UsersManagement /></AdminRoute>} />
+        <Route path="/admin/integrations" element={<AdminRoute><AdminIntegrationsPage /></AdminRoute>} />
+        <Route path="/admin/monitoring" element={<AdminRoute><MonitoringPage /></AdminRoute>} />
+        <Route path="/admin/settings" element={<AdminRoute><AdminSettingsPage /></AdminRoute>} />
       </Route>
       <Route path="*" element={<Navigate to={isAuthenticated ? "/dashboard" : "/auth"} replace />} />
     </Routes>

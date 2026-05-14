@@ -7,11 +7,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import GlobeCanvas from './ui/GlobeCanvas';
 
 const registerSchema = z.object({
-  username: z.string().min(3, 'Mínimo 3 caracteres'),
-  email: z.string().email('Debe ser un email válido'),
-  password: z.string().min(6, 'Mínimo 6 caracteres'),
-  firstName: z.string().min(1, 'Nombre requerido'),
-  lastName: z.string().min(1, 'Apellido requerido'),
+  username: z.string().trim().min(3, 'Mínimo 3 caracteres'),
+  email: z.string().trim().email('Debe ser un email válido'),
+  password: z.string().trim().min(6, 'Mínimo 6 caracteres'),
+  firstName: z.string().trim().min(1, 'Nombre requerido'),
+  lastName: z.string().trim().min(1, 'Apellido requerido'),
 });
 
 type RegisterForm = z.infer<typeof registerSchema>;

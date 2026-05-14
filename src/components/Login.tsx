@@ -8,8 +8,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import GlobeCanvas from './ui/GlobeCanvas';
 
 const loginSchema = z.object({
-  username: z.string().min(1, 'El nombre de usuario es requerido'),
-  password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres'),
+  username: z.string().trim().min(1, 'El nombre de usuario es requerido'),
+  password: z.string().trim().min(6, 'La contraseña debe tener al menos 6 caracteres'),
 });
 
 type LoginForm = z.infer<typeof loginSchema>;

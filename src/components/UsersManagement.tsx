@@ -31,10 +31,10 @@ export default function UsersManagement() {
 
   const updateUser = async (userId: number, data: { username: string; email: string; password: string; firstName: string; lastName: string }) => {
     try {
-      const body: Record<string, string> = { username: data.username, email: data.email, firstName: data.firstName, lastName: data.lastName };
-      if (data.password) body.password = data.password;
+      const body: Record<string, string> = { username: data.username.trim(), email: data.email.trim(), firstName: data.firstName.trim(), lastName: data.lastName.trim() };
+      if (data.password.trim()) body.password = data.password.trim();
       await api.put(`/api/users/${userId}`, body);
-      setUsers(users.map(u => u.id === userId ? { ...u, username: data.username, email: data.email, firstName: data.firstName, lastName: data.lastName } : u));
+      setUsers(users.map(u => u.id === userId ? { ...u, username: body.username, email: body.email, firstName: body.firstName, lastName: body.lastName } : u));
     } catch { setError('No se pudo actualizar el usuario'); }
   };
 
@@ -101,11 +101,11 @@ export default function UsersManagement() {
                     <div className="flex items-center gap-2">
                       <span className="text-slate-600">{user.email}</span>
                       {user.emailVerifiedAt ? (
-                        <MailCheck size={14} className="text-emerald-500" />
+                        <span className="text-emerald-500 text-xs font-medium ml-2">Verificado</span>
                       ) : (
                         <button onClick={() => verifyEmail(user.id)} disabled={verifying === String(user.id)}
-                          className="text-amber-500 hover:text-amber-600 disabled:opacity-50">
-                          {verifying === String(user.id) ? <Loader2 size={14} className="animate-spin" /> : <Mail size={14} />}
+                          className="ml-2 px-2 py-0.5 bg-amber-100 text-amber-700 hover:bg-amber-200 rounded text-xs font-medium transition-colors whitespace-nowrap">
+                          {verifying === String(user.id) ? 'Activando...' : 'Activar'}
                         </button>
                       )}
                     </div>
@@ -235,7 +235,7 @@ export default function UsersManagement() {
             <div className="flex justify-end gap-3 px-4 py-3 border-t border-slate-200">
               <button onClick={() => { setShowCreateModal(false); setCreateData({ username: '', email: '', password: '', firstName: '', lastName: '' }); }}
                 className="px-4 py-2 rounded-lg text-sm text-slate-600 hover:bg-slate-50 transition-colors">Cancelar</button>
-              <button onClick={async () => { setCreating(true); try { const r = await api.post('/api/users/register', createData); setUsers([r.data, ...users]); setShowCreateModal(false); } catch { setError('No se pudo crear el usuario'); } finally { setCreating(false); } }}
+              <button onClick={async () => { setCreating(true); try { const cleanData = { username: createData.username.trim(), email: createData.email.trim(), password: createData.password.trim(), firstName: createData.firstName.trim(), lastName: createData.lastName.trim() }; const r = await api.post('/api/users/register', cleanData); setUsers([r.data, ...users]); setShowCreateModal(false); } catch { setError('No se pudo crear el usuario'); } finally { setCreating(false); } }}
                 disabled={creating || !createData.username || !createData.email || !createData.password}
                 className="px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium disabled:opacity-50 transition-colors flex items-center gap-2">
                 {creating && <Loader2 size={14} className="animate-spin" />}Crear Usuario

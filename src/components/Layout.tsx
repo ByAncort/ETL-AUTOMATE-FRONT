@@ -18,6 +18,7 @@ const pageMeta: Record<string, { title: string; subtitle: string }> = {
   '/admin/users': { title: 'Gestión de Usuarios', subtitle: 'Administra usuarios' },
   '/admin/integrations': { title: 'Integraciones', subtitle: 'Configuración global' },
   '/admin/monitoring': { title: 'Monitoreo', subtitle: 'Estado del sistema' },
+  '/admin/llm-configs': { title: 'Configuración LLM', subtitle: 'Modelos de lenguaje configurados' },
   '/admin/logs': { title: 'Logs del Sistema', subtitle: 'Registros de actividad' },
   '/admin/settings': { title: 'Configuración Admin', subtitle: 'Ajustes administrativos' },
 };

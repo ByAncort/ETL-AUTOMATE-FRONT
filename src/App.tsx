@@ -9,6 +9,7 @@ import DataExplorerPage from './pages/DataExplorerPage';
 import AdminIntegrationsPage from './pages/AdminIntegrationsPage';
 import MonitoringPage from './pages/MonitoringPage';
 import AdminSettingsPage from './pages/AdminSettingsPage';
+import AdminLlmConfigsPage from './pages/AdminLlmConfigsPage';
 import Layout from './components/Layout';
 import UsersManagement from './components/UsersManagement';
 
@@ -42,6 +43,7 @@ export default function App() {
         <Route path="/admin/integrations" element={<AdminRoute><AdminIntegrationsPage /></AdminRoute>} />
         <Route path="/admin/monitoring" element={<AdminRoute><MonitoringPage /></AdminRoute>} />
         <Route path="/admin/settings" element={<AdminRoute><AdminSettingsPage /></AdminRoute>} />
+        <Route path="/admin/llm-configs" element={<AdminRoute><AdminLlmConfigsPage /></AdminRoute>} />
       </Route>
       <Route path="*" element={<Navigate to={isAuthenticated ? "/dashboard" : "/auth"} replace />} />
     </Routes>

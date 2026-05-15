@@ -1,24 +1,10 @@
-import { useState, useEffect } from 'react';
-import { X, Sparkles, GitMerge, Play, CheckCheck, Loader2, AlertCircle } from 'lucide-react';
-import { cn } from '../lib/utils';
-import api from '../services/api';
-
-interface FieldMatch {
-  fieldA: string; typeA: string; fieldB: string; typeB: string;
-  confidence: number; method: string;
-}
-
-const typeColor: Record<string, string> = {
-  string: 'text-blue-600', email: 'text-emerald-600', datetime: 'text-amber-600',
-  date: 'text-amber-600', uuid: 'text-violet-600', integer: 'text-red-500',
-};
-
-function ConfidenceBar({ value }: { value: number }) {
-  const color = value >= 95 ? '#059669' : value >= 85 ? '#2563eb' : value >= 75 ? '#d97706' : '#dc2626';
-  return <div className="w-12 h-1 bg-slate-100 rounded-full overflow-hidden">
-    <div className="h-full rounded-full" style={{ width: `${value}%`, background: color }} />
-  </div>;
-}
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { X, Sparkles, GitMerge, Loader2, AlertCircle } from 'lucide-react';
+import { fetchSchemaMatches } from '../services/schemaMatchService';
+import { useAuth } from '../context/AuthContext';
+import MatchReviewCard from './MatchReviewCard';
+import EtlExecutionPanel from './EtlExecutionPanel';
+import type { SchemaMatch } from '../types';
 
 interface Props {
   integrationId: number;
@@ -26,23 +12,15 @@ interface Props {
 }
 
 export default function SchemaMatcherModal({ integrationId, onClose }: Props) {
-  const [matches, setMatches] = useState<FieldMatch[]>([]);
+  const { userData } = useAuth();
+  const [matches, setMatches] = useState<SchemaMatch[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    api.get(`/api/schema-matches/integration/${integrationId}`)
-      .then(res => {
-        const data = Array.isArray(res.data) ? res.data : [];
-        const mapped: FieldMatch[] = data.map((item: Record<string, unknown>) => ({
-          fieldA: String(item.sourceField || item.fieldA || ''),
-          typeA: String(item.sourceType || item.typeA || 'string'),
-          fieldB: String(item.targetField || item.fieldB || ''),
-          typeB: String(item.targetType || item.typeB || 'string'),
-          confidence: typeof item.confidence === 'number' ? Math.round(item.confidence * 100) : Number(item.confidence) || 0,
-          method: String(item.method || (item.confidence && Number(item.confidence) > 0.9 ? 'Exacto' : 'Semántico')),
-        }));
-        setMatches(mapped);
+    fetchSchemaMatches(integrationId)
+      .then(data => {
+        setMatches(Array.isArray(data) ? data : []);
         setLoading(false);
       })
       .catch(() => {
@@ -50,6 +28,14 @@ export default function SchemaMatcherModal({ integrationId, onClose }: Props) {
         setLoading(false);
       });
   }, [integrationId]);
+
+  const approvedCount = useMemo(() => matches.filter(m => m.status === 'ACCEPTED').length, [matches]);
+  const hasApprovedMatches = approvedCount > 0;
+
+  const handleReviewed = useCallback((updated: SchemaMatch) => {
+    if (!updated) return;
+    setMatches(prev => prev.map(m => m.id === updated.id ? updated : m));
+  }, []);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
@@ -109,32 +95,13 @@ export default function SchemaMatcherModal({ integrationId, onClose }: Props) {
               </div>
 
               <div className="space-y-2.5">
-                {matches.map((match, i) => (
-                  <div key={i} className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
-                    <div className="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5">
-                      <div>
-                        <code className="text-xs text-slate-900 font-mono">{match.fieldA}</code>
-                        <div className={cn('text-[10px] font-semibold mt-0.5', typeColor[match.typeA] ?? 'text-slate-400')}>{match.typeA}</div>
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-center gap-1 min-w-[80px]">
-                      <div className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-gradient-to-r from-violet-100 to-blue-100 text-violet-700 border border-violet-200">
-                        <Sparkles size={9} />{match.confidence}%
-                      </div>
-                      <ConfidenceBar value={match.confidence} />
-                      <div className="relative flex items-center w-full">
-                        <div className="flex-1 h-px bg-gradient-to-r from-blue-300 via-violet-400 to-cyan-300" />
-                        <div className="absolute left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-violet-500" />
-                      </div>
-                      <span className="text-[9px] text-slate-400">{match.method}</span>
-                    </div>
-                    <div className="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5">
-                      <div>
-                        <code className="text-xs text-slate-900 font-mono">{match.fieldB}</code>
-                        <div className={cn('text-[10px] font-semibold mt-0.5', typeColor[match.typeB] ?? 'text-slate-400')}>{match.typeB}</div>
-                      </div>
-                    </div>
-                  </div>
+                {matches.map((match) => (
+                  <MatchReviewCard
+                    key={match.id}
+                    match={match}
+                    userId={userData?.id ?? 0}
+                    onReviewed={handleReviewed}
+                  />
                 ))}
               </div>
 
@@ -150,16 +117,12 @@ export default function SchemaMatcherModal({ integrationId, onClose }: Props) {
         </div>
 
         {!loading && !error && matches.length > 0 && (
-          <div className="flex gap-3 px-6 pb-5 flex-shrink-0">
-            <button onClick={onClose}
-              className="flex-1 py-2.5 rounded-lg border border-violet-200 text-violet-700 text-sm font-semibold hover:bg-violet-50 transition-colors">
-              <CheckCheck size={15} className="inline mr-1" />
-              Confirmar Mapeo
-            </button>
-            <button onClick={onClose}
-              className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold transition-colors">
-              <Play size={14} fill="currentColor" /> Ejecutar ETL Ahora
-            </button>
+          <div className="px-6 pb-5 flex-shrink-0">
+            <EtlExecutionPanel
+              integrationId={integrationId}
+              hasApprovedMatches={hasApprovedMatches}
+              onClose={onClose}
+            />
           </div>
         )}
       </div>

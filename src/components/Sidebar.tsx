@@ -31,7 +31,7 @@ const sidebarItems = {
     { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
     { icon: Plug, label: 'Conexiones', path: '/dashboard/connections' },
     { icon: GitMerge, label: 'Integraciones', path: '/dashboard/integrations' },
-    { icon: Database, label: 'Explorador de Datos', path: '/dashboard/explorer' },
+    // { icon: Database, label: 'Explorador de Datos', path: '/dashboard/explorer' },
   ],
 };
 

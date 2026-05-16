@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { runEtl } from '../services/etlService';
+import { runEtlById } from '../services/etlService';
 import type { EtlResponse } from '../types';
 
 export type EtlPhase = 'idle' | 'extracting' | 'transforming' | 'loading' | 'done' | 'error';
@@ -23,7 +23,7 @@ export function useEtlExecution() {
       setProgress(60);
       setPhase('loading');
 
-      const response = await runEtl({ integrationId });
+      const response = await runEtlById(integrationId);
 
       setProgress(100);
       setPhase(response.errors.length === 0 ? 'done' : 'error');

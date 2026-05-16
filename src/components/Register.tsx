@@ -7,11 +7,23 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import GlobeCanvas from './ui/GlobeCanvas';
 
 const registerSchema = z.object({
+<<<<<<< HEAD
   username: z.string().trim().min(3, 'Mínimo 3 caracteres'),
   email: z.string().trim().email('Debe ser un email válido'),
   password: z.string().trim().min(6, 'Mínimo 6 caracteres'),
   firstName: z.string().trim().min(1, 'Nombre requerido'),
   lastName: z.string().trim().min(1, 'Apellido requerido'),
+=======
+  username: z.string().min(3, 'Mínimo 3 caracteres').max(50, 'Máximo 50 caracteres').regex(/^[a-zA-Z0-9_]+$/, 'Solo letras, números y guión bajo (sin espacios)'),
+  email: z.string().email('Debe ser un email válido').toLowerCase().max(100, 'Máximo 100 caracteres').regex(/^[^\s]+$/, 'El email no debe tener espacios'),
+  password: z.string().min(6, 'Mínimo 6 caracteres').max(100, 'Máximo 100 caracteres').regex(/^[^\s]+$/, 'La contraseña no debe tener espacios'),
+  confirmPassword: z.string(),
+  firstName: z.string().min(1, 'Nombre requerido').max(50, 'Máximo 50 caracteres').regex(/^[a-zA-Z]+(?:\s[a-zA-Z]+)*$/, 'Solo letras sin tildes, ni espacios al final/inicio'),
+  lastName: z.string().min(1, 'Apellido requerido').max(50, 'Máximo 50 caracteres').regex(/^[a-zA-Z]+(?:\s[a-zA-Z]+)*$/, 'Solo letras sin tildes, ni espacios al final/inicio'),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Las contraseñas no coinciden",
+  path: ["confirmPassword"],
+>>>>>>> fix-dev-fel
 });
 
 type RegisterForm = z.infer<typeof registerSchema>;
@@ -29,9 +41,10 @@ export default function Register({ onToggleForm }: Props) {
   const onSubmit = async (data: RegisterForm) => {
     setError(null); setSuccess(null); setLoading(true);
     try {
-      await api.post('/api/users/register', data);
-      setSuccess('Usuario creado exitosamente. Redirigiendo...');
-      setTimeout(() => onToggleForm(), 2000);
+      const { confirmPassword, ...payload } = data;
+      await api.post('/api/users/register', payload);
+      setSuccess('Usuario creado exitosamente. Tu cuenta está pendiente de ser activada por un administrador. Redirigiendo...');
+      setTimeout(() => onToggleForm(), 4000);
     } catch {
       setError('No se pudo registrar. Quizás el usuario/email ya existe.');
     } finally { setLoading(false); }
@@ -111,6 +124,17 @@ export default function Register({ onToggleForm }: Props) {
                     </button>
                   </div>
                   {errors.password && <p className="mt-1 text-xs text-red-500">{errors.password.message}</p>}
+                </div>
+
+                <div>
+                  <label htmlFor="reg-confirm-password" className={labelClass}>Confirmar Contraseña</label>
+                  <div className="relative">
+                    <Lock className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <input id="reg-confirm-password" type={showPassword ? 'text' : 'password'} autoComplete="new-password"
+                      placeholder="••••••••" {...register('confirmPassword')}
+                      className={`${inputClass} ${errors.confirmPassword ? 'ring-2 ring-red-500/30 border-red-300' : ''}`} />
+                  </div>
+                  {errors.confirmPassword && <p className="mt-1 text-xs text-red-500">{errors.confirmPassword.message}</p>}
                 </div>
 
                 {error && <div className="rounded-lg border border-red-200 bg-red-50/90 px-3 py-2.5 text-xs text-red-600 backdrop-blur-sm">{error}</div>}

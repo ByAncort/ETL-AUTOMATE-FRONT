@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Users, Search, Trash2, Shield, Mail, MailCheck, X, Loader2, Plus, Pencil } from 'lucide-react';
+import { Users, Search, Trash2, Shield, Mail, MailCheck, X, Loader2, Plus, Pencil, Power } from 'lucide-react';
 import api from '../services/api';
 import LoadingState from './ui/LoadingState';
 
@@ -45,6 +45,23 @@ export default function UsersManagement() {
 
   const verifyEmail = async (userId: number) => {
     try { setVerifying(String(userId)); await api.post(`/api/users/${userId}/verify-email`); setUsers(users.map(u => u.id === userId ? { ...u, emailVerifiedAt: new Date().toISOString() } : u)); } catch { setError('No se pudo verificar el correo'); } finally { setVerifying(null); }
+  };
+
+  const activateUser = async (userId: number) => {
+    try { 
+      setVerifying(String(userId)); 
+      await api.post(`/api/users/${userId}/activate`); 
+      setUsers(users.map(u => u.id === userId ? { ...u, status: 'active' } : u)); 
+    } catch { setError('No se pudo activar al usuario'); } finally { setVerifying(null); }
+  };
+
+  const deactivateUser = async (userId: number) => {
+    if (!confirm('¿Estás seguro de desactivar (bloquear el acceso) a este usuario?')) return;
+    try { 
+      setVerifying(String(userId)); 
+      await api.post(`/api/users/${userId}/deactivate`); 
+      setUsers(users.map(u => u.id === userId ? { ...u, status: 'inactive' } : u)); 
+    } catch { setError('No se pudo desactivar al usuario'); } finally { setVerifying(null); }
   };
 
   const filtered = users.filter(u =>
@@ -127,12 +144,23 @@ export default function UsersManagement() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1">
+                      {user.status === 'active' ? (
+                        <button onClick={() => deactivateUser(user.id)} disabled={verifying === String(user.id)}
+                          className="p-1.5 rounded-lg text-emerald-600 hover:bg-emerald-50 transition-colors" title="Desactivar Usuario">
+                          {verifying === String(user.id) ? <Loader2 size={14} className="animate-spin" /> : <Power size={14} />}
+                        </button>
+                      ) : (
+                        <button onClick={() => activateUser(user.id)} disabled={verifying === String(user.id)}
+                          className="p-1.5 rounded-lg text-amber-500 hover:bg-amber-50 transition-colors" title="Activar Usuario">
+                          {verifying === String(user.id) ? <Loader2 size={14} className="animate-spin" /> : <Power size={14} />}
+                        </button>
+                      )}
                       <button onClick={() => { setEditingUser(user); setFormData({ username: user.username, email: user.email, password: '', firstName: user.firstName || '', lastName: user.lastName || '' }); }}
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-violet-500 hover:bg-violet-50 transition-colors">
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-violet-500 hover:bg-violet-50 transition-colors" title="Editar">
                         <Pencil size={14} />
                       </button>
                       <button onClick={() => deleteUser(user.id)}
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors">
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors" title="Eliminar">
                         <Trash2 size={14} />
                       </button>
                     </div>

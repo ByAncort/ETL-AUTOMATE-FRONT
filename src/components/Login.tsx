@@ -8,17 +8,18 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import GlobeCanvas from './ui/GlobeCanvas';
 
 const loginSchema = z.object({
-  username: z.string().min(1, 'El nombre de usuario es requerido'),
-  password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres'),
+  username: z.string().trim().min(1, 'El nombre de usuario es requerido'),
+  password: z.string().trim().min(6, 'La contraseña debe tener al menos 6 caracteres'),
 });
 
 type LoginForm = z.infer<typeof loginSchema>;
 
 interface Props {
   onToggleForm?: () => void;
+  onForgot?: () => void;
 }
 
-export default function Login({ onToggleForm }: Props) {
+export default function Login({ onToggleForm, onForgot }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -72,7 +73,12 @@ export default function Login({ onToggleForm }: Props) {
               </div>
 
               <div>
-                <label htmlFor="password" className={labelClass}>Contraseña</label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label htmlFor="password" className="block text-xs font-medium text-slate-700">Contraseña</label>
+                  <button type="button" onClick={onForgot} className="text-xs text-blue-600 hover:text-blue-500 hover:underline">
+                    ¿Olvidaste tu contraseña?
+                  </button>
+                </div>
                 <div className="relative">
                   <Lock className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                   <input id="password" type={showPassword ? 'text' : 'password'} autoComplete="current-password"

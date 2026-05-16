@@ -1,12 +1,16 @@
 import { useState } from 'react';
 import Login from '../components/Login';
 import Register from '../components/Register';
+import ForgotPassword from '../components/ForgotPassword';
 
 export default function AuthPage() {
-  const [isRegistering, setIsRegistering] = useState(false);
+  const [view, setView] = useState<'login' | 'register' | 'forgot'>('login');
 
-  if (isRegistering) {
-    return <Register onToggleForm={() => setIsRegistering(false)} />;
+  if (view === 'register') {
+    return <Register onToggleForm={() => setView('login')} />;
   }
-  return <Login onToggleForm={() => setIsRegistering(true)} />;
+  if (view === 'forgot') {
+    return <ForgotPassword onBack={() => setView('login')} />;
+  }
+  return <Login onToggleForm={() => setView('register')} onForgot={() => setView('forgot')} />;
 }

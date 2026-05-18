@@ -100,6 +100,12 @@ export interface LlmConfigRequest {
   isDefault: boolean;
 }
 
+export interface LogEntry {
+  timestamp: string;
+  level: string;
+  message: string;
+}
+
 export interface LlmConfigResponse {
   id: number;
   name: string;

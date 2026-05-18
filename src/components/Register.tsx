@@ -7,13 +7,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import GlobeCanvas from './ui/GlobeCanvas';
 
 const registerSchema = z.object({
-<<<<<<< HEAD
-  username: z.string().trim().min(3, 'Mínimo 3 caracteres'),
-  email: z.string().trim().email('Debe ser un email válido'),
-  password: z.string().trim().min(6, 'Mínimo 6 caracteres'),
-  firstName: z.string().trim().min(1, 'Nombre requerido'),
-  lastName: z.string().trim().min(1, 'Apellido requerido'),
-=======
   username: z.string().min(3, 'Mínimo 3 caracteres').max(50, 'Máximo 50 caracteres').regex(/^[a-zA-Z0-9_]+$/, 'Solo letras, números y guión bajo (sin espacios)'),
   email: z.string().email('Debe ser un email válido').toLowerCase().max(100, 'Máximo 100 caracteres').regex(/^[^\s]+$/, 'El email no debe tener espacios'),
   password: z.string().min(6, 'Mínimo 6 caracteres').max(100, 'Máximo 100 caracteres').regex(/^[^\s]+$/, 'La contraseña no debe tener espacios'),
@@ -23,7 +16,6 @@ const registerSchema = z.object({
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Las contraseñas no coinciden",
   path: ["confirmPassword"],
->>>>>>> fix-dev-fel
 });
 
 type RegisterForm = z.infer<typeof registerSchema>;

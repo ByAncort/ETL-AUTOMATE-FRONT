@@ -23,7 +23,7 @@ const sidebarItems = {
     { icon: LayoutDashboard, label: 'Dashboard Admin', path: '/admin' },
     { icon: Users, label: 'Gestión Usuarios', path: '/admin/users' },
     { icon: Plug, label: 'Integraciones', path: '/admin/integrations' },
-    { icon: Activity, label: 'Monitoreo', path: '/admin/monitoring' },
+    // { icon: Activity, label: 'Monitoreo', path: '/admin/monitoring' },
     { icon: Brain, label: 'LLMs', path: '/admin/llm-configs' },
     { icon: Settings, label: 'Configuración', path: '/admin/settings' },
   ],

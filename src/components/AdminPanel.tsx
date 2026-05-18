@@ -1,16 +1,22 @@
+import { useState, useEffect } from 'react';
 import { useIntegrations } from '../hooks/useIntegrations';
 import { useUsers } from '../hooks/useUsers';
 import { Users, GitMerge, Activity, AlertCircle, Shield } from 'lucide-react';
-
-const staticSystemLogs = [
-  { timestamp: '2024-01-15 10:23:45', level: 'INFO', message: 'Sincronización completada' },
-  { timestamp: '2024-01-15 09:15:22', level: 'WARN', message: 'Timeout en conexión API' },
-  { timestamp: '2024-01-15 08:45:10', level: 'INFO', message: 'Nueva integración añadida' }
-];
+import { fetchLogs } from '../services/logService';
+import type { LogEntry } from '../types';
 
 export default function AdminPanel() {
   const { integrations } = useIntegrations();
   const { users, deleteUser, loading: loadingUsers } = useUsers();
+  const [logs, setLogs] = useState<LogEntry[]>([]);
+  const [loadingLogs, setLoadingLogs] = useState(true);
+
+  useEffect(() => {
+    fetchLogs()
+      .then(setLogs)
+      .catch(() => setLogs([]))
+      .finally(() => setLoadingLogs(false));
+  }, []);
 
   const stats = [
     { icon: <Users size={16} className="text-violet-600" />, label: 'Usuarios Activos', value: users.length },
@@ -103,12 +109,23 @@ export default function AdminPanel() {
             Logs del Sistema
           </h3>
         </div>
-        <div className="space-y-1 p-3 font-mono text-xs">
-          {staticSystemLogs.map((log, idx) => (
-            <div key={idx} className="text-slate-500 py-1">
-              [{log.timestamp}] <span className={log.level === 'WARN' ? 'text-amber-600' : 'text-slate-600'}>{log.level}</span> - {log.message}
-            </div>
-          ))}
+        <div className="space-y-1 p-3 font-mono text-xs max-h-64 overflow-y-auto">
+          {loadingLogs ? (
+            <div className="text-slate-400 py-1">Cargando logs...</div>
+          ) : logs.length === 0 ? (
+            <div className="text-slate-400 py-1">No hay logs disponibles.</div>
+          ) : (
+            logs.map((log, idx) => (
+              <div key={idx} className="text-slate-500 py-1">
+                [{log.timestamp}]{' '}
+                <span className={
+                  log.level === 'WARN' || log.level === 'WARNING' ? 'text-amber-600' :
+                  log.level === 'ERROR' ? 'text-red-500' :
+                  'text-slate-600'
+                }>{log.level}</span> - {log.message}
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>

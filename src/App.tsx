@@ -12,6 +12,7 @@ import AdminSettingsPage from './pages/AdminSettingsPage';
 import AdminLlmConfigsPage from './pages/AdminLlmConfigsPage';
 import Layout from './components/Layout';
 import UsersManagement from './components/UsersManagement';
+import ProfilePage from './pages/ProfilePage';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
@@ -38,6 +39,7 @@ export default function App() {
         <Route path="/dashboard/connections" element={<ConnectionsPage />} />
         <Route path="/dashboard/integrations" element={<IntegrationsPage />} />
         <Route path="/dashboard/explorer" element={<DataExplorerPage />} />
+        <Route path="/dashboard/profile" element={<ProfilePage />} />
         <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
         <Route path="/admin/users" element={<AdminRoute><UsersManagement /></AdminRoute>} />
         <Route path="/admin/integrations" element={<AdminRoute><AdminIntegrationsPage /></AdminRoute>} />

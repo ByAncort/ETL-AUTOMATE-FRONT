@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
-import { Plus, Search, User, LogOut, X, Shield, ShieldOff, KeyRound } from 'lucide-react';
+import { Plus, Search, User, LogOut, X, Shield, ShieldOff } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import NotificationBell from './NotificationBell';
 import { cn } from '../lib/utils';
-import ChangePasswordModal from './ChangePasswordModal';
 
 interface HeaderProps {
   title?: string;
@@ -16,9 +16,9 @@ export default function Header({ title = 'ETL Automate', subtitle = 'Plataforma 
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [showPasswordModal, setShowPasswordModal] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
   const { userData, isAdmin, viewAdmin, setViewAdmin } = useAuth();
 
   useEffect(() => {
@@ -131,12 +131,12 @@ export default function Header({ title = 'ETL Automate', subtitle = 'Plataforma 
                 </button>
               )}
               <button
-                onClick={() => { setShowUserMenu(false); setShowPasswordModal(true); }}
+                onClick={() => { setShowUserMenu(false); navigate('/dashboard/profile'); }}
                 className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-slate-600 hover:bg-slate-50 transition-colors"
                 role="menuitem"
               >
-                <KeyRound size={14} />
-                <span>Cambiar Contraseña</span>
+                <User size={14} />
+                <span>Editar Perfil</span>
               </button>
               <button
                 onClick={onLogout}
@@ -151,7 +151,6 @@ export default function Header({ title = 'ETL Automate', subtitle = 'Plataforma 
         </div>
       </div>
 
-      {showPasswordModal && <ChangePasswordModal onClose={() => setShowPasswordModal(false)} />}
     </header>
   );
 }

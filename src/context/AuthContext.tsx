@@ -6,6 +6,8 @@ interface UserData {
   username: string;
   email: string;
   name: string;
+  firstName?: string;
+  lastName?: string;
 }
 
 interface AuthContextType {
@@ -18,6 +20,7 @@ interface AuthContextType {
   login: (token: string) => void;
   logout: () => void;
   setViewAdmin: (value: boolean) => void;
+  refetchUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -117,8 +120,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUserData(null);
   };
 
+  const refetchUser = async () => {
+    const activeToken = token || localStorage.getItem('token');
+    const activeUsername = localStorage.getItem('username') || storedUsername;
+    if (activeUsername && activeToken) {
+      await fetchUserData(activeUsername, activeToken);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ isAuthenticated, token, isAdmin, viewAdmin, username: storedUsername, userData, login, logout, setViewAdmin: handleSetViewAdmin }}>
+    <AuthContext.Provider value={{ isAuthenticated, token, isAdmin, viewAdmin, username: storedUsername, userData, login, logout, setViewAdmin: handleSetViewAdmin, refetchUser }}>
       {children}
     </AuthContext.Provider>
   );

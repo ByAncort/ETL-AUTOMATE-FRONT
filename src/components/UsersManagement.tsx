@@ -126,7 +126,7 @@ export default function UsersManagement() {
                       ) : (
                         <button onClick={() => verifyEmail(user.id)} disabled={verifying === String(user.id)}
                           className="ml-2 px-2 py-0.5 bg-amber-100 text-amber-700 hover:bg-amber-200 rounded text-xs font-medium transition-colors whitespace-nowrap">
-                          {verifying === String(user.id) ? 'Activando...' : 'Activar'}
+                          {verifying === String(user.id) ? 'Activando...' : 'Por verificar'}
                         </button>
                       )}
                     </div>

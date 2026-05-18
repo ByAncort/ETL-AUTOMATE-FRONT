@@ -14,6 +14,7 @@ const pageMeta: Record<string, { title: string; subtitle: string }> = {
   '/dashboard/explorer': { title: 'Explorador de Datos', subtitle: 'Explora tus fuentes de datos' },
   '/dashboard/settings': { title: 'Configuración', subtitle: 'Ajustes del sistema' },
   '/dashboard/integrations': { title: 'Integraciones', subtitle: 'Pipelines de datos' },
+  '/dashboard/profile': { title: 'Perfil de Usuario', subtitle: 'Edita tus datos personales y contraseña' },
   '/admin': { title: 'Panel de Administración', subtitle: 'Administración del sistema' },
   '/admin/users': { title: 'Gestión de Usuarios', subtitle: 'Administra usuarios' },
   '/admin/integrations': { title: 'Integraciones', subtitle: 'Configuración global' },

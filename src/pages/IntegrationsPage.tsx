@@ -1,7 +1,9 @@
 import { useState } from 'react';
-import { GitMerge, RefreshCw } from 'lucide-react';
+import { GitMerge, Play, RefreshCw, Loader2 } from 'lucide-react';
 import { useIntegrations } from '../hooks/useIntegrations';
 import { useApiConnections } from '../hooks/useApiConnections';
+import { runEtlById } from '../services/etlService';
+import { addNotification } from '../services/notificationService';
 import { IntegrationResponse } from '../types';
 import PageHeader from '../components/ui/PageHeader';
 import LoadingState from '../components/ui/LoadingState';
@@ -24,12 +26,14 @@ function formatDate(dateStr: string): string {
   });
 }
 
-function IntegrationCard({ integration, connections, onEdit, onDelete, onSchemaMatch }: {
+function IntegrationCard({ integration, connections, onEdit, onDelete, onSchemaMatch, onRunEtl, running }: {
   integration: IntegrationResponse;
   connections: { id: number; description: string; method: string }[];
   onEdit: (i: IntegrationResponse) => void;
   onDelete: (id: number) => void;
   onSchemaMatch: (id: number) => void;
+  onRunEtl: (id: number) => void;
+  running?: boolean;
 }) {
   const [showMenu, setShowMenu] = useState(false);
   const status = statusConfig[integration.status] || statusConfig.inactive;
@@ -45,9 +49,15 @@ function IntegrationCard({ integration, connections, onEdit, onDelete, onSchemaM
               {integration.description || `Integración ${integration.id}`}
             </h3>
             <div className="flex items-center gap-2 mt-1.5">
-              <span className={cn('px-2 py-0.5 rounded text-[10px] font-semibold', status.bg, status.color)}>
-                {status.label}
-              </span>
+              {running ? (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-50 text-blue-700">
+                  <Loader2 size={10} className="animate-spin" /> Ejecutando
+                </span>
+              ) : (
+                <span className={cn('px-2 py-0.5 rounded text-[10px] font-semibold', status.bg, status.color)}>
+                  {status.label}
+                </span>
+              )}
             </div>
           </div>
           <div className="relative">
@@ -58,7 +68,11 @@ function IntegrationCard({ integration, connections, onEdit, onDelete, onSchemaM
               </svg>
             </button>
             {showMenu && (
-              <div className="absolute right-0 top-full mt-1 w-36 bg-white border border-slate-200 rounded-lg shadow-lg z-20 overflow-hidden">
+              <div className="absolute right-0 top-full mt-1 w-40 bg-white border border-slate-200 rounded-lg shadow-lg z-20 overflow-hidden">
+                <button onClick={() => { onRunEtl(integration.id); setShowMenu(false); }}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 font-medium">
+                  <Play size={12} /> Ejecutar ETL
+                </button>
                 <button onClick={() => { onSchemaMatch(integration.id); setShowMenu(false); }}
                   className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50">
                   Ver Mapeo
@@ -176,6 +190,23 @@ export default function IntegrationsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [editingIntegration, setEditingIntegration] = useState<IntegrationResponse | null>(null);
   const [schemaMatchId, setSchemaMatchId] = useState<number | null>(null);
+  const [runningEtlId, setRunningEtlId] = useState<number | null>(null);
+
+  const handleRunEtl = async (id: number) => {
+    setRunningEtlId(id);
+    try {
+      const result = await runEtlById(id);
+      if (result.errors?.length > 0) {
+        addNotification('error', 'ETL con errores', `Integración #${id} — ${result.errors.length} error(es)`);
+      } else {
+        addNotification('success', 'ETL ejecutado', `Integración #${id} — ${result.loadedRecords} registros cargados`);
+      }
+    } catch {
+      addNotification('error', 'Error en ETL', `No se pudo ejecutar ETL en integración #${id}`);
+    } finally {
+      setRunningEtlId(null);
+    }
+  };
 
   const filtered = integrations.filter(i =>
     i.description?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -223,10 +254,11 @@ export default function IntegrationsPage() {
              actionLabel="Nueva Integración" onAction={() => {}} />
          ) : (
            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-             {filtered.map(i => (
-               <IntegrationCard key={i.id} integration={i} connections={connMap}
-                 onEdit={setEditingIntegration} onDelete={handleDelete}
-                 onSchemaMatch={setSchemaMatchId} />
+              {filtered.map(i => (
+                <IntegrationCard key={i.id} integration={i} connections={connMap}
+                  onEdit={setEditingIntegration} onDelete={handleDelete}
+                  onSchemaMatch={setSchemaMatchId} onRunEtl={handleRunEtl}
+                  running={runningEtlId === i.id} />
              ))}
            </div>
          )}

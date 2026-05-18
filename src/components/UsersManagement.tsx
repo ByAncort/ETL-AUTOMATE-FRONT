@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Users, Search, Trash2, Shield, Mail, MailCheck, X, Loader2, Plus, Pencil, Power } from 'lucide-react';
 import api from '../services/api';
+import { addNotification } from '../services/notificationService';
 import LoadingState from './ui/LoadingState';
 
 interface User {
@@ -35,16 +36,17 @@ export default function UsersManagement() {
       if (data.password.trim()) body.password = data.password.trim();
       await api.put(`/api/users/${userId}`, body);
       setUsers(users.map(u => u.id === userId ? { ...u, username: body.username, email: body.email, firstName: body.firstName, lastName: body.lastName } : u));
+      addNotification('system', 'Usuario actualizado', `El usuario ${body.username} ha sido actualizado`);
     } catch { setError('No se pudo actualizar el usuario'); }
   };
 
   const deleteUser = async (userId: number) => {
     if (!confirm('¿Estás seguro de eliminar este usuario?')) return;
-    try { await api.delete(`/api/users/${userId}`); setUsers(users.filter(u => u.id !== userId)); } catch { setError('No se pudo eliminar el usuario'); }
+    try { await api.delete(`/api/users/${userId}`); setUsers(users.filter(u => u.id !== userId)); addNotification('system', 'Usuario eliminado', `Usuario #${userId} eliminado del sistema`); } catch { setError('No se pudo eliminar el usuario'); }
   };
 
   const verifyEmail = async (userId: number) => {
-    try { setVerifying(String(userId)); await api.post(`/api/users/${userId}/verify-email`); setUsers(users.map(u => u.id === userId ? { ...u, emailVerifiedAt: new Date().toISOString() } : u)); } catch { setError('No se pudo verificar el correo'); } finally { setVerifying(null); }
+    try { setVerifying(String(userId)); await api.post(`/api/users/${userId}/verify-email`); setUsers(users.map(u => u.id === userId ? { ...u, emailVerifiedAt: new Date().toISOString() } : u)); addNotification('success', 'Email verificado', `Email del usuario #${userId} verificado exitosamente`); } catch { setError('No se pudo verificar el correo'); } finally { setVerifying(null); }
   };
 
   const activateUser = async (userId: number) => {
@@ -52,6 +54,7 @@ export default function UsersManagement() {
       setVerifying(String(userId)); 
       await api.post(`/api/users/${userId}/activate`); 
       setUsers(users.map(u => u.id === userId ? { ...u, status: 'active' } : u)); 
+      addNotification('success', 'Usuario activado', `Usuario #${userId} ha sido activado`);
     } catch { setError('No se pudo activar al usuario'); } finally { setVerifying(null); }
   };
 
@@ -61,6 +64,7 @@ export default function UsersManagement() {
       setVerifying(String(userId)); 
       await api.post(`/api/users/${userId}/deactivate`); 
       setUsers(users.map(u => u.id === userId ? { ...u, status: 'inactive' } : u)); 
+      addNotification('system', 'Usuario desactivado', `Usuario #${userId} ha sido desactivado`);
     } catch { setError('No se pudo desactivar al usuario'); } finally { setVerifying(null); }
   };
 
@@ -263,7 +267,7 @@ export default function UsersManagement() {
             <div className="flex justify-end gap-3 px-4 py-3 border-t border-slate-200">
               <button onClick={() => { setShowCreateModal(false); setCreateData({ username: '', email: '', password: '', firstName: '', lastName: '' }); }}
                 className="px-4 py-2 rounded-lg text-sm text-slate-600 hover:bg-slate-50 transition-colors">Cancelar</button>
-              <button onClick={async () => { setCreating(true); try { const cleanData = { username: createData.username.trim(), email: createData.email.trim(), password: createData.password.trim(), firstName: createData.firstName.trim(), lastName: createData.lastName.trim() }; const r = await api.post('/api/users/register', cleanData); setUsers([r.data, ...users]); setShowCreateModal(false); } catch { setError('No se pudo crear el usuario'); } finally { setCreating(false); } }}
+              <button onClick={async () => { setCreating(true); try { const cleanData = { username: createData.username.trim(), email: createData.email.trim(), password: createData.password.trim(), firstName: createData.firstName.trim(), lastName: createData.lastName.trim() }; const r = await api.post('/api/users/register', cleanData); setUsers([r.data, ...users]); setShowCreateModal(false); addNotification('success', 'Usuario creado', `El usuario ${cleanData.username} ha sido registrado`); } catch { setError('No se pudo crear el usuario'); } finally { setCreating(false); } }}
                 disabled={creating || !createData.username || !createData.email || !createData.password}
                 className="px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium disabled:opacity-50 transition-colors flex items-center gap-2">
                 {creating && <Loader2 size={14} className="animate-spin" />}Crear Usuario

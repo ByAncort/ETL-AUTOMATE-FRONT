@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Brain, Plus, Pencil, Trash2, Star, X, Loader2 } from 'lucide-react';
 import { useLlmConfigs } from '../hooks/useLlmConfigs';
 import { LlmConfigRequest } from '../types';
+import { addNotification } from '../services/notificationService';
 import PageHeader from '../components/ui/PageHeader';
 import LoadingState from '../components/ui/LoadingState';
 import ErrorState from '../components/ui/ErrorState';
@@ -51,16 +52,23 @@ export default function AdminLlmConfigsPage() {
     setSaving(false);
     if (result.success) {
       setShowModal(false);
+      if (editingId) {
+        addNotification('system', 'Configuración LLM actualizada', `La configuración "${formData.name}" ha sido actualizada`);
+      } else {
+        addNotification('success', 'Configuración LLM creada', `La configuración "${formData.name}" ha sido creada`);
+      }
     }
   };
 
   const handleDelete = async (id: number) => {
     if (!confirm('¿Estás seguro de eliminar esta configuración LLM?')) return;
     await deleteConfig(id);
+    addNotification('system', 'Configuración LLM eliminada', `La configuración LLM #${id} ha sido eliminada`);
   };
 
   const handleSetDefault = async (id: number) => {
     await setDefault(id);
+    addNotification('system', 'Configuración por defecto', `La configuración LLM #${id} ahora es la predeterminada`);
   };
 
   if (loading) return <LoadingState message="Cargando configuraciones LLM..." />;

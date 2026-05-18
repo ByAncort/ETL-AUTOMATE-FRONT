@@ -3,6 +3,7 @@ import { useIntegrations } from '../hooks/useIntegrations';
 import { useUsers } from '../hooks/useUsers';
 import { Users, GitMerge, Activity, AlertCircle, Shield } from 'lucide-react';
 import { fetchLogs } from '../services/logService';
+import { addNotification } from '../services/notificationService';
 import type { LogEntry } from '../types';
 
 export default function AdminPanel() {
@@ -89,7 +90,10 @@ export default function AdminPanel() {
                       <span className="text-emerald-600 text-xs">● {user.status || 'Activo'}</span>
                     </td>
                     <td className="px-4 py-3">
-                      <button onClick={() => deleteUser(user.id)}
+                      <button onClick={() => {
+                        deleteUser(user.id);
+                        addNotification('system', 'Usuario eliminado', `El usuario ${user.username} ha sido eliminado del sistema`);
+                      }}
                         className="text-red-500 hover:text-red-600 text-xs font-medium">
                         Eliminar
                       </button>

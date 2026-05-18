@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Sparkles, CheckCheck, XCircle, Loader2, AlertCircle } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { submitFeedback } from '../services/schemaMatchService';
+import { addNotification } from '../services/notificationService';
 import type { SchemaMatch } from '../types';
 
 interface Props {
@@ -30,7 +31,10 @@ export default function MatchReviewCard({ match, userId, onReviewed }: Props) {
         actualTarget: match.targetField,
         reviewedBy: userId,
       });
-      if (result?.schemaMatch) onReviewed(result.schemaMatch);
+      if (result?.schemaMatch) {
+        onReviewed(result.schemaMatch);
+        addNotification('success', 'Match aceptado', `Campo "${match.sourceField}" → "${match.targetField}" aceptado`);
+      }
     } catch (e: any) {
       if (e.response?.status === 409) {
         setError('Este match ya fue revisado por otro usuario');
@@ -53,7 +57,10 @@ export default function MatchReviewCard({ match, userId, onReviewed }: Props) {
         actualTarget: actualTarget.trim(),
         reviewedBy: userId,
       });
-      if (result?.schemaMatch) onReviewed(result.schemaMatch);
+      if (result?.schemaMatch) {
+        onReviewed(result.schemaMatch);
+        addNotification('system', 'Match rechazado', `Campo "${match.sourceField}" → "${actualTarget.trim()}" asignado manualmente`);
+      }
     } catch (e: any) {
       if (e.response?.status === 409) {
         setError('Este match ya fue revisado por otro usuario');

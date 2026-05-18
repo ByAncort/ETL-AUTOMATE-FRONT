@@ -1,5 +1,6 @@
 import { Settings, Save, Bell, Lock, Globe } from 'lucide-react';
 import { useState } from 'react';
+import { addNotification } from '../services/notificationService';
 import PageHeader from '../components/ui/PageHeader';
 
 export default function AdminSettingsPage() {
@@ -7,6 +8,7 @@ export default function AdminSettingsPage() {
 
   const handleSave = () => {
     setSaved(true);
+    addNotification('success', 'Configuración guardada', 'Los ajustes del sistema se han guardado correctamente');
     setTimeout(() => setSaved(false), 2000);
   };
 

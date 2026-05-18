@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Play, RotateCcw, Loader2, AlertCircle, CheckCircle, Database, GitCompare, Upload } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useEtlExecution, type EtlPhase } from '../hooks/useEtlExecution';
+import { addNotification } from '../services/notificationService';
 
 interface Props {
   integrationId: number;
@@ -33,6 +34,15 @@ export default function EtlExecutionPanel({ integrationId, hasApprovedMatches, o
 
   const isRunning = phase === 'extracting' || phase === 'transforming' || phase === 'loading';
   const canRun = hasApprovedMatches && !isRunning && phase !== 'done';
+
+  useEffect(() => {
+    if (phase === 'done' && result && result.errors.length === 0) {
+      addNotification('success', 'ETL completado', `Integración #${integrationId} — ${result.totalRecords} registros procesados exitosamente`);
+    }
+    if (phase === 'error') {
+      addNotification('error', 'Error en ETL', `Integración #${integrationId} — ${error || 'Error durante la ejecución'}`);
+    }
+  }, [phase]);
 
   const handleRunClick = () => {
     if (!showConfirm) {

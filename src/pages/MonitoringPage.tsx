@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import PageHeader from '../components/ui/PageHeader';
 import LoadingState from '../components/ui/LoadingState';
 import api from '../services/api';
+import { addNotification } from '../services/notificationService';
 import { cn } from '../lib/utils';
 
 interface HealthCheck {
@@ -20,17 +21,27 @@ export default function MonitoringPage() {
     setLoading(true);
     try {
       const r = await api.get('/api/health');
-      setHealth(Array.isArray(r.data) ? r.data : [
+      const data = Array.isArray(r.data) ? r.data : [
         { service: 'API Gateway', status: 'up', lastCheck: new Date().toISOString(), responseTime: 12 },
         { service: 'Base de Datos', status: 'up', lastCheck: new Date().toISOString(), responseTime: 3 },
         { service: 'Schema Matcher', status: 'up', lastCheck: new Date().toISOString(), responseTime: 45 },
         { service: 'ETL Engine', status: 'degraded', lastCheck: new Date().toISOString(), responseTime: 120 },
-      ]);
+      ];
+      setHealth(data);
+      const downServices = data.filter(h => h.status === 'down');
+      const degradedServices = data.filter(h => h.status === 'degraded');
+      if (downServices.length > 0) {
+        addNotification('error', 'Servicios caídos', `${downServices.map(s => s.service).join(', ')} — sin respuesta`);
+      }
+      if (degradedServices.length > 0) {
+        addNotification('system', 'Servicios degradados', `${degradedServices.map(s => s.service).join(', ')} — rendimiento reducido`);
+      }
     } catch {
       setHealth([
         { service: 'API Gateway', status: 'down', lastCheck: new Date().toISOString(), responseTime: 0 },
         { service: 'Base de Datos', status: 'down', lastCheck: new Date().toISOString(), responseTime: 0 },
       ]);
+      addNotification('error', 'Error de monitoreo', 'No se pudo conectar con el servicio de salud del sistema');
     } finally {
       setLoading(false);
     }

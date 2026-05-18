@@ -26,6 +26,7 @@ export default function ConnectionsPage() {
   const handleDelete = async (id: number) => {
     if (window.confirm('¿Estás seguro de eliminar esta conexión?')) {
       await deleteConnection(id);
+      addNotification('connection', 'Conexión eliminada', `La conexión #${id} ha sido eliminada`);
     }
   };
 

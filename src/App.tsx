@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import AuthPage from './pages/AuthPage';
+import ResetPassword from './components/ResetPassword';
 import DashboardPage from './pages/DashboardPage';
 import AdminPage from './pages/AdminPage';
 import ConnectionsPage from './pages/ConnectionsPage';
@@ -34,6 +35,7 @@ export default function App() {
       <Route path="/auth" element={
         isAuthenticated ? <Navigate to="/dashboard" replace /> : <AuthPage />
       } />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/dashboard/connections" element={<ConnectionsPage />} />

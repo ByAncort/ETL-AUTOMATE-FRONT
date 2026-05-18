@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Mail, ArrowRight, ArrowLeft, Zap, CheckCircle2 } from 'lucide-react';
+import api from '../services/api';
 import GlobeCanvas from './ui/GlobeCanvas';
 
 interface Props {
@@ -19,11 +20,7 @@ export default function ForgotPassword({ onBack }: Props) {
     setLoading(true);
     setError(null);
     try {
-      // TODO: Implement actual SMTP email logic in backend (e.g. Google SMTP)
-      // await api.post('/api/users/forgot-password', { email });
-      
-      // Simulating a successful reset request for now
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await api.post('/api/users/forgot-password', { email: email.trim() });
       setSuccess(true);
     } catch {
       setError('Ocurrió un error al procesar la solicitud.');

@@ -21,14 +21,20 @@ api.interceptors.request.use(
   }
 );
 
+const publicAuthPaths = ['/auth', '/reset-password'];
+
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('username');
-      localStorage.setItem('viewAdmin', 'false');
-      window.location.href = '/auth';
+      const currentPath = window.location.pathname;
+      const isPublicAuth = publicAuthPaths.some(p => currentPath.startsWith(p));
+      if (!isPublicAuth) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('username');
+        localStorage.setItem('viewAdmin', 'false');
+        window.location.href = '/auth';
+      }
     }
     return Promise.reject(error);
   }

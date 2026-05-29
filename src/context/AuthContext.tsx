@@ -88,6 +88,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('viewAdmin', String(viewAdmin));
   }, [viewAdmin]);
 
+  // Observer Pattern: Escuchar eventos de desactivación desde el backend
+  useEffect(() => {
+    let eventSource: EventSource | null = null;
+    const currentUsername = localStorage.getItem('username');
+
+    if (token && currentUsername) {
+      // Conectar al endpoint SSE del Gateway, pasando el token en la query
+      const url = `http://localhost:8080/api/users/username/${currentUsername}/observe?token=${token}`;
+      eventSource = new EventSource(url);
+
+      eventSource.addEventListener('DEACTIVATED', (event) => {
+        console.warn('Observer Event: User deactivated by admin!', event);
+        alert('Tu cuenta ha sido desactivada. La sesión se cerrará de inmediato.');
+        logout();
+      });
+
+      eventSource.onerror = (error) => {
+        console.error('Observer SSE Error:', error);
+      };
+    }
+
+    return () => {
+      if (eventSource) {
+        eventSource.close();
+      }
+    };
+  }, [token]);
+
   const handleSetViewAdmin = (value: boolean) => {
     if (isAdmin || !value) {
       setViewAdmin(value);

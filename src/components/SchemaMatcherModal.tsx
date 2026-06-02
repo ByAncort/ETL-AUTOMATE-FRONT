@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { X, Sparkles, GitMerge, Loader2, AlertCircle } from 'lucide-react';
-import { fetchSchemaMatches } from '../services/schemaMatchService';
+import { X, Sparkles, GitMerge, Loader2, AlertCircle, RefreshCw } from 'lucide-react';
+import { fetchSchemaMatches, runMatching } from '../services/schemaMatchService';
+import { addNotification } from '../services/notificationService';
 import { useAuth } from '../context/AuthContext';
 import MatchReviewCard from './MatchReviewCard';
 import EtlExecutionPanel from './EtlExecutionPanel';
@@ -16,8 +17,11 @@ export default function SchemaMatcherModal({ integrationId, onClose }: Props) {
   const [matches, setMatches] = useState<SchemaMatch[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [running, setRunning] = useState(false);
 
-  useEffect(() => {
+  const loadMatches = useCallback(() => {
+    setLoading(true);
+    setError(null);
     fetchSchemaMatches(integrationId)
       .then(data => {
         setMatches(Array.isArray(data) ? data : []);
@@ -28,6 +32,21 @@ export default function SchemaMatcherModal({ integrationId, onClose }: Props) {
         setLoading(false);
       });
   }, [integrationId]);
+
+  useEffect(() => { loadMatches(); }, [loadMatches]);
+
+  const handleRunMatching = async () => {
+    setRunning(true);
+    try {
+      await runMatching(integrationId);
+      addNotification('success', 'Matching ejecutado', `Integración #${integrationId}`);
+      loadMatches();
+    } catch {
+      addNotification('error', 'Error en matching', `No se pudo ejecutar matching en integración #${integrationId}`);
+    } finally {
+      setRunning(false);
+    }
+  };
 
   const approvedCount = useMemo(() => matches.filter(m => m.status === 'ACCEPTED').length, [matches]);
   const hasApprovedMatches = approvedCount > 0;
@@ -50,10 +69,17 @@ export default function SchemaMatcherModal({ integrationId, onClose }: Props) {
               <p className="text-xs text-slate-500">Schema Matcher · Integración #{integrationId}</p>
             </div>
           </div>
-          <button onClick={onClose}
-            className="flex items-center justify-center w-7 h-7 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors">
-            <X size={15} />
-          </button>
+          <div className="flex items-center gap-2">
+            <button onClick={handleRunMatching} disabled={running}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-blue-600 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+              <RefreshCw size={13} className={running ? 'animate-spin' : ''} />
+              {running ? 'Ejecutando...' : 'Re-ejecutar Matching'}
+            </button>
+            <button onClick={onClose}
+              className="flex items-center justify-center w-7 h-7 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors">
+              <X size={15} />
+            </button>
+          </div>
         </div>
 
         <div className="px-6 py-5 overflow-y-auto">

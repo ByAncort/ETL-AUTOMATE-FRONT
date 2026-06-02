@@ -12,7 +12,7 @@ interface Props {
 
 const methodColors: Record<string, string> = {
   GET: 'text-emerald-600',
-  POST: 'text-blue-600',
+  POST: 'text-[#5741d8]',
   PUT: 'text-amber-600',
   DELETE: 'text-red-500',
   PATCH: 'text-violet-600',
@@ -53,14 +53,14 @@ export default function NewIntegrationModal({ connections, onClose, onSuccess }:
           <button
             type="button"
             onClick={onClose}
-            className="flex-1 py-2.5 rounded-lg border border-slate-200 text-slate-600 text-sm font-medium hover:bg-slate-50 transition-colors"
+            className="flex-1 py-2.5 rounded-lg border border-[#5741d8]/[0.12] text-[#0a0a0a]/60 text-sm font-medium hover:bg-[#5741d8]/5 transition-colors"
           >
             Cancelar
           </button>
           <button
             onClick={handleSubmit}
             disabled={!apiA || !apiB || apiA === apiB || loading}
-            className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold transition-colors"
+            className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg bg-gradient-to-b from-[#5741d8] to-[#4635b5] hover:from-[#5d47e0] hover:to-[#4d39c4] disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold transition-all shadow-[0_1px_2px_rgb(87_65_216/0.3)] hover:shadow-[0_2px_6px_rgb(87_65_216/0.35)] active:scale-[0.98]"
           >
             {loading ? <Loader2 size={15} className="animate-spin" /> : <Plug size={15} />}
             {loading ? 'Creando...' : 'Crear Integración'}
@@ -76,11 +76,11 @@ export default function NewIntegrationModal({ connections, onClose, onSuccess }:
         )}
 
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1.5">API Origen (A)</label>
+          <label className="block text-xs font-medium text-[#0a0a0a]/60 mb-1.5">API Origen (A)</label>
           <select
             value={apiA ?? ''}
             onChange={(e) => setApiA(e.target.value ? Number(e.target.value) : null)}
-            className="w-full bg-white border border-slate-200 rounded-lg px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all cursor-pointer"
+            className="w-full bg-white border border-[#5741d8]/[0.12] rounded-lg px-3.5 py-2.5 text-sm text-[#0a0a0a] focus:outline-none focus:ring-2 focus:ring-[#5741d8]/20 focus:border-[#5741d8]/40 transition-all cursor-pointer"
           >
             <option value="">Seleccionar API...</option>
             {connections.filter(c => c.id !== apiB).map(conn => (
@@ -90,27 +90,27 @@ export default function NewIntegrationModal({ connections, onClose, onSuccess }:
             ))}
           </select>
           {selectedA && (
-            <div className="mt-2 px-3 py-2 rounded-lg bg-slate-50 border border-slate-200">
+            <div className="mt-2 px-3 py-2 rounded-lg bg-[#5741d8]/5 border border-[#5741d8]/10">
               <span className={`text-xs font-semibold ${methodColors[selectedA.method] || 'text-slate-500'}`}>
                 {selectedA.method}
               </span>
-              <span className="text-xs text-slate-500 ml-2 font-mono">{selectedA.url}{selectedA.pathParams}</span>
+              <span className="text-xs text-[#0a0a0a]/50 ml-2 font-mono">{selectedA.url}{selectedA.pathParams}</span>
             </div>
           )}
         </div>
 
         <div className="flex justify-center">
-          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 border border-slate-200">
-            <ArrowRight size={14} className="text-slate-400" />
+          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[#5741d8]/10 border border-[#5741d8]/15">
+            <ArrowRight size={14} className="text-[#5741d8]/50" />
           </div>
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1.5">API Destino (B)</label>
+          <label className="block text-xs font-medium text-[#0a0a0a]/60 mb-1.5">API Destino (B)</label>
           <select
             value={apiB ?? ''}
             onChange={(e) => setApiB(e.target.value ? Number(e.target.value) : null)}
-            className="w-full bg-white border border-slate-200 rounded-lg px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all cursor-pointer"
+            className="w-full bg-white border border-[#5741d8]/[0.12] rounded-lg px-3.5 py-2.5 text-sm text-[#0a0a0a] focus:outline-none focus:ring-2 focus:ring-[#5741d8]/20 focus:border-[#5741d8]/40 transition-all cursor-pointer"
           >
             <option value="">Seleccionar API...</option>
             {connections.filter(c => c.id !== apiA).map(conn => (
@@ -120,23 +120,23 @@ export default function NewIntegrationModal({ connections, onClose, onSuccess }:
             ))}
           </select>
           {selectedB && (
-            <div className="mt-2 px-3 py-2 rounded-lg bg-slate-50 border border-slate-200">
+            <div className="mt-2 px-3 py-2 rounded-lg bg-[#5741d8]/5 border border-[#5741d8]/10">
               <span className={`text-xs font-semibold ${methodColors[selectedB.method] || 'text-slate-500'}`}>
                 {selectedB.method}
               </span>
-              <span className="text-xs text-slate-500 ml-2 font-mono">{selectedB.url}{selectedB.pathParams}</span>
+              <span className="text-xs text-[#0a0a0a]/50 ml-2 font-mono">{selectedB.url}{selectedB.pathParams}</span>
             </div>
           )}
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1.5">Descripción</label>
+          <label className="block text-xs font-medium text-[#0a0a0a]/60 mb-1.5">Descripción</label>
           <input
             type="text"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Ej: Sincronización CRM → ERP"
-            className="w-full bg-white border border-slate-200 rounded-lg px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all"
+            className="w-full bg-white border border-[#5741d8]/[0.12] rounded-lg px-3.5 py-2.5 text-sm text-[#0a0a0a] placeholder:text-[#0a0a0a]/30 focus:outline-none focus:ring-2 focus:ring-[#5741d8]/20 focus:border-[#5741d8]/40 transition-all"
           />
         </div>
       </form>

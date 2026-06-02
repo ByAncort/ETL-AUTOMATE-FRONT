@@ -10,3 +10,8 @@ export async function fetchSchemaMatches(integrationId: number): Promise<SchemaM
   const res = await api.get(`/api/schema-matches/integration/${integrationId}`);
   return res.data;
 }
+
+export async function runMatching(integrationId: number): Promise<any> {
+  const res = await api.post(`/api/integrations/connections/${integrationId}/run-matching`);
+  return res.data;
+}

@@ -1,0 +1,367 @@
+{
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\eslint.config.js": {
+    "mtime": 1778284805.4080408,
+    "ast_hash": "4225f837ef9e9b6352935d05a57f40ff",
+    "semantic_hash": "4225f837ef9e9b6352935d05a57f40ff"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\package.json": {
+    "mtime": 1780359393.13987,
+    "ast_hash": "4ad97cf0aa3c82d4f353f0e3dc2a7d7a",
+    "semantic_hash": "4ad97cf0aa3c82d4f353f0e3dc2a7d7a"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\postcss.config.js": {
+    "mtime": 1778284805.4110415,
+    "ast_hash": "33fad9c02cb0ec6d6030369ef6347d57",
+    "semantic_hash": "33fad9c02cb0ec6d6030369ef6347d57"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\App.tsx": {
+    "mtime": 1779156353.8782842,
+    "ast_hash": "2392a55d2f1d84a5c4f010632e1a4d59",
+    "semantic_hash": "2392a55d2f1d84a5c4f010632e1a4d59"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\components\\AdminPanel.tsx": {
+    "mtime": 1779156353.883495,
+    "ast_hash": "b09a5593a02c04e3e9a49f4f4c117703",
+    "semantic_hash": "b09a5593a02c04e3e9a49f4f4c117703"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\components\\ChangePasswordModal.tsx": {
+    "mtime": 1779156353.8855138,
+    "ast_hash": "6818e80d47df7b36fc74640dcf77f74a",
+    "semantic_hash": "6818e80d47df7b36fc74640dcf77f74a"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\components\\EtlExecutionPanel.tsx": {
+    "mtime": 1779156353.8870244,
+    "ast_hash": "9c5a95f46a35bd98a3d529e20b016a2d",
+    "semantic_hash": "9c5a95f46a35bd98a3d529e20b016a2d"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\components\\ForgotPassword.tsx": {
+    "mtime": 1779156353.889039,
+    "ast_hash": "ae9ec5067e30e61e67f4a6d70f613706",
+    "semantic_hash": "ae9ec5067e30e61e67f4a6d70f613706"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\components\\Header.tsx": {
+    "mtime": 1779156353.8920405,
+    "ast_hash": "4ee33553f79a53ab9fe326299dbdd5f3",
+    "semantic_hash": "4ee33553f79a53ab9fe326299dbdd5f3"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\components\\IntegrationCard.tsx": {
+    "mtime": 1779156353.8946724,
+    "ast_hash": "9c88ae3730a29f0eb5553683d42488a1",
+    "semantic_hash": "9c88ae3730a29f0eb5553683d42488a1"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\components\\Layout.tsx": {
+    "mtime": 1779156353.8966918,
+    "ast_hash": "8538adb669db903bf7070b241e0ae9e9",
+    "semantic_hash": "8538adb669db903bf7070b241e0ae9e9"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\components\\Login.tsx": {
+    "mtime": 1780359432.0445008,
+    "ast_hash": "03b46f12d4e2f728787dc693f2b7a185",
+    "semantic_hash": "03b46f12d4e2f728787dc693f2b7a185"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\components\\MatchReviewCard.tsx": {
+    "mtime": 1779156353.9012904,
+    "ast_hash": "81b45f737b8aff1dd5d99f8575cbc329",
+    "semantic_hash": "81b45f737b8aff1dd5d99f8575cbc329"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\components\\NewConnectionModal.tsx": {
+    "mtime": 1779156353.9036272,
+    "ast_hash": "cf61a861342a30f6fd8db0d8c9acdd41",
+    "semantic_hash": "cf61a861342a30f6fd8db0d8c9acdd41"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\components\\NewIntegrationModal.tsx": {
+    "mtime": 1779156353.9053764,
+    "ast_hash": "785bf9a0cb903e4152fd20f70cfc3bfa",
+    "semantic_hash": "785bf9a0cb903e4152fd20f70cfc3bfa"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\components\\NotificationBell.tsx": {
+    "mtime": 1779156353.9076562,
+    "ast_hash": "3b6ac0021bfcc0d9c98c2d02e45ef553",
+    "semantic_hash": "3b6ac0021bfcc0d9c98c2d02e45ef553"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\components\\Register.tsx": {
+    "mtime": 1779156353.909798,
+    "ast_hash": "884a687b8eae7609d4f01ca4286b2fa0",
+    "semantic_hash": "884a687b8eae7609d4f01ca4286b2fa0"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\components\\ResetPassword.tsx": {
+    "mtime": 1779156353.9117985,
+    "ast_hash": "8be9247b2705c12252c6ac0949a8da87",
+    "semantic_hash": "8be9247b2705c12252c6ac0949a8da87"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\components\\SchemaMatcherModal.tsx": {
+    "mtime": 1779156353.9147987,
+    "ast_hash": "0f4ace28c6aa273bb7906a20e8f50f63",
+    "semantic_hash": "0f4ace28c6aa273bb7906a20e8f50f63"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\components\\Sidebar.tsx": {
+    "mtime": 1779156353.9173076,
+    "ast_hash": "e0a5954573e123989138da76240b53a2",
+    "semantic_hash": "e0a5954573e123989138da76240b53a2"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\components\\StatsBar.tsx": {
+    "mtime": 1779156353.9193213,
+    "ast_hash": "0189f0e1de60b8c17519cd3c802d2d4d",
+    "semantic_hash": "0189f0e1de60b8c17519cd3c802d2d4d"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\components\\UnifiedDataTable.tsx": {
+    "mtime": 1779156353.9213204,
+    "ast_hash": "4017674fbf49937653df16c5abc162a8",
+    "semantic_hash": "4017674fbf49937653df16c5abc162a8"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\components\\UsersManagement.tsx": {
+    "mtime": 1779156353.9236803,
+    "ast_hash": "ba0ea9de25a432c7ae9f7d2990e49716",
+    "semantic_hash": "ba0ea9de25a432c7ae9f7d2990e49716"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\components\\connections\\ConnectionCard.tsx": {
+    "mtime": 1779156353.9285307,
+    "ast_hash": "b1d34b425ec1625bfcd8b545c1adaded",
+    "semantic_hash": "b1d34b425ec1625bfcd8b545c1adaded"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\components\\connections\\CreateConnectionModal.tsx": {
+    "mtime": 1779156353.930045,
+    "ast_hash": "726b3881994fb1ec6ad6f3050162fd17",
+    "semantic_hash": "726b3881994fb1ec6ad6f3050162fd17"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\components\\connections\\TestResultDialog.tsx": {
+    "mtime": 1779156353.9330587,
+    "ast_hash": "68313f29280b37644d28b08c4f338019",
+    "semantic_hash": "68313f29280b37644d28b08c4f338019"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\components\\ui\\EmptyState.tsx": {
+    "mtime": 1779156353.937064,
+    "ast_hash": "2fd152e7aa6be5273e1458bf9ff6f42e",
+    "semantic_hash": "2fd152e7aa6be5273e1458bf9ff6f42e"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\components\\ui\\ErrorState.tsx": {
+    "mtime": 1779156353.9385698,
+    "ast_hash": "a5817fb81e86d9b98112904f815ba8de",
+    "semantic_hash": "a5817fb81e86d9b98112904f815ba8de"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\components\\ui\\GlobeCanvas.tsx": {
+    "mtime": 1779156353.9408937,
+    "ast_hash": "6eef38265045228a036116e6410e8c5e",
+    "semantic_hash": "6eef38265045228a036116e6410e8c5e"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\components\\ui\\LoadingState.tsx": {
+    "mtime": 1779156353.944402,
+    "ast_hash": "d9ff4bee9e690931a2feada2e5cacc84",
+    "semantic_hash": "d9ff4bee9e690931a2feada2e5cacc84"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\components\\ui\\Modal.tsx": {
+    "mtime": 1779156353.9467318,
+    "ast_hash": "bbe1caca0fb0f927804d494d4347c48d",
+    "semantic_hash": "bbe1caca0fb0f927804d494d4347c48d"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\components\\ui\\PageHeader.tsx": {
+    "mtime": 1779156353.9484193,
+    "ast_hash": "c08c430b7da85c19dd86136a7314d7d3",
+    "semantic_hash": "c08c430b7da85c19dd86136a7314d7d3"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\components\\ui\\cobe-globe-cdn.tsx": {
+    "mtime": 1780359466.5491514,
+    "ast_hash": "89c23faabf1fac1a052adcf133bcfed0",
+    "semantic_hash": "89c23faabf1fac1a052adcf133bcfed0"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\context\\AuthContext.tsx": {
+    "mtime": 1779156353.9506724,
+    "ast_hash": "e5a0cb2530221c5c100017a861dd6a51",
+    "semantic_hash": "e5a0cb2530221c5c100017a861dd6a51"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\hooks\\useApiConnections.ts": {
+    "mtime": 1779156353.9523528,
+    "ast_hash": "e89a3ccb9395a6b2ff6528015e466514",
+    "semantic_hash": "e89a3ccb9395a6b2ff6528015e466514"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\hooks\\useEtlExecution.ts": {
+    "mtime": 1779156353.9540298,
+    "ast_hash": "c6e054f25e7b212f6ec4f0e24b70ef8f",
+    "semantic_hash": "c6e054f25e7b212f6ec4f0e24b70ef8f"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\hooks\\useIntegrations.ts": {
+    "mtime": 1779156353.9557407,
+    "ast_hash": "dc5ba105d857fddfab29763b3b6dd311",
+    "semantic_hash": "dc5ba105d857fddfab29763b3b6dd311"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\hooks\\useLlmConfigs.ts": {
+    "mtime": 1779156353.9577549,
+    "ast_hash": "0837fe9f3e445e66a691cb0f6ecdf4d6",
+    "semantic_hash": "0837fe9f3e445e66a691cb0f6ecdf4d6"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\hooks\\useUnifiedRecords.ts": {
+    "mtime": 1778284805.4234283,
+    "ast_hash": "a58db96ed4efe9d0a08637ef32bf03b9",
+    "semantic_hash": "a58db96ed4efe9d0a08637ef32bf03b9"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\hooks\\useUsers.ts": {
+    "mtime": 1778284805.4234283,
+    "ast_hash": "dee2ac5c928478be2cc8ce54d72d6fe3",
+    "semantic_hash": "dee2ac5c928478be2cc8ce54d72d6fe3"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\lib\\utils.ts": {
+    "mtime": 1779156353.9626906,
+    "ast_hash": "0a3d688a6c4a897d87fc887b5e421c60",
+    "semantic_hash": "0a3d688a6c4a897d87fc887b5e421c60"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\main.tsx": {
+    "mtime": 1779156353.9651582,
+    "ast_hash": "c316d39088d4db9fdcf8d56773ee9229",
+    "semantic_hash": "c316d39088d4db9fdcf8d56773ee9229"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\pages\\AdminIntegrationsPage.tsx": {
+    "mtime": 1779156353.967172,
+    "ast_hash": "b6a2c067a11fbd062366223a34057497",
+    "semantic_hash": "b6a2c067a11fbd062366223a34057497"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\pages\\AdminLlmConfigsPage.tsx": {
+    "mtime": 1779156353.9691737,
+    "ast_hash": "447276ab0d0961c5947f08cdc45722c0",
+    "semantic_hash": "447276ab0d0961c5947f08cdc45722c0"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\pages\\AdminPage.tsx": {
+    "mtime": 1779156353.970456,
+    "ast_hash": "83d1f595816c1f39343245704fcac659",
+    "semantic_hash": "83d1f595816c1f39343245704fcac659"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\pages\\AdminSettingsPage.tsx": {
+    "mtime": 1779156353.9724422,
+    "ast_hash": "6721105a115073b918ac2e114e395ffb",
+    "semantic_hash": "6721105a115073b918ac2e114e395ffb"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\pages\\AuthPage.tsx": {
+    "mtime": 1779156353.9732096,
+    "ast_hash": "ed685e43032dfb1603628b14369a70ce",
+    "semantic_hash": "ed685e43032dfb1603628b14369a70ce"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\pages\\ConnectionsPage.tsx": {
+    "mtime": 1779156353.9752226,
+    "ast_hash": "871a792af7455640e9dc8cda1d16d3dd",
+    "semantic_hash": "871a792af7455640e9dc8cda1d16d3dd"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\pages\\DashboardPage.tsx": {
+    "mtime": 1779156353.9772227,
+    "ast_hash": "1643ef0d82635af30804a8b00ee0ce5f",
+    "semantic_hash": "1643ef0d82635af30804a8b00ee0ce5f"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\pages\\DataExplorerPage.tsx": {
+    "mtime": 1779156353.9789276,
+    "ast_hash": "8609ab6ec5d65c5fc5fe976490a11f03",
+    "semantic_hash": "8609ab6ec5d65c5fc5fe976490a11f03"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\pages\\IntegrationsPage.tsx": {
+    "mtime": 1779156353.9811983,
+    "ast_hash": "a6f07dc2d8c12728a4672f0ca59d5fe4",
+    "semantic_hash": "a6f07dc2d8c12728a4672f0ca59d5fe4"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\pages\\MonitoringPage.tsx": {
+    "mtime": 1779156353.982347,
+    "ast_hash": "d0ac7c30f8b88c60f8da56dac815ad20",
+    "semantic_hash": "d0ac7c30f8b88c60f8da56dac815ad20"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\pages\\ProfilePage.tsx": {
+    "mtime": 1779156353.9843616,
+    "ast_hash": "aabf8a14a011024248a8f7724648accd",
+    "semantic_hash": "aabf8a14a011024248a8f7724648accd"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\services\\api.ts": {
+    "mtime": 1779156353.9863646,
+    "ast_hash": "7f53d23a8901473c361bca633170100b",
+    "semantic_hash": "7f53d23a8901473c361bca633170100b"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\services\\etlService.ts": {
+    "mtime": 1779156353.9873607,
+    "ast_hash": "79bdc816a0678f9e327b5284e50bd773",
+    "semantic_hash": "79bdc816a0678f9e327b5284e50bd773"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\services\\logService.ts": {
+    "mtime": 1779156353.9898899,
+    "ast_hash": "6540e8daac04a355e41026e1501a8f77",
+    "semantic_hash": "6540e8daac04a355e41026e1501a8f77"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\services\\notificationService.ts": {
+    "mtime": 1779156353.991989,
+    "ast_hash": "3f97266967e40bce4548accd7c145be9",
+    "semantic_hash": "3f97266967e40bce4548accd7c145be9"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\services\\schemaMatchService.ts": {
+    "mtime": 1779156353.9929895,
+    "ast_hash": "66acc025bb9237f0d1535a5e4788d7aa",
+    "semantic_hash": "66acc025bb9237f0d1535a5e4788d7aa"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\types\\index.ts": {
+    "mtime": 1779156353.995713,
+    "ast_hash": "1c19c4667f70d83c89ab985370627db5",
+    "semantic_hash": "1c19c4667f70d83c89ab985370627db5"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\vite-env.d.ts": {
+    "mtime": 1778284805.4282746,
+    "ast_hash": "8f68c27c3fc38817b2726b20e2d4f1ee",
+    "semantic_hash": "8f68c27c3fc38817b2726b20e2d4f1ee"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\tailwind.config.js": {
+    "mtime": 1779156353.9981108,
+    "ast_hash": "f2506215eca417d983b2d05a53a5fec8",
+    "semantic_hash": "f2506215eca417d983b2d05a53a5fec8"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\tsconfig.app.json": {
+    "mtime": 1778284805.4282746,
+    "ast_hash": "c8a06a5c7d728682ef4bc91ffd488149",
+    "semantic_hash": "c8a06a5c7d728682ef4bc91ffd488149"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\tsconfig.json": {
+    "mtime": 1778284805.429697,
+    "ast_hash": "852c3a5df14a4b43ac28e9554ebedf4a",
+    "semantic_hash": "852c3a5df14a4b43ac28e9554ebedf4a"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\tsconfig.node.json": {
+    "mtime": 1778284805.429697,
+    "ast_hash": "e980c1dd3d183c0e364644efa7aaf82f",
+    "semantic_hash": "e980c1dd3d183c0e364644efa7aaf82f"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\vite.config.ts": {
+    "mtime": 1778284805.4306972,
+    "ast_hash": "a6342f8c3326ff5109ea1f759d80b847",
+    "semantic_hash": "a6342f8c3326ff5109ea1f759d80b847"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\README.md": {
+    "mtime": 1779156353.8588562,
+    "ast_hash": "39ca6408e351ab8e94683e51cd535fbe",
+    "semantic_hash": "39ca6408e351ab8e94683e51cd535fbe"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\docker-compose.yml": {
+    "mtime": 1779156353.860599,
+    "ast_hash": "7d8b71d5de04285b22f1173e7d8b6fd1",
+    "semantic_hash": "7d8b71d5de04285b22f1173e7d8b6fd1"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\docs\\MATCH_FEEDBACK_LOGIC.md": {
+    "mtime": 1779156353.8638954,
+    "ast_hash": "d8e6c5251712eba33d7be732da3542dd",
+    "semantic_hash": "d8e6c5251712eba33d7be732da3542dd"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\docs\\SAVE_DATA_ETL_LOGIC.md": {
+    "mtime": 1779156353.86575,
+    "ast_hash": "d3769fc95574bf675eda9163fceabb03",
+    "semantic_hash": "d3769fc95574bf675eda9163fceabb03"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\docs\\role-controller.md": {
+    "mtime": 1779156353.8680818,
+    "ast_hash": "f249c810e5bd79459a70158e433ea1c4",
+    "semantic_hash": "f249c810e5bd79459a70158e433ea1c4"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\docs\\user-role-controller.md": {
+    "mtime": 1779156353.8697865,
+    "ast_hash": "cc8df9fff422cd967ae3b23ae52eb4eb",
+    "semantic_hash": "cc8df9fff422cd967ae3b23ae52eb4eb"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\index.html": {
+    "mtime": 1778284805.4090407,
+    "ast_hash": "3ae9963d56cf37bb30eb38544834625a",
+    "semantic_hash": "3ae9963d56cf37bb30eb38544834625a"
+  },
+  "C:\\Users\\user\\Documents\\ETL-AUTOMATE-FRONT\\src\\assets\\cobe-texture.png": {
+    "mtime": 1779156353.8811893,
+    "ast_hash": "5f145cfae65710fd88e3f0895c94d597",
+    "semantic_hash": "5f145cfae65710fd88e3f0895c94d597"
+  }
+}

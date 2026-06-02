@@ -1,0 +1,1161 @@
+{
+  "directed": false,
+  "multigraph": false,
+  "graph": {
+    "hyperedges": [
+      {
+        "id": "etl_execution_flow",
+        "label": "ETL Execution Flow",
+        "nodes": [
+          "ms_save_data_service",
+          "integration_ms_service",
+          "api_register_ms_service",
+          "schema_matching_ms",
+          "schemamatch_entity"
+        ],
+        "relation": "implement",
+        "confidence": "INFERRED",
+        "confidence_score": 0.85,
+        "source_file": "docs/SAVE_DATA_ETL_LOGIC.md"
+      },
+      {
+        "id": "role_management_system",
+        "label": "Role-Based Access Control System",
+        "nodes": [
+          "rolecontroller_api",
+          "userrolecontroller_api",
+          "known_seed_roles",
+          "apigateway"
+        ],
+        "relation": "implement",
+        "confidence": "INFERRED",
+        "confidence_score": 0.85,
+        "source_file": "docs/role-controller.md"
+      }
+    ]
+  },
+  "nodes": [
+    {
+      "label": "App",
+      "file_type": "code",
+      "source_file": "src/App.tsx",
+      "source_location": "L30",
+      "id": "src_app_app",
+      "community": 34,
+      "norm_label": "app"
+    },
+    {
+      "label": "GlobeCanvas",
+      "file_type": "code",
+      "source_file": "src/components/ui/GlobeCanvas.tsx",
+      "source_location": "L79",
+      "id": "ui_globecanvas_globecanvas",
+      "community": 51,
+      "norm_label": "globecanvas"
+    },
+    {
+      "label": "ApiConnection",
+      "file_type": "code",
+      "source_file": "src/hooks/useApiConnections.ts",
+      "source_location": "L4",
+      "id": "hooks_useapiconnections_apiconnection",
+      "community": 6,
+      "norm_label": "apiconnection"
+    },
+    {
+      "label": "ApiAuthConfig",
+      "file_type": "code",
+      "source_file": "src/hooks/useApiConnections.ts",
+      "source_location": "L21",
+      "id": "hooks_useapiconnections_apiauthconfig",
+      "community": 5,
+      "norm_label": "apiauthconfig"
+    },
+    {
+      "label": "CreateConnectionPayload",
+      "file_type": "code",
+      "source_file": "src/hooks/useApiConnections.ts",
+      "source_location": "L31",
+      "id": "hooks_useapiconnections_createconnectionpayload",
+      "community": 7,
+      "norm_label": "createconnectionpayload"
+    },
+    {
+      "label": "useApiConnections",
+      "file_type": "code",
+      "source_file": "src/hooks/useApiConnections.ts",
+      "source_location": "L43",
+      "id": "hooks_useapiconnections_useapiconnections",
+      "community": 8,
+      "norm_label": "useapiconnections"
+    },
+    {
+      "label": "EtlPhase",
+      "file_type": "code",
+      "source_file": "src/hooks/useEtlExecution.ts",
+      "source_location": "L5",
+      "id": "hooks_useetlexecution_etlphase",
+      "community": 9,
+      "norm_label": "etlphase"
+    },
+    {
+      "label": "useEtlExecution",
+      "file_type": "code",
+      "source_file": "src/hooks/useEtlExecution.ts",
+      "source_location": "L7",
+      "id": "hooks_useetlexecution_useetlexecution",
+      "community": 10,
+      "norm_label": "useetlexecution"
+    },
+    {
+      "label": "Integration",
+      "file_type": "code",
+      "source_file": "src/hooks/useIntegrations.ts",
+      "source_location": "L5",
+      "id": "hooks_useintegrations_integration",
+      "community": 12,
+      "norm_label": "integration"
+    },
+    {
+      "label": "CreateIntegrationPayload",
+      "file_type": "code",
+      "source_file": "src/hooks/useIntegrations.ts",
+      "source_location": "L14",
+      "id": "hooks_useintegrations_createintegrationpayload",
+      "community": 11,
+      "norm_label": "createintegrationpayload"
+    },
+    {
+      "label": "UpdateIntegrationPayload",
+      "file_type": "code",
+      "source_file": "src/hooks/useIntegrations.ts",
+      "source_location": "L20",
+      "id": "hooks_useintegrations_updateintegrationpayload",
+      "community": 13,
+      "norm_label": "updateintegrationpayload"
+    },
+    {
+      "label": "useIntegrations",
+      "file_type": "code",
+      "source_file": "src/hooks/useIntegrations.ts",
+      "source_location": "L27",
+      "id": "hooks_useintegrations_useintegrations",
+      "community": 14,
+      "norm_label": "useintegrations"
+    },
+    {
+      "label": "useLlmConfigs",
+      "file_type": "code",
+      "source_file": "src/hooks/useLlmConfigs.ts",
+      "source_location": "L5",
+      "id": "hooks_usellmconfigs_usellmconfigs",
+      "community": 15,
+      "norm_label": "usellmconfigs"
+    },
+    {
+      "label": "useUnifiedRecords",
+      "file_type": "code",
+      "source_file": "src/hooks/useUnifiedRecords.ts",
+      "source_location": "L5",
+      "id": "hooks_useunifiedrecords_useunifiedrecords",
+      "community": 16,
+      "norm_label": "useunifiedrecords"
+    },
+    {
+      "label": "User",
+      "file_type": "code",
+      "source_file": "src/hooks/useUsers.ts",
+      "source_location": "L4",
+      "id": "hooks_useusers_user",
+      "community": 17,
+      "norm_label": "user"
+    },
+    {
+      "label": "useUsers",
+      "file_type": "code",
+      "source_file": "src/hooks/useUsers.ts",
+      "source_location": "L13",
+      "id": "hooks_useusers_useusers",
+      "community": 18,
+      "norm_label": "useusers"
+    },
+    {
+      "label": "cn",
+      "file_type": "code",
+      "source_file": "src/lib/utils.ts",
+      "source_location": "L4",
+      "id": "lib_utils_cn",
+      "community": 19,
+      "norm_label": "cn"
+    },
+    {
+      "label": "AdminPage",
+      "file_type": "code",
+      "source_file": "src/pages/AdminPage.tsx",
+      "source_location": "L3",
+      "id": "pages_adminpage_adminpage",
+      "community": 20,
+      "norm_label": "adminpage"
+    },
+    {
+      "label": "AuthPage",
+      "file_type": "code",
+      "source_file": "src/pages/AuthPage.tsx",
+      "source_location": "L6",
+      "id": "pages_authpage_authpage",
+      "community": 21,
+      "norm_label": "authpage"
+    },
+    {
+      "label": "runEtl",
+      "file_type": "code",
+      "source_file": "src/services/etlService.ts",
+      "source_location": "L22",
+      "id": "services_etlservice_runetl",
+      "community": 22,
+      "norm_label": "runetl"
+    },
+    {
+      "label": "runEtlById",
+      "file_type": "code",
+      "source_file": "src/services/etlService.ts",
+      "source_location": "L27",
+      "id": "services_etlservice_runetlbyid",
+      "community": 23,
+      "norm_label": "runetlbyid"
+    },
+    {
+      "label": "fetchLogs",
+      "file_type": "code",
+      "source_file": "src/services/logService.ts",
+      "source_location": "L17",
+      "id": "services_logservice_fetchlogs",
+      "community": 24,
+      "norm_label": "fetchlogs"
+    },
+    {
+      "label": "Notification",
+      "file_type": "code",
+      "source_file": "src/services/notificationService.ts",
+      "source_location": "L1",
+      "id": "services_notificationservice_notification",
+      "community": 30,
+      "norm_label": "notification"
+    },
+    {
+      "label": "addNotification",
+      "file_type": "code",
+      "source_file": "src/services/notificationService.ts",
+      "source_location": "L21",
+      "id": "services_notificationservice_addnotification",
+      "community": 25,
+      "norm_label": "addnotification"
+    },
+    {
+      "label": "markAsRead",
+      "file_type": "code",
+      "source_file": "src/services/notificationService.ts",
+      "source_location": "L34",
+      "id": "services_notificationservice_markasread",
+      "community": 29,
+      "norm_label": "markasread"
+    },
+    {
+      "label": "markAllAsRead",
+      "file_type": "code",
+      "source_file": "src/services/notificationService.ts",
+      "source_location": "L41",
+      "id": "services_notificationservice_markallasread",
+      "community": 28,
+      "norm_label": "markallasread"
+    },
+    {
+      "label": "clearAll",
+      "file_type": "code",
+      "source_file": "src/services/notificationService.ts",
+      "source_location": "L46",
+      "id": "services_notificationservice_clearall",
+      "community": 26,
+      "norm_label": "clearall"
+    },
+    {
+      "label": "getNotifications",
+      "file_type": "code",
+      "source_file": "src/services/notificationService.ts",
+      "source_location": "L51",
+      "id": "services_notificationservice_getnotifications",
+      "community": 27,
+      "norm_label": "getnotifications"
+    },
+    {
+      "label": "subscribe",
+      "file_type": "code",
+      "source_file": "src/services/notificationService.ts",
+      "source_location": "L55",
+      "id": "services_notificationservice_subscribe",
+      "community": 31,
+      "norm_label": "subscribe"
+    },
+    {
+      "label": "submitFeedback",
+      "file_type": "code",
+      "source_file": "src/services/schemaMatchService.ts",
+      "source_location": "L4",
+      "id": "services_schemamatchservice_submitfeedback",
+      "community": 33,
+      "norm_label": "submitfeedback"
+    },
+    {
+      "label": "fetchSchemaMatches",
+      "file_type": "code",
+      "source_file": "src/services/schemaMatchService.ts",
+      "source_location": "L9",
+      "id": "services_schemamatchservice_fetchschemamatches",
+      "community": 32,
+      "norm_label": "fetchschemamatches"
+    },
+    {
+      "label": "IntegrationStatus",
+      "file_type": "code",
+      "source_file": "src/types/index.ts",
+      "source_location": "L1",
+      "id": "types_index_integrationstatus",
+      "community": 42,
+      "norm_label": "integrationstatus"
+    },
+    {
+      "label": "MLBadge",
+      "file_type": "code",
+      "source_file": "src/types/index.ts",
+      "source_location": "L3",
+      "id": "types_index_mlbadge",
+      "community": 46,
+      "norm_label": "mlbadge"
+    },
+    {
+      "label": "Integration",
+      "file_type": "code",
+      "source_file": "src/types/index.ts",
+      "source_location": "L8",
+      "id": "types_index_integration",
+      "community": 40,
+      "norm_label": "integration"
+    },
+    {
+      "label": "IntegrationResponse",
+      "file_type": "code",
+      "source_file": "src/types/index.ts",
+      "source_location": "L19",
+      "id": "types_index_integrationresponse",
+      "community": 41,
+      "norm_label": "integrationresponse"
+    },
+    {
+      "label": "UnifiedRecord",
+      "file_type": "code",
+      "source_file": "src/types/index.ts",
+      "source_location": "L28",
+      "id": "types_index_unifiedrecord",
+      "community": 50,
+      "norm_label": "unifiedrecord"
+    },
+    {
+      "label": "SchemaField",
+      "file_type": "code",
+      "source_file": "src/types/index.ts",
+      "source_location": "L37",
+      "id": "types_index_schemafield",
+      "community": 47,
+      "norm_label": "schemafield"
+    },
+    {
+      "label": "ApiField",
+      "file_type": "code",
+      "source_file": "src/types/index.ts",
+      "source_location": "L42",
+      "id": "types_index_apifield",
+      "community": 35,
+      "norm_label": "apifield"
+    },
+    {
+      "label": "SchemaMatchStatus",
+      "file_type": "code",
+      "source_file": "src/types/index.ts",
+      "source_location": "L47",
+      "id": "types_index_schemamatchstatus",
+      "community": 49,
+      "norm_label": "schemamatchstatus"
+    },
+    {
+      "label": "SchemaMatch",
+      "file_type": "code",
+      "source_file": "src/types/index.ts",
+      "source_location": "L49",
+      "id": "types_index_schemamatch",
+      "community": 48,
+      "norm_label": "schemamatch"
+    },
+    {
+      "label": "FeedbackRequest",
+      "file_type": "code",
+      "source_file": "src/types/index.ts",
+      "source_location": "L62",
+      "id": "types_index_feedbackrequest",
+      "community": 38,
+      "norm_label": "feedbackrequest"
+    },
+    {
+      "label": "FeedbackResponse",
+      "file_type": "code",
+      "source_file": "src/types/index.ts",
+      "source_location": "L69",
+      "id": "types_index_feedbackresponse",
+      "community": 39,
+      "norm_label": "feedbackresponse"
+    },
+    {
+      "label": "EtlRequest",
+      "file_type": "code",
+      "source_file": "src/types/index.ts",
+      "source_location": "L80",
+      "id": "types_index_etlrequest",
+      "community": 36,
+      "norm_label": "etlrequest"
+    },
+    {
+      "label": "EtlResponse",
+      "file_type": "code",
+      "source_file": "src/types/index.ts",
+      "source_location": "L84",
+      "id": "types_index_etlresponse",
+      "community": 37,
+      "norm_label": "etlresponse"
+    },
+    {
+      "label": "LlmConfigRequest",
+      "file_type": "code",
+      "source_file": "src/types/index.ts",
+      "source_location": "L94",
+      "id": "types_index_llmconfigrequest",
+      "community": 43,
+      "norm_label": "llmconfigrequest"
+    },
+    {
+      "label": "LogEntry",
+      "file_type": "code",
+      "source_file": "src/types/index.ts",
+      "source_location": "L103",
+      "id": "types_index_logentry",
+      "community": 45,
+      "norm_label": "logentry"
+    },
+    {
+      "label": "LlmConfigResponse",
+      "file_type": "code",
+      "source_file": "src/types/index.ts",
+      "source_location": "L109",
+      "id": "types_index_llmconfigresponse",
+      "community": 44,
+      "norm_label": "llmconfigresponse"
+    },
+    {
+      "label": "ETL Automate Frontend",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "readme_project_overview",
+      "community": 1,
+      "norm_label": "etl automate frontend"
+    },
+    {
+      "label": "Match Feedback Logic",
+      "file_type": "document",
+      "source_file": "docs/MATCH_FEEDBACK_LOGIC.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "match_feedback_logic_doc",
+      "community": 2,
+      "norm_label": "match feedback logic"
+    },
+    {
+      "label": "MS-SAVE-DATA ETL Logic",
+      "file_type": "document",
+      "source_file": "docs/SAVE_DATA_ETL_LOGIC.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "save_data_etl_logic_doc",
+      "community": 0,
+      "norm_label": "ms-save-data etl logic"
+    },
+    {
+      "label": "Role Controller Documentation",
+      "file_type": "document",
+      "source_file": "docs/role-controller.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "role_controller_doc",
+      "community": 3,
+      "norm_label": "role controller documentation"
+    },
+    {
+      "label": "User Role Controller Documentation",
+      "file_type": "document",
+      "source_file": "docs/user-role-controller.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "user_role_controller_doc",
+      "community": 1,
+      "norm_label": "user role controller documentation"
+    },
+    {
+      "label": "Docker Compose Config",
+      "file_type": "code",
+      "source_file": "docker-compose.yml",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "docker_compose_config",
+      "community": 1,
+      "norm_label": "docker compose config"
+    },
+    {
+      "label": "index.html Entry Point",
+      "file_type": "code",
+      "source_file": "index.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "index_html_entry",
+      "community": 1,
+      "norm_label": "index.html entry point"
+    },
+    {
+      "label": "API Gateway Backend",
+      "file_type": "code",
+      "source_file": "README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "apigateway",
+      "community": 1,
+      "norm_label": "api gateway backend"
+    },
+    {
+      "label": "SchemaMatch Entity",
+      "file_type": "code",
+      "source_file": "docs/MATCH_FEEDBACK_LOGIC.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "schemamatch_entity",
+      "community": 2,
+      "norm_label": "schemamatch entity"
+    },
+    {
+      "label": "MatchFeedback Entity",
+      "file_type": "code",
+      "source_file": "docs/MATCH_FEEDBACK_LOGIC.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "matchfeedback_entity",
+      "community": 2,
+      "norm_label": "matchfeedback entity"
+    },
+    {
+      "label": "MatchReviewCard Component",
+      "file_type": "code",
+      "source_file": "docs/MATCH_FEEDBACK_LOGIC.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "matchreviewcard_component",
+      "community": 2,
+      "norm_label": "matchreviewcard component"
+    },
+    {
+      "label": "Schema Matching Microservice",
+      "file_type": "code",
+      "source_file": "docs/MATCH_FEEDBACK_LOGIC.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "schema_matching_ms",
+      "community": 2,
+      "norm_label": "schema matching microservice"
+    },
+    {
+      "label": "MS-SAVE-DATA Microservice",
+      "file_type": "code",
+      "source_file": "docs/SAVE_DATA_ETL_LOGIC.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "ms_save_data_service",
+      "community": 0,
+      "norm_label": "ms-save-data microservice"
+    },
+    {
+      "label": "EtlExecutionPanel Component",
+      "file_type": "code",
+      "source_file": "docs/SAVE_DATA_ETL_LOGIC.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "etlexecutionpanel_component",
+      "community": 0,
+      "norm_label": "etlexecutionpanel component"
+    },
+    {
+      "label": "useEtlExecution Hook",
+      "file_type": "code",
+      "source_file": "docs/SAVE_DATA_ETL_LOGIC.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "useetlexecution_hook",
+      "community": 0,
+      "norm_label": "useetlexecution hook"
+    },
+    {
+      "label": "runEtl Service Function",
+      "file_type": "code",
+      "source_file": "docs/SAVE_DATA_ETL_LOGIC.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "runetl_service",
+      "community": 0,
+      "norm_label": "runetl service function"
+    },
+    {
+      "label": "Integration Microservice",
+      "file_type": "code",
+      "source_file": "docs/SAVE_DATA_ETL_LOGIC.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "integration_ms_service",
+      "community": 0,
+      "norm_label": "integration microservice"
+    },
+    {
+      "label": "API Register Microservice",
+      "file_type": "code",
+      "source_file": "docs/SAVE_DATA_ETL_LOGIC.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "api_register_ms_service",
+      "community": 0,
+      "norm_label": "api register microservice"
+    },
+    {
+      "label": "RoleController API",
+      "file_type": "code",
+      "source_file": "docs/role-controller.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rolecontroller_api",
+      "community": 3,
+      "norm_label": "rolecontroller api"
+    },
+    {
+      "label": "UserRoleController API",
+      "file_type": "code",
+      "source_file": "docs/user-role-controller.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "userrolecontroller_api",
+      "community": 3,
+      "norm_label": "userrolecontroller api"
+    },
+    {
+      "label": "Known Seed Roles",
+      "file_type": "code",
+      "source_file": "docs/role-controller.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "known_seed_roles",
+      "community": 3,
+      "norm_label": "known seed roles"
+    },
+    {
+      "label": "React Application",
+      "file_type": "code",
+      "source_file": "README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "react_application",
+      "community": 1,
+      "norm_label": "react application"
+    },
+    {
+      "label": "ETL Pipeline (Extract-Transform-Load)",
+      "file_type": "code",
+      "source_file": "docs/SAVE_DATA_ETL_LOGIC.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "etl_pipeline_concept",
+      "community": 0,
+      "norm_label": "etl pipeline (extract-transform-load)"
+    },
+    {
+      "label": "cobe-texture.png",
+      "file_type": "image",
+      "source_file": "src/assets/cobe-texture.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "cobe_texture_png",
+      "community": 4,
+      "norm_label": "cobe-texture.png"
+    },
+    {
+      "label": "Globe Texture Asset",
+      "file_type": "image",
+      "source_file": "src/assets/cobe-texture.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "globe_texture_asset",
+      "community": 4,
+      "norm_label": "globe texture asset"
+    }
+  ],
+  "links": [
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "readme_project_overview",
+      "target": "apigateway"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "readme_project_overview",
+      "target": "react_application"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/MATCH_FEEDBACK_LOGIC.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "match_feedback_logic_doc",
+      "target": "matchfeedback_entity"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/MATCH_FEEDBACK_LOGIC.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "match_feedback_logic_doc",
+      "target": "matchreviewcard_component"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/MATCH_FEEDBACK_LOGIC.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "match_feedback_logic_doc",
+      "target": "schema_matching_ms"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/MATCH_FEEDBACK_LOGIC.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "match_feedback_logic_doc",
+      "target": "schemamatch_entity"
+    },
+    {
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
+      "source_file": "docs/SAVE_DATA_ETL_LOGIC.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "save_data_etl_logic_doc",
+      "target": "match_feedback_logic_doc"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/SAVE_DATA_ETL_LOGIC.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "save_data_etl_logic_doc",
+      "target": "api_register_ms_service"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/SAVE_DATA_ETL_LOGIC.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "save_data_etl_logic_doc",
+      "target": "etl_pipeline_concept"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/SAVE_DATA_ETL_LOGIC.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "save_data_etl_logic_doc",
+      "target": "etlexecutionpanel_component"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/SAVE_DATA_ETL_LOGIC.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "save_data_etl_logic_doc",
+      "target": "integration_ms_service"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/SAVE_DATA_ETL_LOGIC.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "save_data_etl_logic_doc",
+      "target": "ms_save_data_service"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/SAVE_DATA_ETL_LOGIC.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "save_data_etl_logic_doc",
+      "target": "runetl_service"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/SAVE_DATA_ETL_LOGIC.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "save_data_etl_logic_doc",
+      "target": "schema_matching_ms"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/SAVE_DATA_ETL_LOGIC.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "save_data_etl_logic_doc",
+      "target": "useetlexecution_hook"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/role-controller.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "role_controller_doc",
+      "target": "known_seed_roles"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/role-controller.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "role_controller_doc",
+      "target": "rolecontroller_api"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/role-controller.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "role_controller_doc",
+      "target": "userrolecontroller_api"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/user-role-controller.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "user_role_controller_doc",
+      "target": "apigateway"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/user-role-controller.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "user_role_controller_doc",
+      "target": "userrolecontroller_api"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docker-compose.yml",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "docker_compose_config",
+      "target": "react_application"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "index_html_entry",
+      "target": "react_application"
+    },
+    {
+      "relation": "implements",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "docs/MATCH_FEEDBACK_LOGIC.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "schema_matching_ms",
+      "target": "schemamatch_entity"
+    },
+    {
+      "relation": "shares_data_with",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/MATCH_FEEDBACK_LOGIC.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "schemamatch_entity",
+      "target": "matchfeedback_entity"
+    },
+    {
+      "relation": "shares_data_with",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/SAVE_DATA_ETL_LOGIC.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "schemamatch_entity",
+      "target": "ms_save_data_service"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/SAVE_DATA_ETL_LOGIC.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "ms_save_data_service",
+      "target": "schema_matching_ms"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/SAVE_DATA_ETL_LOGIC.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "ms_save_data_service",
+      "target": "api_register_ms_service"
+    },
+    {
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/SAVE_DATA_ETL_LOGIC.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "ms_save_data_service",
+      "target": "etl_pipeline_concept"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/SAVE_DATA_ETL_LOGIC.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "ms_save_data_service",
+      "target": "integration_ms_service"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/SAVE_DATA_ETL_LOGIC.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "etlexecutionpanel_component",
+      "target": "useetlexecution_hook"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/SAVE_DATA_ETL_LOGIC.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "useetlexecution_hook",
+      "target": "runetl_service"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/role-controller.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "known_seed_roles",
+      "target": "rolecontroller_api"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/role-controller.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "rolecontroller_api",
+      "target": "userrolecontroller_api"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "AMBIGUOUS",
+      "confidence_score": 0.3,
+      "source_file": "src/assets/cobe-texture.png",
+      "source_location": null,
+      "weight": 0.5,
+      "source": "cobe_texture_png",
+      "target": "globe_texture_asset"
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "etl_execution_flow",
+      "label": "ETL Execution Flow",
+      "nodes": [
+        "ms_save_data_service",
+        "integration_ms_service",
+        "api_register_ms_service",
+        "schema_matching_ms",
+        "schemamatch_entity"
+      ],
+      "relation": "implement",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "docs/SAVE_DATA_ETL_LOGIC.md"
+    },
+    {
+      "id": "role_management_system",
+      "label": "Role-Based Access Control System",
+      "nodes": [
+        "rolecontroller_api",
+        "userrolecontroller_api",
+        "known_seed_roles",
+        "apigateway"
+      ],
+      "relation": "implement",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "docs/role-controller.md"
+    }
+  ],
+  "built_at_commit": "682f25d43c95dd375837dc0cde9674b67d4cce33"
+}

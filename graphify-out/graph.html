@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>graphify - graphify-out/graph.html</title>
+<script src="https://unpkg.com/vis-network@9.1.6/standalone/umd/vis-network.min.js"
+        integrity="sha384-Ux6phic9PEHJ38YtrijhkzyJ8yQlH8i/+buBR8s3mAZOJrP1gwyvAcIYl3GWtpX1"
+        crossorigin="anonymous"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0f0f1a; color: #e0e0e0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; display: flex; height: 100vh; overflow: hidden; }
+  #graph { flex: 1; }
+  #sidebar { width: 280px; background: #1a1a2e; border-left: 1px solid #2a2a4e; display: flex; flex-direction: column; overflow: hidden; }
+  #search-wrap { padding: 12px; border-bottom: 1px solid #2a2a4e; }
+  #search { width: 100%; background: #0f0f1a; border: 1px solid #3a3a5e; color: #e0e0e0; padding: 7px 10px; border-radius: 6px; font-size: 13px; outline: none; }
+  #search:focus { border-color: #4E79A7; }
+  #search-results { max-height: 140px; overflow-y: auto; padding: 4px 12px; border-bottom: 1px solid #2a2a4e; display: none; }
+  .search-item { padding: 4px 6px; cursor: pointer; border-radius: 4px; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .search-item:hover { background: #2a2a4e; }
+  #info-panel { padding: 14px; border-bottom: 1px solid #2a2a4e; min-height: 140px; }
+  #info-panel h3 { font-size: 13px; color: #aaa; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+  #info-content { font-size: 13px; color: #ccc; line-height: 1.6; }
+  #info-content .field { margin-bottom: 5px; }
+  #info-content .field b { color: #e0e0e0; }
+  #info-content .empty { color: #555; font-style: italic; }
+  .neighbor-link { display: block; padding: 2px 6px; margin: 2px 0; border-radius: 3px; cursor: pointer; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-left: 3px solid #333; }
+  .neighbor-link:hover { background: #2a2a4e; }
+  #neighbors-list { max-height: 160px; overflow-y: auto; margin-top: 4px; }
+  #legend-wrap { flex: 1; overflow-y: auto; padding: 12px; }
+  #legend-wrap h3 { font-size: 13px; color: #aaa; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .legend-item { display: flex; align-items: center; gap: 8px; padding: 4px 0; cursor: pointer; border-radius: 4px; font-size: 12px; }
+  .legend-item:hover { background: #2a2a4e; padding-left: 4px; }
+  .legend-item.dimmed { opacity: 0.35; }
+  .legend-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  .legend-label { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .legend-count { color: #666; font-size: 11px; }
+  #stats { padding: 10px 14px; border-top: 1px solid #2a2a4e; font-size: 11px; color: #555; }
+  #legend-controls { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding: 4px 0; }
+  #legend-controls label { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 12px; color: #aaa; user-select: none; }
+  #legend-controls label:hover { color: #e0e0e0; }
+  .legend-cb, #select-all-cb { appearance: none; -webkit-appearance: none; width: 14px; height: 14px; border: 1.5px solid #3a3a5e; border-radius: 3px; background: #0f0f1a; cursor: pointer; position: relative; flex-shrink: 0; }
+  .legend-cb:checked, #select-all-cb:checked { background: #4E79A7; border-color: #4E79A7; }
+  .legend-cb:checked::after, #select-all-cb:checked::after { content: ''; position: absolute; left: 3.5px; top: 1px; width: 4px; height: 7px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+  #select-all-cb:indeterminate { background: #4E79A7; border-color: #4E79A7; }
+  #select-all-cb:indeterminate::after { content: ''; position: absolute; left: 2px; top: 5px; width: 8px; height: 2px; background: #fff; border: none; transform: none; }
+</style>
+</head>
+<body>
+<div id="graph"></div>
+<div id="sidebar">
+  <div id="search-wrap">
+    <input id="search" type="text" placeholder="Search nodes..." autocomplete="off">
+    <div id="search-results"></div>
+  </div>
+  <div id="info-panel">
+    <h3>Node Info</h3>
+    <div id="info-content"><span class="empty">Click a node to inspect it</span></div>
+  </div>
+  <div id="legend-wrap">
+    <h3>Communities</h3>
+    <div id="legend-controls">
+      <label><input type="checkbox" id="select-all-cb" checked onchange="toggleAllCommunities(!this.checked)">Select All</label>
+    </div>
+    <div id="legend"></div>
+  </div>
+  <div id="stats">72 nodes &middot; 34 edges &middot; 52 communities</div>
+</div>
+<script>
+const RAW_NODES = [{"id": "src_app_app", "label": "App", "color": {"background": "#59A14F", "border": "#59A14F", "highlight": {"background": "#ffffff", "border": "#59A14F"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "App", "community": 34, "community_name": "App Entry", "source_file": "src/App.tsx", "file_type": "code", "degree": 0}, {"id": "ui_globecanvas_globecanvas", "label": "GlobeCanvas", "color": {"background": "#F28E2B", "border": "#F28E2B", "highlight": {"background": "#ffffff", "border": "#F28E2B"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "GlobeCanvas", "community": 51, "community_name": "GlobeCanvas UI", "source_file": "src/components/ui/GlobeCanvas.tsx", "file_type": "code", "degree": 0}, {"id": "hooks_useapiconnections_apiconnection", "label": "ApiConnection", "color": {"background": "#B07AA1", "border": "#B07AA1", "highlight": {"background": "#ffffff", "border": "#B07AA1"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "ApiConnection", "community": 6, "community_name": "API Connection Model", "source_file": "src/hooks/useApiConnections.ts", "file_type": "code", "degree": 0}, {"id": "hooks_useapiconnections_apiauthconfig", "label": "ApiAuthConfig", "color": {"background": "#EDC948", "border": "#EDC948", "highlight": {"background": "#ffffff", "border": "#EDC948"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "ApiAuthConfig", "community": 5, "community_name": "API Connection Hooks", "source_file": "src/hooks/useApiConnections.ts", "file_type": "code", "degree": 0}, {"id": "hooks_useapiconnections_createconnectionpayload", "label": "CreateConnectionPayload", "color": {"background": "#FF9DA7", "border": "#FF9DA7", "highlight": {"background": "#ffffff", "border": "#FF9DA7"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "CreateConnectionPayload", "community": 7, "community_name": "Connection Payload", "source_file": "src/hooks/useApiConnections.ts", "file_type": "code", "degree": 0}, {"id": "hooks_useapiconnections_useapiconnections", "label": "useApiConnections", "color": {"background": "#9C755F", "border": "#9C755F", "highlight": {"background": "#ffffff", "border": "#9C755F"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "useApiConnections", "community": 8, "community_name": "API Connections Hook", "source_file": "src/hooks/useApiConnections.ts", "file_type": "code", "degree": 0}, {"id": "hooks_useetlexecution_etlphase", "label": "EtlPhase", "color": {"background": "#BAB0AC", "border": "#BAB0AC", "highlight": {"background": "#ffffff", "border": "#BAB0AC"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "EtlPhase", "community": 9, "community_name": "ETL Phase Model", "source_file": "src/hooks/useEtlExecution.ts", "file_type": "code", "degree": 0}, {"id": "hooks_useetlexecution_useetlexecution", "label": "useEtlExecution", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "useEtlExecution", "community": 10, "community_name": "ETL Execution Hook", "source_file": "src/hooks/useEtlExecution.ts", "file_type": "code", "degree": 0}, {"id": "hooks_useintegrations_integration", "label": "Integration", "color": {"background": "#E15759", "border": "#E15759", "highlight": {"background": "#ffffff", "border": "#E15759"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "Integration", "community": 12, "community_name": "Integration Model", "source_file": "src/hooks/useIntegrations.ts", "file_type": "code", "degree": 0}, {"id": "hooks_useintegrations_createintegrationpayload", "label": "CreateIntegrationPayload", "color": {"background": "#F28E2B", "border": "#F28E2B", "highlight": {"background": "#ffffff", "border": "#F28E2B"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "CreateIntegrationPayload", "community": 11, "community_name": "Integration Payload", "source_file": "src/hooks/useIntegrations.ts", "file_type": "code", "degree": 0}, {"id": "hooks_useintegrations_updateintegrationpayload", "label": "UpdateIntegrationPayload", "color": {"background": "#76B7B2", "border": "#76B7B2", "highlight": {"background": "#ffffff", "border": "#76B7B2"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "UpdateIntegrationPayload", "community": 13, "community_name": "Update Integration", "source_file": "src/hooks/useIntegrations.ts", "file_type": "code", "degree": 0}, {"id": "hooks_useintegrations_useintegrations", "label": "useIntegrations", "color": {"background": "#59A14F", "border": "#59A14F", "highlight": {"background": "#ffffff", "border": "#59A14F"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "useIntegrations", "community": 14, "community_name": "Integrations Hook", "source_file": "src/hooks/useIntegrations.ts", "file_type": "code", "degree": 0}, {"id": "hooks_usellmconfigs_usellmconfigs", "label": "useLlmConfigs", "color": {"background": "#EDC948", "border": "#EDC948", "highlight": {"background": "#ffffff", "border": "#EDC948"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "useLlmConfigs", "community": 15, "community_name": "LLM Configs Hook", "source_file": "src/hooks/useLlmConfigs.ts", "file_type": "code", "degree": 0}, {"id": "hooks_useunifiedrecords_useunifiedrecords", "label": "useUnifiedRecords", "color": {"background": "#B07AA1", "border": "#B07AA1", "highlight": {"background": "#ffffff", "border": "#B07AA1"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "useUnifiedRecords", "community": 16, "community_name": "Unified Records Hook", "source_file": "src/hooks/useUnifiedRecords.ts", "file_type": "code", "degree": 0}, {"id": "hooks_useusers_user", "label": "User", "color": {"background": "#FF9DA7", "border": "#FF9DA7", "highlight": {"background": "#ffffff", "border": "#FF9DA7"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "User", "community": 17, "community_name": "User Model", "source_file": "src/hooks/useUsers.ts", "file_type": "code", "degree": 0}, {"id": "hooks_useusers_useusers", "label": "useUsers", "color": {"background": "#9C755F", "border": "#9C755F", "highlight": {"background": "#ffffff", "border": "#9C755F"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "useUsers", "community": 18, "community_name": "Users Hook", "source_file": "src/hooks/useUsers.ts", "file_type": "code", "degree": 0}, {"id": "lib_utils_cn", "label": "cn", "color": {"background": "#BAB0AC", "border": "#BAB0AC", "highlight": {"background": "#ffffff", "border": "#BAB0AC"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "cn", "community": 19, "community_name": "Utility Functions", "source_file": "src/lib/utils.ts", "file_type": "code", "degree": 0}, {"id": "pages_adminpage_adminpage", "label": "AdminPage", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "AdminPage", "community": 20, "community_name": "Admin Page", "source_file": "src/pages/AdminPage.tsx", "file_type": "code", "degree": 0}, {"id": "pages_authpage_authpage", "label": "AuthPage", "color": {"background": "#F28E2B", "border": "#F28E2B", "highlight": {"background": "#ffffff", "border": "#F28E2B"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "AuthPage", "community": 21, "community_name": "Auth Page", "source_file": "src/pages/AuthPage.tsx", "file_type": "code", "degree": 0}, {"id": "services_etlservice_runetl", "label": "runEtl", "color": {"background": "#E15759", "border": "#E15759", "highlight": {"background": "#ffffff", "border": "#E15759"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "runEtl", "community": 22, "community_name": "Run ETL Service", "source_file": "src/services/etlService.ts", "file_type": "code", "degree": 0}, {"id": "services_etlservice_runetlbyid", "label": "runEtlById", "color": {"background": "#76B7B2", "border": "#76B7B2", "highlight": {"background": "#ffffff", "border": "#76B7B2"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "runEtlById", "community": 23, "community_name": "Run ETL By ID", "source_file": "src/services/etlService.ts", "file_type": "code", "degree": 0}, {"id": "services_logservice_fetchlogs", "label": "fetchLogs", "color": {"background": "#59A14F", "border": "#59A14F", "highlight": {"background": "#ffffff", "border": "#59A14F"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "fetchLogs", "community": 24, "community_name": "Log Service", "source_file": "src/services/logService.ts", "file_type": "code", "degree": 0}, {"id": "services_notificationservice_notification", "label": "Notification", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "Notification", "community": 30, "community_name": "Notification Model", "source_file": "src/services/notificationService.ts", "file_type": "code", "degree": 0}, {"id": "services_notificationservice_addnotification", "label": "addNotification", "color": {"background": "#EDC948", "border": "#EDC948", "highlight": {"background": "#ffffff", "border": "#EDC948"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "addNotification", "community": 25, "community_name": "Add Notification", "source_file": "src/services/notificationService.ts", "file_type": "code", "degree": 0}, {"id": "services_notificationservice_markasread", "label": "markAsRead", "color": {"background": "#BAB0AC", "border": "#BAB0AC", "highlight": {"background": "#ffffff", "border": "#BAB0AC"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "markAsRead", "community": 29, "community_name": "Mark Read", "source_file": "src/services/notificationService.ts", "file_type": "code", "degree": 0}, {"id": "services_notificationservice_markallasread", "label": "markAllAsRead", "color": {"background": "#9C755F", "border": "#9C755F", "highlight": {"background": "#ffffff", "border": "#9C755F"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "markAllAsRead", "community": 28, "community_name": "Mark All Read", "source_file": "src/services/notificationService.ts", "file_type": "code", "degree": 0}, {"id": "services_notificationservice_clearall", "label": "clearAll", "color": {"background": "#B07AA1", "border": "#B07AA1", "highlight": {"background": "#ffffff", "border": "#B07AA1"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "clearAll", "community": 26, "community_name": "Clear Notifications", "source_file": "src/services/notificationService.ts", "file_type": "code", "degree": 0}, {"id": "services_notificationservice_getnotifications", "label": "getNotifications", "color": {"background": "#FF9DA7", "border": "#FF9DA7", "highlight": {"background": "#ffffff", "border": "#FF9DA7"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "getNotifications", "community": 27, "community_name": "Get Notifications", "source_file": "src/services/notificationService.ts", "file_type": "code", "degree": 0}, {"id": "services_notificationservice_subscribe", "label": "subscribe", "color": {"background": "#F28E2B", "border": "#F28E2B", "highlight": {"background": "#ffffff", "border": "#F28E2B"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "subscribe", "community": 31, "community_name": "Subscribe Notifications", "source_file": "src/services/notificationService.ts", "file_type": "code", "degree": 0}, {"id": "services_schemamatchservice_submitfeedback", "label": "submitFeedback", "color": {"background": "#76B7B2", "border": "#76B7B2", "highlight": {"background": "#ffffff", "border": "#76B7B2"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "submitFeedback", "community": 33, "community_name": "Submit Feedback", "source_file": "src/services/schemaMatchService.ts", "file_type": "code", "degree": 0}, {"id": "services_schemamatchservice_fetchschemamatches", "label": "fetchSchemaMatches", "color": {"background": "#E15759", "border": "#E15759", "highlight": {"background": "#ffffff", "border": "#E15759"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "fetchSchemaMatches", "community": 32, "community_name": "Fetch Schema Matches", "source_file": "src/services/schemaMatchService.ts", "file_type": "code", "degree": 0}, {"id": "types_index_integrationstatus", "label": "IntegrationStatus", "color": {"background": "#E15759", "border": "#E15759", "highlight": {"background": "#ffffff", "border": "#E15759"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "IntegrationStatus", "community": 42, "community_name": "Integration Status", "source_file": "src/types/index.ts", "file_type": "code", "degree": 0}, {"id": "types_index_mlbadge", "label": "MLBadge", "color": {"background": "#B07AA1", "border": "#B07AA1", "highlight": {"background": "#ffffff", "border": "#B07AA1"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "MLBadge", "community": 46, "community_name": "ML Badge Type", "source_file": "src/types/index.ts", "file_type": "code", "degree": 0}, {"id": "types_index_integration", "label": "Integration", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "Integration", "community": 40, "community_name": "Integration Type", "source_file": "src/types/index.ts", "file_type": "code", "degree": 0}, {"id": "types_index_integrationresponse", "label": "IntegrationResponse", "color": {"background": "#F28E2B", "border": "#F28E2B", "highlight": {"background": "#ffffff", "border": "#F28E2B"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "IntegrationResponse", "community": 41, "community_name": "Integration Response", "source_file": "src/types/index.ts", "file_type": "code", "degree": 0}, {"id": "types_index_unifiedrecord", "label": "UnifiedRecord", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "UnifiedRecord", "community": 50, "community_name": "Unified Record Type", "source_file": "src/types/index.ts", "file_type": "code", "degree": 0}, {"id": "types_index_schemafield", "label": "SchemaField", "color": {"background": "#FF9DA7", "border": "#FF9DA7", "highlight": {"background": "#ffffff", "border": "#FF9DA7"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "SchemaField", "community": 47, "community_name": "Schema Field Type", "source_file": "src/types/index.ts", "file_type": "code", "degree": 0}, {"id": "types_index_apifield", "label": "ApiField", "color": {"background": "#EDC948", "border": "#EDC948", "highlight": {"background": "#ffffff", "border": "#EDC948"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "ApiField", "community": 35, "community_name": "API Field Type", "source_file": "src/types/index.ts", "file_type": "code", "degree": 0}, {"id": "types_index_schemamatchstatus", "label": "SchemaMatchStatus", "color": {"background": "#BAB0AC", "border": "#BAB0AC", "highlight": {"background": "#ffffff", "border": "#BAB0AC"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "SchemaMatchStatus", "community": 49, "community_name": "Match Status Type", "source_file": "src/types/index.ts", "file_type": "code", "degree": 0}, {"id": "types_index_schemamatch", "label": "SchemaMatch", "color": {"background": "#9C755F", "border": "#9C755F", "highlight": {"background": "#ffffff", "border": "#9C755F"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "SchemaMatch", "community": 48, "community_name": "Schema Match Type", "source_file": "src/types/index.ts", "file_type": "code", "degree": 0}, {"id": "types_index_feedbackrequest", "label": "FeedbackRequest", "color": {"background": "#9C755F", "border": "#9C755F", "highlight": {"background": "#ffffff", "border": "#9C755F"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "FeedbackRequest", "community": 38, "community_name": "Feedback Request", "source_file": "src/types/index.ts", "file_type": "code", "degree": 0}, {"id": "types_index_feedbackresponse", "label": "FeedbackResponse", "color": {"background": "#BAB0AC", "border": "#BAB0AC", "highlight": {"background": "#ffffff", "border": "#BAB0AC"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "FeedbackResponse", "community": 39, "community_name": "Feedback Response", "source_file": "src/types/index.ts", "file_type": "code", "degree": 0}, {"id": "types_index_etlrequest", "label": "EtlRequest", "color": {"background": "#B07AA1", "border": "#B07AA1", "highlight": {"background": "#ffffff", "border": "#B07AA1"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "EtlRequest", "community": 36, "community_name": "ETL Request Type", "source_file": "src/types/index.ts", "file_type": "code", "degree": 0}, {"id": "types_index_etlresponse", "label": "EtlResponse", "color": {"background": "#FF9DA7", "border": "#FF9DA7", "highlight": {"background": "#ffffff", "border": "#FF9DA7"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "EtlResponse", "community": 37, "community_name": "ETL Response Type", "source_file": "src/types/index.ts", "file_type": "code", "degree": 0}, {"id": "types_index_llmconfigrequest", "label": "LlmConfigRequest", "color": {"background": "#76B7B2", "border": "#76B7B2", "highlight": {"background": "#ffffff", "border": "#76B7B2"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "LlmConfigRequest", "community": 43, "community_name": "LLM Config Request", "source_file": "src/types/index.ts", "file_type": "code", "degree": 0}, {"id": "types_index_logentry", "label": "LogEntry", "color": {"background": "#EDC948", "border": "#EDC948", "highlight": {"background": "#ffffff", "border": "#EDC948"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "LogEntry", "community": 45, "community_name": "Log Entry Type", "source_file": "src/types/index.ts", "file_type": "code", "degree": 0}, {"id": "types_index_llmconfigresponse", "label": "LlmConfigResponse", "color": {"background": "#59A14F", "border": "#59A14F", "highlight": {"background": "#ffffff", "border": "#59A14F"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "LlmConfigResponse", "community": 44, "community_name": "LLM Config Response", "source_file": "src/types/index.ts", "file_type": "code", "degree": 0}, {"id": "readme_project_overview", "label": "ETL Automate Frontend", "color": {"background": "#F28E2B", "border": "#F28E2B", "highlight": {"background": "#ffffff", "border": "#F28E2B"}}, "size": 16.7, "font": {"size": 12, "color": "#ffffff"}, "title": "ETL Automate Frontend", "community": 1, "community_name": "Application Infrastructure", "source_file": "README.md", "file_type": "document", "degree": 2}, {"id": "match_feedback_logic_doc", "label": "Match Feedback Logic", "color": {"background": "#E15759", "border": "#E15759", "highlight": {"background": "#ffffff", "border": "#E15759"}}, "size": 26.7, "font": {"size": 12, "color": "#ffffff"}, "title": "Match Feedback Logic", "community": 2, "community_name": "Schema Matching", "source_file": "docs/MATCH_FEEDBACK_LOGIC.md", "file_type": "document", "degree": 5}, {"id": "save_data_etl_logic_doc", "label": "MS-SAVE-DATA ETL Logic", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 40.0, "font": {"size": 12, "color": "#ffffff"}, "title": "MS-SAVE-DATA ETL Logic", "community": 0, "community_name": "ETL Pipeline Core", "source_file": "docs/SAVE_DATA_ETL_LOGIC.md", "file_type": "document", "degree": 9}, {"id": "role_controller_doc", "label": "Role Controller Documentation", "color": {"background": "#76B7B2", "border": "#76B7B2", "highlight": {"background": "#ffffff", "border": "#76B7B2"}}, "size": 20.0, "font": {"size": 12, "color": "#ffffff"}, "title": "Role Controller Documentation", "community": 3, "community_name": "User Roles", "source_file": "docs/role-controller.md", "file_type": "document", "degree": 3}, {"id": "user_role_controller_doc", "label": "User Role Controller Documentation", "color": {"background": "#F28E2B", "border": "#F28E2B", "highlight": {"background": "#ffffff", "border": "#F28E2B"}}, "size": 16.7, "font": {"size": 12, "color": "#ffffff"}, "title": "User Role Controller Documentation", "community": 1, "community_name": "Application Infrastructure", "source_file": "docs/user-role-controller.md", "file_type": "document", "degree": 2}, {"id": "docker_compose_config", "label": "Docker Compose Config", "color": {"background": "#F28E2B", "border": "#F28E2B", "highlight": {"background": "#ffffff", "border": "#F28E2B"}}, "size": 13.3, "font": {"size": 0, "color": "#ffffff"}, "title": "Docker Compose Config", "community": 1, "community_name": "Application Infrastructure", "source_file": "docker-compose.yml", "file_type": "code", "degree": 1}, {"id": "index_html_entry", "label": "index.html Entry Point", "color": {"background": "#F28E2B", "border": "#F28E2B", "highlight": {"background": "#ffffff", "border": "#F28E2B"}}, "size": 13.3, "font": {"size": 0, "color": "#ffffff"}, "title": "index.html Entry Point", "community": 1, "community_name": "Application Infrastructure", "source_file": "index.html", "file_type": "code", "degree": 1}, {"id": "apigateway", "label": "API Gateway Backend", "color": {"background": "#F28E2B", "border": "#F28E2B", "highlight": {"background": "#ffffff", "border": "#F28E2B"}}, "size": 16.7, "font": {"size": 12, "color": "#ffffff"}, "title": "API Gateway Backend", "community": 1, "community_name": "Application Infrastructure", "source_file": "README.md", "file_type": "code", "degree": 2}, {"id": "schemamatch_entity", "label": "SchemaMatch Entity", "color": {"background": "#E15759", "border": "#E15759", "highlight": {"background": "#ffffff", "border": "#E15759"}}, "size": 23.3, "font": {"size": 12, "color": "#ffffff"}, "title": "SchemaMatch Entity", "community": 2, "community_name": "Schema Matching", "source_file": "docs/MATCH_FEEDBACK_LOGIC.md", "file_type": "code", "degree": 4}, {"id": "matchfeedback_entity", "label": "MatchFeedback Entity", "color": {"background": "#E15759", "border": "#E15759", "highlight": {"background": "#ffffff", "border": "#E15759"}}, "size": 16.7, "font": {"size": 12, "color": "#ffffff"}, "title": "MatchFeedback Entity", "community": 2, "community_name": "Schema Matching", "source_file": "docs/MATCH_FEEDBACK_LOGIC.md", "file_type": "code", "degree": 2}, {"id": "matchreviewcard_component", "label": "MatchReviewCard Component", "color": {"background": "#E15759", "border": "#E15759", "highlight": {"background": "#ffffff", "border": "#E15759"}}, "size": 13.3, "font": {"size": 0, "color": "#ffffff"}, "title": "MatchReviewCard Component", "community": 2, "community_name": "Schema Matching", "source_file": "docs/MATCH_FEEDBACK_LOGIC.md", "file_type": "code", "degree": 1}, {"id": "schema_matching_ms", "label": "Schema Matching Microservice", "color": {"background": "#E15759", "border": "#E15759", "highlight": {"background": "#ffffff", "border": "#E15759"}}, "size": 23.3, "font": {"size": 12, "color": "#ffffff"}, "title": "Schema Matching Microservice", "community": 2, "community_name": "Schema Matching", "source_file": "docs/MATCH_FEEDBACK_LOGIC.md", "file_type": "code", "degree": 4}, {"id": "ms_save_data_service", "label": "MS-SAVE-DATA Microservice", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 30.0, "font": {"size": 12, "color": "#ffffff"}, "title": "MS-SAVE-DATA Microservice", "community": 0, "community_name": "ETL Pipeline Core", "source_file": "docs/SAVE_DATA_ETL_LOGIC.md", "file_type": "code", "degree": 6}, {"id": "etlexecutionpanel_component", "label": "EtlExecutionPanel Component", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 16.7, "font": {"size": 12, "color": "#ffffff"}, "title": "EtlExecutionPanel Component", "community": 0, "community_name": "ETL Pipeline Core", "source_file": "docs/SAVE_DATA_ETL_LOGIC.md", "file_type": "code", "degree": 2}, {"id": "useetlexecution_hook", "label": "useEtlExecution Hook", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 20.0, "font": {"size": 12, "color": "#ffffff"}, "title": "useEtlExecution Hook", "community": 0, "community_name": "ETL Pipeline Core", "source_file": "docs/SAVE_DATA_ETL_LOGIC.md", "file_type": "code", "degree": 3}, {"id": "runetl_service", "label": "runEtl Service Function", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 16.7, "font": {"size": 12, "color": "#ffffff"}, "title": "runEtl Service Function", "community": 0, "community_name": "ETL Pipeline Core", "source_file": "docs/SAVE_DATA_ETL_LOGIC.md", "file_type": "code", "degree": 2}, {"id": "integration_ms_service", "label": "Integration Microservice", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 16.7, "font": {"size": 12, "color": "#ffffff"}, "title": "Integration Microservice", "community": 0, "community_name": "ETL Pipeline Core", "source_file": "docs/SAVE_DATA_ETL_LOGIC.md", "file_type": "code", "degree": 2}, {"id": "api_register_ms_service", "label": "API Register Microservice", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 16.7, "font": {"size": 12, "color": "#ffffff"}, "title": "API Register Microservice", "community": 0, "community_name": "ETL Pipeline Core", "source_file": "docs/SAVE_DATA_ETL_LOGIC.md", "file_type": "code", "degree": 2}, {"id": "rolecontroller_api", "label": "RoleController API", "color": {"background": "#76B7B2", "border": "#76B7B2", "highlight": {"background": "#ffffff", "border": "#76B7B2"}}, "size": 20.0, "font": {"size": 12, "color": "#ffffff"}, "title": "RoleController API", "community": 3, "community_name": "User Roles", "source_file": "docs/role-controller.md", "file_type": "code", "degree": 3}, {"id": "userrolecontroller_api", "label": "UserRoleController API", "color": {"background": "#76B7B2", "border": "#76B7B2", "highlight": {"background": "#ffffff", "border": "#76B7B2"}}, "size": 20.0, "font": {"size": 12, "color": "#ffffff"}, "title": "UserRoleController API", "community": 3, "community_name": "User Roles", "source_file": "docs/user-role-controller.md", "file_type": "code", "degree": 3}, {"id": "known_seed_roles", "label": "Known Seed Roles", "color": {"background": "#76B7B2", "border": "#76B7B2", "highlight": {"background": "#ffffff", "border": "#76B7B2"}}, "size": 16.7, "font": {"size": 12, "color": "#ffffff"}, "title": "Known Seed Roles", "community": 3, "community_name": "User Roles", "source_file": "docs/role-controller.md", "file_type": "code", "degree": 2}, {"id": "react_application", "label": "React Application", "color": {"background": "#F28E2B", "border": "#F28E2B", "highlight": {"background": "#ffffff", "border": "#F28E2B"}}, "size": 20.0, "font": {"size": 12, "color": "#ffffff"}, "title": "React Application", "community": 1, "community_name": "Application Infrastructure", "source_file": "README.md", "file_type": "code", "degree": 3}, {"id": "etl_pipeline_concept", "label": "ETL Pipeline (Extract-Transform-Load)", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 16.7, "font": {"size": 12, "color": "#ffffff"}, "title": "ETL Pipeline (Extract-Transform-Load)", "community": 0, "community_name": "ETL Pipeline Core", "source_file": "docs/SAVE_DATA_ETL_LOGIC.md", "file_type": "code", "degree": 2}, {"id": "cobe_texture_png", "label": "cobe-texture.png", "color": {"background": "#59A14F", "border": "#59A14F", "highlight": {"background": "#ffffff", "border": "#59A14F"}}, "size": 13.3, "font": {"size": 0, "color": "#ffffff"}, "title": "cobe-texture.png", "community": 4, "community_name": "Globe Texture", "source_file": "src/assets/cobe-texture.png", "file_type": "image", "degree": 1}, {"id": "globe_texture_asset", "label": "Globe Texture Asset", "color": {"background": "#59A14F", "border": "#59A14F", "highlight": {"background": "#ffffff", "border": "#59A14F"}}, "size": 13.3, "font": {"size": 0, "color": "#ffffff"}, "title": "Globe Texture Asset", "community": 4, "community_name": "Globe Texture", "source_file": "src/assets/cobe-texture.png", "file_type": "image", "degree": 1}];
+const RAW_EDGES = [{"from": "readme_project_overview", "to": "apigateway", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "readme_project_overview", "to": "react_application", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "match_feedback_logic_doc", "to": "matchfeedback_entity", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "match_feedback_logic_doc", "to": "matchreviewcard_component", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "match_feedback_logic_doc", "to": "schema_matching_ms", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "match_feedback_logic_doc", "to": "schemamatch_entity", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "save_data_etl_logic_doc", "to": "match_feedback_logic_doc", "label": "references", "title": "references [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "save_data_etl_logic_doc", "to": "api_register_ms_service", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "save_data_etl_logic_doc", "to": "etl_pipeline_concept", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "save_data_etl_logic_doc", "to": "etlexecutionpanel_component", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "save_data_etl_logic_doc", "to": "integration_ms_service", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "save_data_etl_logic_doc", "to": "ms_save_data_service", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "save_data_etl_logic_doc", "to": "runetl_service", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "save_data_etl_logic_doc", "to": "schema_matching_ms", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "save_data_etl_logic_doc", "to": "useetlexecution_hook", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "role_controller_doc", "to": "known_seed_roles", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "role_controller_doc", "to": "rolecontroller_api", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "role_controller_doc", "to": "userrolecontroller_api", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "user_role_controller_doc", "to": "apigateway", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "user_role_controller_doc", "to": "userrolecontroller_api", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "docker_compose_config", "to": "react_application", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_html_entry", "to": "react_application", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "schema_matching_ms", "to": "schemamatch_entity", "label": "implements", "title": "implements [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "schemamatch_entity", "to": "matchfeedback_entity", "label": "shares_data_with", "title": "shares_data_with [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "schemamatch_entity", "to": "ms_save_data_service", "label": "shares_data_with", "title": "shares_data_with [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "ms_save_data_service", "to": "schema_matching_ms", "label": "calls", "title": "calls [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "ms_save_data_service", "to": "api_register_ms_service", "label": "calls", "title": "calls [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "ms_save_data_service", "to": "etl_pipeline_concept", "label": "implements", "title": "implements [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "ms_save_data_service", "to": "integration_ms_service", "label": "calls", "title": "calls [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "etlexecutionpanel_component", "to": "useetlexecution_hook", "label": "calls", "title": "calls [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "useetlexecution_hook", "to": "runetl_service", "label": "calls", "title": "calls [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "known_seed_roles", "to": "rolecontroller_api", "label": "conceptually_related_to", "title": "conceptually_related_to [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "rolecontroller_api", "to": "userrolecontroller_api", "label": "conceptually_related_to", "title": "conceptually_related_to [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "cobe_texture_png", "to": "globe_texture_asset", "label": "conceptually_related_to", "title": "conceptually_related_to [AMBIGUOUS]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "AMBIGUOUS"}];
+const LEGEND = [{"cid": 0, "color": "#4E79A7", "label": "ETL Pipeline Core", "count": 8}, {"cid": 1, "color": "#F28E2B", "label": "Application Infrastructure", "count": 6}, {"cid": 2, "color": "#E15759", "label": "Schema Matching", "count": 5}, {"cid": 3, "color": "#76B7B2", "label": "User Roles", "count": 4}, {"cid": 4, "color": "#59A14F", "label": "Globe Texture", "count": 2}, {"cid": 5, "color": "#EDC948", "label": "API Connection Hooks", "count": 1}, {"cid": 6, "color": "#B07AA1", "label": "API Connection Model", "count": 1}, {"cid": 7, "color": "#FF9DA7", "label": "Connection Payload", "count": 1}, {"cid": 8, "color": "#9C755F", "label": "API Connections Hook", "count": 1}, {"cid": 9, "color": "#BAB0AC", "label": "ETL Phase Model", "count": 1}, {"cid": 10, "color": "#4E79A7", "label": "ETL Execution Hook", "count": 1}, {"cid": 11, "color": "#F28E2B", "label": "Integration Payload", "count": 1}, {"cid": 12, "color": "#E15759", "label": "Integration Model", "count": 1}, {"cid": 13, "color": "#76B7B2", "label": "Update Integration", "count": 1}, {"cid": 14, "color": "#59A14F", "label": "Integrations Hook", "count": 1}, {"cid": 15, "color": "#EDC948", "label": "LLM Configs Hook", "count": 1}, {"cid": 16, "color": "#B07AA1", "label": "Unified Records Hook", "count": 1}, {"cid": 17, "color": "#FF9DA7", "label": "User Model", "count": 1}, {"cid": 18, "color": "#9C755F", "label": "Users Hook", "count": 1}, {"cid": 19, "color": "#BAB0AC", "label": "Utility Functions", "count": 1}, {"cid": 20, "color": "#4E79A7", "label": "Admin Page", "count": 1}, {"cid": 21, "color": "#F28E2B", "label": "Auth Page", "count": 1}, {"cid": 22, "color": "#E15759", "label": "Run ETL Service", "count": 1}, {"cid": 23, "color": "#76B7B2", "label": "Run ETL By ID", "count": 1}, {"cid": 24, "color": "#59A14F", "label": "Log Service", "count": 1}, {"cid": 25, "color": "#EDC948", "label": "Add Notification", "count": 1}, {"cid": 26, "color": "#B07AA1", "label": "Clear Notifications", "count": 1}, {"cid": 27, "color": "#FF9DA7", "label": "Get Notifications", "count": 1}, {"cid": 28, "color": "#9C755F", "label": "Mark All Read", "count": 1}, {"cid": 29, "color": "#BAB0AC", "label": "Mark Read", "count": 1}, {"cid": 30, "color": "#4E79A7", "label": "Notification Model", "count": 1}, {"cid": 31, "color": "#F28E2B", "label": "Subscribe Notifications", "count": 1}, {"cid": 32, "color": "#E15759", "label": "Fetch Schema Matches", "count": 1}, {"cid": 33, "color": "#76B7B2", "label": "Submit Feedback", "count": 1}, {"cid": 34, "color": "#59A14F", "label": "App Entry", "count": 1}, {"cid": 35, "color": "#EDC948", "label": "API Field Type", "count": 1}, {"cid": 36, "color": "#B07AA1", "label": "ETL Request Type", "count": 1}, {"cid": 37, "color": "#FF9DA7", "label": "ETL Response Type", "count": 1}, {"cid": 38, "color": "#9C755F", "label": "Feedback Request", "count": 1}, {"cid": 39, "color": "#BAB0AC", "label": "Feedback Response", "count": 1}, {"cid": 40, "color": "#4E79A7", "label": "Integration Type", "count": 1}, {"cid": 41, "color": "#F28E2B", "label": "Integration Response", "count": 1}, {"cid": 42, "color": "#E15759", "label": "Integration Status", "count": 1}, {"cid": 43, "color": "#76B7B2", "label": "LLM Config Request", "count": 1}, {"cid": 44, "color": "#59A14F", "label": "LLM Config Response", "count": 1}, {"cid": 45, "color": "#EDC948", "label": "Log Entry Type", "count": 1}, {"cid": 46, "color": "#B07AA1", "label": "ML Badge Type", "count": 1}, {"cid": 47, "color": "#FF9DA7", "label": "Schema Field Type", "count": 1}, {"cid": 48, "color": "#9C755F", "label": "Schema Match Type", "count": 1}, {"cid": 49, "color": "#BAB0AC", "label": "Match Status Type", "count": 1}, {"cid": 50, "color": "#4E79A7", "label": "Unified Record Type", "count": 1}, {"cid": 51, "color": "#F28E2B", "label": "GlobeCanvas UI", "count": 1}];
+
+// HTML-escape helper — prevents XSS when injecting graph data into innerHTML
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// Build vis datasets
+const nodesDS = new vis.DataSet(RAW_NODES.map(n => ({
+  id: n.id, label: n.label, color: n.color, size: n.size,
+  font: n.font, title: n.title,
+  _community: n.community, _community_name: n.community_name,
+  _source_file: n.source_file, _file_type: n.file_type, _degree: n.degree,
+})));
+
+const edgesDS = new vis.DataSet(RAW_EDGES.map((e, i) => ({
+  id: i, from: e.from, to: e.to,
+  label: '',
+  title: e.title,
+  dashes: e.dashes,
+  width: e.width,
+  color: e.color,
+  arrows: { to: { enabled: true, scaleFactor: 0.5 } },
+})));
+
+const container = document.getElementById('graph');
+const network = new vis.Network(container, { nodes: nodesDS, edges: edgesDS }, {
+  physics: {
+    enabled: true,
+    solver: 'forceAtlas2Based',
+    forceAtlas2Based: {
+      gravitationalConstant: -60,
+      centralGravity: 0.005,
+      springLength: 120,
+      springConstant: 0.08,
+      damping: 0.4,
+      avoidOverlap: 0.8,
+    },
+    stabilization: { iterations: 200, fit: true },
+  },
+  interaction: {
+    hover: true,
+    tooltipDelay: 100,
+    hideEdgesOnDrag: true,
+    navigationButtons: false,
+    keyboard: false,
+  },
+  nodes: { shape: 'dot', borderWidth: 1.5 },
+  edges: { smooth: { type: 'continuous', roundness: 0.2 }, selectionWidth: 3 },
+});
+
+network.once('stabilizationIterationsDone', () => {
+  network.setOptions({ physics: { enabled: false } });
+});
+
+function showInfo(nodeId) {
+  const n = nodesDS.get(nodeId);
+  if (!n) return;
+  const neighborIds = network.getConnectedNodes(nodeId);
+  const neighborItems = neighborIds.map(nid => {
+    const nb = nodesDS.get(nid);
+    const color = nb ? nb.color.background : '#555';
+    return `<span class="neighbor-link" style="border-left-color:${esc(color)}" onclick="focusNode(${JSON.stringify(nid)})">${esc(nb ? nb.label : nid)}</span>`;
+  }).join('');
+  document.getElementById('info-content').innerHTML = `
+    <div class="field"><b>${esc(n.label)}</b></div>
+    <div class="field">Type: ${esc(n._file_type || 'unknown')}</div>
+    <div class="field">Community: ${esc(n._community_name)}</div>
+    <div class="field">Source: ${esc(n._source_file || '-')}</div>
+    <div class="field">Degree: ${n._degree}</div>
+    ${neighborIds.length ? `<div class="field" style="margin-top:8px;color:#aaa;font-size:11px">Neighbors (${neighborIds.length})</div><div id="neighbors-list">${neighborItems}</div>` : ''}
+  `;
+}
+
+function focusNode(nodeId) {
+  network.focus(nodeId, { scale: 1.4, animation: true });
+  network.selectNodes([nodeId]);
+  showInfo(nodeId);
+}
+
+// Track hovered node — hover detection is more reliable than click params
+let hoveredNodeId = null;
+network.on('hoverNode', params => {
+  hoveredNodeId = params.node;
+  container.style.cursor = 'pointer';
+});
+network.on('blurNode', () => {
+  hoveredNodeId = null;
+  container.style.cursor = 'default';
+});
+container.addEventListener('click', () => {
+  if (hoveredNodeId !== null) {
+    showInfo(hoveredNodeId);
+    network.selectNodes([hoveredNodeId]);
+  }
+});
+network.on('click', params => {
+  if (params.nodes.length > 0) {
+    showInfo(params.nodes[0]);
+  } else if (hoveredNodeId === null) {
+    document.getElementById('info-content').innerHTML = '<span class="empty">Click a node to inspect it</span>';
+  }
+});
+
+const searchInput = document.getElementById('search');
+const searchResults = document.getElementById('search-results');
+searchInput.addEventListener('input', () => {
+  const q = searchInput.value.toLowerCase().trim();
+  searchResults.innerHTML = '';
+  if (!q) { searchResults.style.display = 'none'; return; }
+  const matches = RAW_NODES.filter(n => n.label.toLowerCase().includes(q)).slice(0, 20);
+  if (!matches.length) { searchResults.style.display = 'none'; return; }
+  searchResults.style.display = 'block';
+  matches.forEach(n => {
+    const el = document.createElement('div');
+    el.className = 'search-item';
+    el.textContent = n.label;
+    el.style.borderLeft = `3px solid ${n.color.background}`;
+    el.style.paddingLeft = '8px';
+    el.onclick = () => {
+      network.focus(n.id, { scale: 1.5, animation: true });
+      network.selectNodes([n.id]);
+      showInfo(n.id);
+      searchResults.style.display = 'none';
+      searchInput.value = '';
+    };
+    searchResults.appendChild(el);
+  });
+});
+document.addEventListener('click', e => {
+  if (!searchResults.contains(e.target) && e.target !== searchInput)
+    searchResults.style.display = 'none';
+});
+
+const hiddenCommunities = new Set();
+
+const selectAllCb = document.getElementById('select-all-cb');
+
+function updateSelectAllState() {
+  const total = LEGEND.length;
+  const hidden = hiddenCommunities.size;
+  selectAllCb.checked = hidden === 0;
+  selectAllCb.indeterminate = hidden > 0 && hidden < total;
+}
+
+function toggleAllCommunities(hide) {
+  document.querySelectorAll('.legend-item').forEach(item => {
+    hide ? item.classList.add('dimmed') : item.classList.remove('dimmed');
+  });
+  document.querySelectorAll('.legend-cb').forEach(cb => {
+    cb.checked = !hide;
+  });
+  LEGEND.forEach(c => {
+    if (hide) hiddenCommunities.add(c.cid); else hiddenCommunities.delete(c.cid);
+  });
+  const updates = RAW_NODES.map(n => ({ id: n.id, hidden: hide }));
+  nodesDS.update(updates);
+  updateSelectAllState();
+}
+
+const legendEl = document.getElementById('legend');
+LEGEND.forEach(c => {
+  const item = document.createElement('div');
+  item.className = 'legend-item';
+  const cb = document.createElement('input');
+  cb.type = 'checkbox';
+  cb.className = 'legend-cb';
+  cb.checked = true;
+  cb.addEventListener('change', (e) => {
+    e.stopPropagation();
+    if (cb.checked) {
+      hiddenCommunities.delete(c.cid);
+      item.classList.remove('dimmed');
+    } else {
+      hiddenCommunities.add(c.cid);
+      item.classList.add('dimmed');
+    }
+    const updates = RAW_NODES
+      .filter(n => n.community === c.cid)
+      .map(n => ({ id: n.id, hidden: !cb.checked }));
+    nodesDS.update(updates);
+    updateSelectAllState();
+  });
+  item.innerHTML = `<div class="legend-dot" style="background:${c.color}"></div>
+    <span class="legend-label">${c.label}</span>
+    <span class="legend-count">${c.count}</span>`;
+  item.prepend(cb);
+  item.onclick = (e) => {
+    if (e.target === cb) return;
+    cb.checked = !cb.checked;
+    cb.dispatchEvent(new Event('change'));
+  };
+  legendEl.appendChild(item);
+});
+</script>
+<script>
+// Render hyperedges as shaded regions
+const hyperedges = [{"id": "etl_execution_flow", "label": "ETL Execution Flow", "nodes": ["ms_save_data_service", "integration_ms_service", "api_register_ms_service", "schema_matching_ms", "schemamatch_entity"], "relation": "implement", "confidence": "INFERRED", "confidence_score": 0.85, "source_file": "docs/SAVE_DATA_ETL_LOGIC.md"}, {"id": "role_management_system", "label": "Role-Based Access Control System", "nodes": ["rolecontroller_api", "userrolecontroller_api", "known_seed_roles", "apigateway"], "relation": "implement", "confidence": "INFERRED", "confidence_score": 0.85, "source_file": "docs/role-controller.md"}];
+// afterDrawing passes ctx already transformed to network coordinate space.
+// Draw node positions raw — no manual pan/zoom/DPR math needed.
+network.on('afterDrawing', function(ctx) {
+    hyperedges.forEach(h => {
+        const positions = h.nodes
+            .map(nid => network.getPositions([nid])[nid])
+            .filter(p => p !== undefined);
+        if (positions.length < 2) return;
+        ctx.save();
+        ctx.globalAlpha = 0.12;
+        ctx.fillStyle = '#6366f1';
+        ctx.strokeStyle = '#6366f1';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        // Centroid and expanded hull in network coordinates
+        const cx = positions.reduce((s, p) => s + p.x, 0) / positions.length;
+        const cy = positions.reduce((s, p) => s + p.y, 0) / positions.length;
+        const expanded = positions.map(p => ({
+            x: cx + (p.x - cx) * 1.15,
+            y: cy + (p.y - cy) * 1.15
+        }));
+        ctx.moveTo(expanded[0].x, expanded[0].y);
+        expanded.slice(1).forEach(p => ctx.lineTo(p.x, p.y));
+        ctx.closePath();
+        ctx.fill();
+        ctx.globalAlpha = 0.4;
+        ctx.stroke();
+        // Label
+        ctx.globalAlpha = 0.8;
+        ctx.fillStyle = '#4f46e5';
+        ctx.font = 'bold 11px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(h.label, cx, cy - 5);
+        ctx.restore();
+    });
+});
+</script>
+</body>
+</html>

@@ -25,45 +25,45 @@ export default function AdminIntegrationsPage() {
       <PageHeader icon={<GitMerge size={16} />} title="Integraciones"
         description="Configuración global de integraciones">
         <button onClick={refetch}
-          className="p-2 rounded-lg bg-slate-50 border border-slate-200 text-slate-500 hover:text-slate-700 hover:bg-white transition-colors">
+          className="p-2 rounded-lg bg-[#5741d8]/5 border border-[#5741d8]/[0.12] text-[#5741d8]/50 hover:text-[#5741d8]/70 hover:bg-white transition-colors">
           <RefreshCw size={16} />
         </button>
       </PageHeader>
 
       <div className="p-6">
         {loading ? <LoadingState message="Cargando integraciones..." /> : (
-          <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+          <div className="bg-white rounded-xl border border-[#5741d8]/[0.08] overflow-hidden shadow-[0_1px_3px_0_rgb(87_65_216/0.04),0_1px_2px_-1px_rgb(87_65_216/0.06)]">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-slate-100 bg-slate-50">
+                  <tr className="border-b border-[#5741d8]/[0.06] bg-[#5741d8]/5">
                     {['ID', 'Descripción', 'API A', 'API B', 'Estado', 'Creado', 'Acciones'].map(h => (
-                      <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">{h}</th>
+                      <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-[#5741d8]/60 uppercase tracking-wider">{h}</th>
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-[#5741d8]/[0.06]">
                   {integrations.map(integration => {
                     const status = statusConfig[integration.status] || statusConfig.inactive;
                     return (
-                      <tr key={integration.id} className="hover:bg-slate-50 transition-colors">
-                        <td className="px-4 py-3 text-sm text-slate-500 font-mono">#{integration.id}</td>
-                        <td className="px-4 py-3 text-sm text-slate-900 font-medium">{integration.description || '—'}</td>
+                      <tr key={integration.id} className="hover:bg-[#5741d8]/[0.02] transition-colors">
+                        <td className="px-4 py-3 text-sm text-[#0a0a0a]/50 font-mono">#{integration.id}</td>
+                        <td className="px-4 py-3 text-sm text-[#0a0a0a] font-medium">{integration.description || '—'}</td>
                         <td className="px-4 py-3">
-                          <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded text-xs font-mono bg-blue-50 text-blue-700">API {integration.apiA}</span>
+                          <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded text-xs font-mono bg-[#5741d8]/10 text-[#5741d8]">API {integration.apiA}</span>
                         </td>
                         <td className="px-4 py-3">
-                          <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded text-xs font-mono bg-cyan-50 text-cyan-700">API {integration.apiB}</span>
+                          <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded text-xs font-mono bg-[#5741d8]/10 text-[#5741d8]/70">API {integration.apiB}</span>
                         </td>
                         <td className="px-4 py-3">
                           <span className={cn('inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium', status.bg, status.color)}>
                             {status.label}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-xs text-slate-400">{formatDate(integration.createdAt)}</td>
+                        <td className="px-4 py-3 text-xs text-[#0a0a0a]/40">{formatDate(integration.createdAt)}</td>
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2">
-                            <button className="p-1.5 rounded text-slate-400 hover:text-violet-600 hover:bg-violet-50 transition-colors">
+                            <button className="p-1.5 rounded text-[#0a0a0a]/35 hover:text-[#5741d8]/60 hover:bg-[#5741d8]/5 transition-colors">
                               <Globe size={14} />
                             </button>
                           </div>
@@ -75,7 +75,7 @@ export default function AdminIntegrationsPage() {
               </table>
             </div>
             {integrations.length === 0 && (
-              <div className="flex flex-col items-center py-12 text-slate-400">
+              <div className="flex flex-col items-center py-12 text-[#0a0a0a]/35">
                 <GitMerge size={40} className="mb-3 opacity-50" />
                 <p className="text-sm">No hay integraciones configuradas</p>
               </div>

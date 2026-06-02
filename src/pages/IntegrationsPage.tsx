@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { GitMerge, Play, RefreshCw, Loader2 } from 'lucide-react';
+import { GitMerge, Play, RefreshCw, Loader2, RotateCcw } from 'lucide-react';
 import { useIntegrations } from '../hooks/useIntegrations';
 import { useApiConnections } from '../hooks/useApiConnections';
 import { runEtlById } from '../services/etlService';
+import { runMatching } from '../services/schemaMatchService';
 import { addNotification } from '../services/notificationService';
 import { IntegrationResponse } from '../types';
 import PageHeader from '../components/ui/PageHeader';
@@ -26,14 +27,16 @@ function formatDate(dateStr: string): string {
   });
 }
 
-function IntegrationCard({ integration, connections, onEdit, onDelete, onSchemaMatch, onRunEtl, running }: {
+function IntegrationCard({ integration, connections, onEdit, onDelete, onSchemaMatch, onRunEtl, onRunMatching, running, matching }: {
   integration: IntegrationResponse;
   connections: { id: number; description: string; method: string }[];
   onEdit: (i: IntegrationResponse) => void;
   onDelete: (id: number) => void;
   onSchemaMatch: (id: number) => void;
   onRunEtl: (id: number) => void;
+  onRunMatching?: (id: number) => void;
   running?: boolean;
+  matching?: boolean;
 }) {
   const [showMenu, setShowMenu] = useState(false);
   const status = statusConfig[integration.status] || statusConfig.inactive;
@@ -41,15 +44,19 @@ function IntegrationCard({ integration, connections, onEdit, onDelete, onSchemaM
   const apiB = connections.find(c => c.id === integration.apiB);
 
   return (
-    <div className="bg-white border border-slate-200 rounded-xl overflow-hidden hover:border-blue-300 transition-all">
+    <div className="bg-white border border-[#5741d8]/[0.08] rounded-xl hover:border-[#5741d8]/30 hover:shadow-[0_1px_8px_-2px_rgba(87,65,216,0.08)] transition-all">
       <div className="relative p-5">
         <div className="flex items-start justify-between mb-4">
           <div className="min-w-0 flex-1">
-            <h3 className="text-slate-900 font-semibold text-sm truncate">
+            <h3 className="text-[#0a0a0a] font-semibold text-sm truncate">
               {integration.description || `Integración ${integration.id}`}
             </h3>
             <div className="flex items-center gap-2 mt-1.5">
-              {running ? (
+              {matching ? (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-violet-50 text-violet-700">
+                  <Loader2 size={10} className="animate-spin" /> Matching...
+                </span>
+              ) : running ? (
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-50 text-blue-700">
                   <Loader2 size={10} className="animate-spin" /> Ejecutando
                 </span>
@@ -62,23 +69,27 @@ function IntegrationCard({ integration, connections, onEdit, onDelete, onSchemaM
           </div>
           <div className="relative">
             <button onClick={() => setShowMenu(!showMenu)}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors">
+              className="p-1.5 rounded-lg text-[#0a0a0a]/35 hover:text-[#5741d8]/60 hover:bg-[#5741d8]/5 transition-colors">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>
               </svg>
             </button>
             {showMenu && (
-              <div className="absolute right-0 top-full mt-1 w-40 bg-white border border-slate-200 rounded-lg shadow-lg z-20 overflow-hidden">
+              <div className="absolute right-0 top-full mt-1 w-44 bg-white border border-[#5741d8]/[0.08] rounded-lg shadow-lg z-20 overflow-hidden">
+                <button onClick={() => { onRunMatching?.(integration.id); setShowMenu(false); }}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-violet-600 hover:bg-violet-50 font-medium">
+                  <RotateCcw size={12} /> Re-ejecutar Matching
+                </button>
                 <button onClick={() => { onRunEtl(integration.id); setShowMenu(false); }}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 font-medium">
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[#5741d8] hover:bg-[#5741d8]/5 font-medium">
                   <Play size={12} /> Ejecutar ETL
                 </button>
                 <button onClick={() => { onSchemaMatch(integration.id); setShowMenu(false); }}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50">
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[#0a0a0a]/70 hover:bg-[#5741d8]/5">
                   Ver Mapeo
                 </button>
                 <button onClick={() => { onEdit(integration); setShowMenu(false); }}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50">
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[#0a0a0a]/70 hover:bg-[#5741d8]/5">
                   Editar
                 </button>
                 <button onClick={() => { onDelete(integration.id); setShowMenu(false); }}
@@ -90,27 +101,27 @@ function IntegrationCard({ integration, connections, onEdit, onDelete, onSchemaM
           </div>
         </div>
 
-        <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 border border-slate-200">
+        <div className="flex items-center gap-3 p-3 rounded-lg bg-[#5741d8]/5 border border-[#5741d8]/10">
           <div className="flex-1 min-w-0">
-            <div className="text-[10px] text-slate-500 mb-1">ORIGEN (A)</div>
+            <div className="text-[10px] text-[#5741d8]/50 mb-1 font-medium">ORIGEN (A)</div>
             <div className="flex items-center gap-1.5">
-              <span className="text-xs font-semibold text-blue-600">{apiA?.method || 'API'}</span>
-              <span className="text-xs text-slate-500 truncate">{apiA?.description || `ID: ${integration.apiA}`}</span>
+              <span className="text-xs font-semibold text-[#5741d8]">{apiA?.method || 'API'}</span>
+              <span className="text-xs text-[#0a0a0a]/50 truncate">{apiA?.description || `ID: ${integration.apiA}`}</span>
             </div>
           </div>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-slate-400 flex-shrink-0">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[#5741d8]/30 flex-shrink-0">
             <path d="M5 12h14M12 5l7 7-7 7"/>
           </svg>
           <div className="flex-1 min-w-0">
-            <div className="text-[10px] text-slate-500 mb-1">DESTINO (B)</div>
+            <div className="text-[10px] text-[#5741d8]/50 mb-1 font-medium">DESTINO (B)</div>
             <div className="flex items-center gap-1.5">
-              <span className="text-xs font-semibold text-cyan-600">{apiB?.method || 'API'}</span>
-              <span className="text-xs text-slate-500 truncate">{apiB?.description || `ID: ${integration.apiB}`}</span>
+              <span className="text-xs font-semibold text-[#5741d8]/70">{apiB?.method || 'API'}</span>
+              <span className="text-xs text-[#0a0a0a]/50 truncate">{apiB?.description || `ID: ${integration.apiB}`}</span>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5 mt-3 text-xs text-slate-400">
+        <div className="flex items-center gap-1.5 mt-3 text-xs text-[#0a0a0a]/40">
           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
           </svg>
@@ -146,38 +157,38 @@ function EditModal({ integration, connections, onClose, onSave }: {
       footer={
         <>
           <button type="button" onClick={onClose}
-            className="flex-1 py-2.5 rounded-lg border border-slate-200 text-slate-600 text-sm font-medium hover:bg-slate-50 transition-colors">
+            className="flex-1 py-2.5 rounded-lg border border-[#5741d8]/[0.12] text-[#0a0a0a]/60 text-sm font-medium hover:bg-[#5741d8]/5 transition-colors">
             Cancelar
           </button>
           <button onClick={handleSubmit} disabled={loading}
-            className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold transition-colors">
+            className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg bg-gradient-to-b from-[#5741d8] to-[#4635b5] hover:from-[#5d47e0] hover:to-[#4d39c4] disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold transition-all shadow-[0_1px_2px_rgb(87_65_216/0.3)] hover:shadow-[0_2px_6px_rgb(87_65_216/0.35)] active:scale-[0.98]">
             {loading ? 'Guardando...' : 'Guardar'}
           </button>
         </>
       }>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1.5">API Origen (A)</label>
+          <label className="block text-xs font-medium text-[#0a0a0a]/60 mb-1.5">API Origen (A)</label>
           <select value={apiA} onChange={(e) => { const val = Number(e.target.value); setApiA(val); }}
-            className="w-full bg-white border border-slate-200 rounded-lg px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all cursor-pointer">
+            className="w-full bg-white border border-[#5741d8]/[0.12] rounded-lg px-3.5 py-2.5 text-sm text-[#0a0a0a] focus:outline-none focus:ring-2 focus:ring-[#5741d8]/20 focus:border-[#5741d8]/40 transition-all cursor-pointer">
             {connections.map(c => (
               <option key={c.id} value={c.id}>{c.description} ({c.method})</option>
             ))}
           </select>
         </div>
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1.5">API Destino (B)</label>
+          <label className="block text-xs font-medium text-[#0a0a0a]/60 mb-1.5">API Destino (B)</label>
           <select value={apiB} onChange={(e) => setApiB(Number(e.target.value))}
-            className="w-full bg-white border border-slate-200 rounded-lg px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all cursor-pointer">
+            className="w-full bg-white border border-[#5741d8]/[0.12] rounded-lg px-3.5 py-2.5 text-sm text-[#0a0a0a] focus:outline-none focus:ring-2 focus:ring-[#5741d8]/20 focus:border-[#5741d8]/40 transition-all cursor-pointer">
             {otherConnections.map(c => (
               <option key={c.id} value={c.id}>{c.description} ({c.method})</option>
             ))}
           </select>
         </div>
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1.5">Descripción</label>
+          <label className="block text-xs font-medium text-[#0a0a0a]/60 mb-1.5">Descripción</label>
           <input type="text" value={description} onChange={(e) => setDescription(e.target.value)}
-            className="w-full bg-white border border-slate-200 rounded-lg px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all" />
+            className="w-full bg-white border border-[#5741d8]/[0.12] rounded-lg px-3.5 py-2.5 text-sm text-[#0a0a0a] focus:outline-none focus:ring-2 focus:ring-[#5741d8]/20 focus:border-[#5741d8]/40 transition-all" />
         </div>
       </form>
     </Modal>
@@ -191,6 +202,19 @@ export default function IntegrationsPage() {
   const [editingIntegration, setEditingIntegration] = useState<IntegrationResponse | null>(null);
   const [schemaMatchId, setSchemaMatchId] = useState<number | null>(null);
   const [runningEtlId, setRunningEtlId] = useState<number | null>(null);
+  const [matchingId, setMatchingId] = useState<number | null>(null);
+
+  const handleRunMatching = async (id: number) => {
+    setMatchingId(id);
+    try {
+      await runMatching(id);
+      addNotification('success', 'Matching ejecutado', `Integración #${id}`);
+    } catch {
+      addNotification('error', 'Error en matching', `No se pudo ejecutar matching en integración #${id}`);
+    } finally {
+      setMatchingId(null);
+    }
+  };
 
   const handleRunEtl = async (id: number) => {
     setRunningEtlId(id);
@@ -233,14 +257,14 @@ export default function IntegrationsPage() {
         description={`${integrations.length} ${integrations.length === 1 ? 'integración' : 'integraciones'} configuradas`}>
         <div className="relative">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-[#0a0a0a]/35">
             <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
           </svg>
           <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Buscar..." className="bg-slate-50 border border-slate-200 rounded-lg pl-9 pr-4 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 w-44 transition-all" />
+            placeholder="Buscar..." className="bg-[#5741d8]/5 border border-[#5741d8]/[0.12] rounded-lg pl-9 pr-4 py-2 text-sm text-[#0a0a0a] placeholder:text-[#0a0a0a]/30 focus:outline-none focus:ring-2 focus:ring-[#5741d8]/20 focus:border-[#5741d8]/40 w-44 transition-all" />
         </div>
         <button onClick={refetch}
-          className="p-2 rounded-lg bg-slate-50 border border-slate-200 text-slate-500 hover:text-slate-700 hover:bg-white transition-colors">
+          className="p-2 rounded-lg bg-[#5741d8]/5 border border-[#5741d8]/[0.12] text-[#5741d8]/50 hover:text-[#5741d8]/70 hover:bg-white transition-colors">
           <RefreshCw size={16} />
         </button>
       </PageHeader>
@@ -249,7 +273,7 @@ export default function IntegrationsPage() {
         {loading ? <LoadingState message="Cargando integraciones..." /> :
          error ? <ErrorState message={error} onRetry={refetch} /> :
          filtered.length === 0 ? (
-           <EmptyState icon={<GitMerge size={40} className="text-slate-300" />}
+           <EmptyState icon={<GitMerge size={40} className="text-[#5741d8]/30" />}
              title="Sin integraciones" description="Crea tu primera integración para conectar APIs."
              actionLabel="Nueva Integración" onAction={() => {}} />
          ) : (
@@ -258,7 +282,8 @@ export default function IntegrationsPage() {
                 <IntegrationCard key={i.id} integration={i} connections={connMap}
                   onEdit={setEditingIntegration} onDelete={handleDelete}
                   onSchemaMatch={setSchemaMatchId} onRunEtl={handleRunEtl}
-                  running={runningEtlId === i.id} />
+                  onRunMatching={handleRunMatching}
+                  running={runningEtlId === i.id} matching={matchingId === i.id} />
              ))}
            </div>
          )}

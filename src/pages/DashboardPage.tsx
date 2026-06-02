@@ -18,8 +18,8 @@ export default function DashboardPage() {
 
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-semibold text-slate-600">Integraciones Configuradas</h2>
-          <span className="text-xs text-slate-400">{integrations.length} pipelines</span>
+          <h2 className="text-sm font-semibold text-[#0a0a0a]/70">Integraciones Configuradas</h2>
+          <span className="text-xs text-[#0a0a0a]/40">{integrations.length} pipelines</span>
         </div>
         {loadingIntegrations ? (
           <LoadingState message="Cargando integraciones..." />

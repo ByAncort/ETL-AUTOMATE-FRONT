@@ -1,6 +1,7 @@
 import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
+import DataFlowBackground from './DataFlowBackground';
 import { useAuth } from '../context/AuthContext';
 import { useState } from 'react';
 import NewIntegrationModal from './NewIntegrationModal';
@@ -52,8 +53,13 @@ export default function Layout() {
           onNewIntegration={() => setShowIntegrationModal(true)}
           onLogout={logout}
         />
-        <main className="flex-1 overflow-y-auto">
-          <Outlet />
+        <main className="flex-1 overflow-y-auto pt-3">
+          <div className="relative h-full">
+            <DataFlowBackground />
+            <div className="relative z-10">
+              <Outlet />
+            </div>
+          </div>
         </main>
       </div>
       {showIntegrationModal && (

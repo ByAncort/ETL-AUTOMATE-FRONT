@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { Bell, X, CheckCheck, GitMerge, Plug, Info, AlertCircle, CheckCircle } from 'lucide-react';
 import { subscribe, markAsRead, markAllAsRead, Notification } from '../services/notificationService';
 import { cn } from '../lib/utils';
@@ -6,7 +7,7 @@ import { cn } from '../lib/utils';
 const typeConfig: Record<Notification['type'], { icon: typeof Plug; color: string }> = {
   integration: { icon: GitMerge, color: 'text-blue-600' },
   connection: { icon: Plug, color: 'text-emerald-600' },
-  system: { icon: Info, color: 'text-violet-600' },
+  system: { icon: Info, color: 'text-blue-600' },
   success: { icon: CheckCircle, color: 'text-emerald-600' },
   error: { icon: AlertCircle, color: 'text-red-500' },
 };
@@ -19,7 +20,7 @@ function timeAgo(date: Date): string {
   if (minutes < 60) return `hace ${minutes} min`;
   const hours = Math.floor(minutes / 60);
   if (hours === 1) return 'hace 1 hora';
-  if (hours < 24) return `hace ${hours} horas`;
+  if (hours < 60) return `hace ${hours} horas`;
   const days = Math.floor(hours / 24);
   return `hace ${days} día${days > 1 ? 's' : ''}`;
 }
@@ -27,7 +28,10 @@ function timeAgo(date: Date): string {
 export default function NotificationBell() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
+  const [menuPos, setMenuPos] = useState({ top: 0, right: 0 });
+  const btnRef = useRef<HTMLButtonElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const unsub = subscribe(setNotifications);
@@ -36,9 +40,11 @@ export default function NotificationBell() {
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
+      const target = e.target as Node;
+      const isOutside =
+        menuRef.current && !menuRef.current.contains(target) &&
+        wrapperRef.current && !wrapperRef.current.contains(target);
+      if (isOutside) setOpen(false);
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
@@ -46,14 +52,23 @@ export default function NotificationBell() {
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
+  const toggle = () => {
+    if (!open && btnRef.current) {
+      const rect = btnRef.current.getBoundingClientRect();
+      setMenuPos({ top: rect.bottom + 8, right: window.innerWidth - rect.right });
+    }
+    setOpen(!open);
+  };
+
   return (
-    <div className="relative" ref={ref}>
+    <div className="relative" ref={wrapperRef}>
       <button
-        onClick={() => setOpen(!open)}
+        ref={btnRef}
+        onClick={toggle}
         className={cn(
           'relative flex items-center justify-center w-9 h-9 rounded-lg',
-          'bg-white border border-slate-200 text-slate-500',
-          'hover:text-slate-700 hover:border-slate-300 transition-colors',
+          'bg-white/40 backdrop-blur-sm border border-white/70 text-slate-500 shadow-sm',
+          'hover:bg-white/60 hover:border-white/90 transition-all duration-200',
           'focus:outline-none focus:ring-2 focus:ring-blue-500/30'
         )}
         aria-label="Notificaciones"
@@ -66,9 +81,13 @@ export default function NotificationBell() {
         )}
       </button>
 
-      {open && (
-        <div className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-white border border-slate-200 rounded-lg shadow-lg z-50 animate-in">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200">
+      {open && createPortal(
+        <div
+          ref={menuRef}
+          className="fixed w-80 sm:w-96 bg-white/80 backdrop-blur-xl border border-white/60 rounded-xl shadow-lg shadow-slate-900/10 z-[9999] overflow-hidden"
+          style={{ top: menuPos.top, right: menuPos.right }}
+        >
+          <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200/60">
             <h3 className="text-sm font-semibold text-slate-900">Notificaciones</h3>
             {unreadCount > 0 && (
               <button
@@ -95,9 +114,9 @@ export default function NotificationBell() {
                   <div
                     key={n.id}
                     className={cn(
-                      'flex items-start gap-3 px-4 py-3 border-b border-slate-100 last:border-b-0',
-                      'hover:bg-slate-50 transition-colors cursor-pointer',
-                      !n.read && 'bg-blue-50/50'
+                      'flex items-start gap-3 px-4 py-3 border-b border-slate-100/60 last:border-b-0',
+                      'hover:bg-white/60 transition-colors cursor-pointer',
+                      !n.read && 'bg-blue-50/40'
                     )}
                     onClick={() => markAsRead(n.id)}
                   >
@@ -123,7 +142,8 @@ export default function NotificationBell() {
               })
             )}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

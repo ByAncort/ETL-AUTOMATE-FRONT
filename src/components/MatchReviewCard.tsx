@@ -96,7 +96,7 @@ export default function MatchReviewCard({ match, userId, onReviewed }: Props) {
           </span>
         ) : (
           <>
-            <div className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-gradient-to-r from-violet-100 to-blue-100 text-violet-700 border border-violet-200">
+            <div className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-gradient-to-r from-blue-100 to-blue-100 text-blue-700 border border-blue-200">
               <Sparkles size={9} />{confidencePct}%
             </div>
             <div className="w-12 h-1 bg-slate-100 rounded-full overflow-hidden">
@@ -105,8 +105,8 @@ export default function MatchReviewCard({ match, userId, onReviewed }: Props) {
           </>
         )}
         <div className="relative flex items-center w-full">
-          <div className="flex-1 h-px bg-gradient-to-r from-blue-300 via-violet-400 to-cyan-300" />
-          <div className="absolute left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-violet-500" />
+          <div className="flex-1 h-px bg-gradient-to-r from-blue-300 via-blue-400 to-cyan-300" />
+          <div className="absolute left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-blue-500" />
         </div>
       </div>
 
@@ -116,7 +116,7 @@ export default function MatchReviewCard({ match, userId, onReviewed }: Props) {
             value={actualTarget}
             onChange={(e) => { setActualTarget(e.target.value); setError(null); }}
             disabled={submitting}
-            className="w-full text-xs font-mono bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-violet-400 disabled:opacity-50"
+            className="w-full text-xs font-mono bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:opacity-50"
           />
         ) : (
           <div className="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5">

@@ -61,8 +61,8 @@ export default function SchemaMatcherModal({ integrationId, onClose }: Props) {
       <div className="relative w-full max-w-2xl bg-white border border-slate-200 rounded-xl shadow-xl animate-in flex flex-col max-h-[85vh]">
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 flex-shrink-0">
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-r from-violet-100 to-blue-100 border border-violet-200">
-              <GitMerge size={15} className="text-violet-600" />
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-r from-blue-100 to-blue-100 border border-blue-200">
+              <GitMerge size={15} className="text-blue-600" />
             </div>
             <div>
               <h2 className="text-sm font-semibold text-slate-900">Vista de Mapeo Inteligente</h2>
@@ -132,9 +132,9 @@ export default function SchemaMatcherModal({ integrationId, onClose }: Props) {
               </div>
 
               <div className="mt-4 flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200">
-                <Sparkles size={13} className="text-violet-500" />
+                <Sparkles size={13} className="text-blue-500" />
                 <p className="text-xs text-slate-600">
-                  <span className="font-semibold text-violet-700">{matches.length} coincidencias detectadas</span>
+                  <span className="font-semibold text-blue-700">{matches.length} coincidencias detectadas</span>
                   {' '}— Usando Embeddings Semánticos (modelo <code className="font-mono">etl-embed-v2</code>).
                 </p>
               </div>

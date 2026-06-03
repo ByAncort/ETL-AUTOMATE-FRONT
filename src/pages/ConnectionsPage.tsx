@@ -55,29 +55,29 @@ export default function ConnectionsPage() {
         description={`${connections.length} ${connections.length === 1 ? 'conexión' : 'conexiones'} registradas`}
       >
         <div className="relative">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#5741d8]/40" />
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[--text-muted]" />
           <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Buscar..." className="bg-[#5741d8]/5 border border-[#5741d8]/[0.12] rounded-lg pl-9 pr-4 py-2 text-sm text-[#0a0a0a] placeholder:text-[#0a0a0a]/30 focus:outline-none focus:ring-2 focus:ring-[#5741d8]/20 focus:border-[#5741d8]/40 w-40 transition-all" />
+            placeholder="Buscar..." className="bg-[--accent]/5 border border-[--border] rounded-lg pl-9 pr-4 py-2 text-sm text-[--text-primary] placeholder:text-[--text-muted] focus:outline-none focus:ring-2 focus:ring-[--ring] focus:border-[--accent]/40 w-40 transition-all" />
         </div>
         <select value={filterMethod} onChange={(e) => setFilterMethod(e.target.value)}
-          className="bg-[#5741d8]/5 border border-[#5741d8]/[0.12] rounded-lg px-3 py-2 text-sm text-[#0a0a0a]/70 focus:outline-none focus:ring-2 focus:ring-[#5741d8]/20 cursor-pointer">
+          className="bg-[--accent]/5 border border-[--border] rounded-lg px-3 py-2 text-sm text-[--text-secondary] focus:outline-none focus:ring-2 focus:ring-[--ring] cursor-pointer">
           {methods.map(m => <option key={m} value={m}>{m === 'all' ? 'Todos' : m}</option>)}
         </select>
         <button onClick={refetch}
-          className="p-2 rounded-lg bg-[#5741d8]/5 border border-[#5741d8]/[0.12] text-[#5741d8]/50 hover:text-[#5741d8]/70 hover:bg-white transition-colors">
+          className="p-2 rounded-lg bg-[--accent]/5 border border-[--border] text-[--text-muted] hover:text-[--accent] hover:bg-[--bg-card] transition-colors">
           <RefreshCw size={16} />
         </button>
         <button onClick={() => setIsModalOpen(true)}
-          className="flex items-center gap-2 px-3 py-2 bg-gradient-to-b from-[#5741d8] to-[#4635b5] hover:from-[#5d47e0] hover:to-[#4d39c4] text-white rounded-lg text-sm font-semibold transition-all shadow-[0_1px_2px_rgb(87_65_216/0.3)] hover:shadow-[0_2px_6px_rgb(87_65_216/0.35)] active:scale-[0.98]">
+          className="flex items-center gap-2 px-3 py-2 bg-[--accent] hover:bg-[--accent-hover] text-white rounded-lg text-sm font-semibold transition-all shadow-sm hover:shadow-md active:scale-[0.98]">
           <Plus size={16} /> <span className="hidden sm:inline">Nueva</span>
         </button>
       </PageHeader>
 
       <div className="p-6">
-        {loading ? <LoadingState message="Cargando conexiones..." icon={<Plug size={16} className="text-[#5741d8]" />} /> :
+        {loading ? <LoadingState message="Cargando conexiones..." icon={<Plug size={16} className="text-[--accent]" />} /> :
          error ? <ErrorState message={error} onRetry={refetch} /> :
          filteredConnections.length === 0 ? (
-           <EmptyState icon={<Plug size={40} className="text-[#5741d8]/30" />}
+           <EmptyState icon={<Plug size={40} className="text-[--text-muted]" />}
              title="Sin conexiones" description="Crea tu primera conexión API para comenzar a integrar tus fuentes de datos."
              actionLabel="Nueva Conexión" onAction={() => setIsModalOpen(true)} />
          ) : (

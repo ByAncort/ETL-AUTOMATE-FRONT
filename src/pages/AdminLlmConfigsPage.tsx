@@ -82,7 +82,7 @@ export default function AdminLlmConfigsPage() {
       >
         <button
           onClick={openCreate}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-white font-medium text-sm transition-colors"
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium text-sm transition-colors"
         >
           <Plus size={16} /> Nueva Configuración
         </button>
@@ -118,8 +118,8 @@ export default function AdminLlmConfigsPage() {
                   <tr key={config.id} className="hover:bg-slate-50 transition-colors">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-violet-50 flex items-center justify-center">
-                          <Brain size={14} className="text-violet-600" />
+                        <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center">
+                          <Brain size={14} className="text-blue-600" />
                         </div>
                         <div>
                           <span className="font-medium text-slate-900">{config.name}</span>
@@ -150,7 +150,7 @@ export default function AdminLlmConfigsPage() {
                       <div className="flex items-center gap-1">
                         <button
                           onClick={() => openEdit(config)}
-                          className="p-1.5 rounded-lg text-slate-400 hover:text-violet-500 hover:bg-violet-50 transition-colors"
+                          className="p-1.5 rounded-lg text-slate-400 hover:text-blue-500 hover:bg-blue-50 transition-colors"
                         >
                           <Pencil size={14} />
                         </button>
@@ -186,7 +186,7 @@ export default function AdminLlmConfigsPage() {
             <button
               onClick={handleSave}
               disabled={saving || !formData.name || !formData.provider || !formData.modelName}
-              className="px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium disabled:opacity-50 transition-colors flex items-center gap-2"
+              className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium disabled:opacity-50 transition-colors flex items-center gap-2"
             >
               {saving && <Loader2 size={14} className="animate-spin" />}
               {editingId ? 'Guardar' : 'Crear'}
@@ -202,7 +202,7 @@ export default function AdminLlmConfigsPage() {
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               placeholder="GPT-4 Production"
-              className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500/30"
+              className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
@@ -211,7 +211,7 @@ export default function AdminLlmConfigsPage() {
               <select
                 value={formData.provider}
                 onChange={(e) => setFormData({ ...formData, provider: e.target.value })}
-                className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-violet-500/30"
+                className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
               >
                 <option value="">Seleccionar...</option>
                 <option value="openai">OpenAI</option>
@@ -229,7 +229,7 @@ export default function AdminLlmConfigsPage() {
                 value={formData.modelName}
                 onChange={(e) => setFormData({ ...formData, modelName: e.target.value })}
                 placeholder="gpt-4"
-                className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500/30"
+                className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
               />
             </div>
           </div>
@@ -240,7 +240,7 @@ export default function AdminLlmConfigsPage() {
               value={formData.baseUrl}
               onChange={(e) => setFormData({ ...formData, baseUrl: e.target.value })}
               placeholder="https://api.openai.com/v1"
-              className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500/30"
+              className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
             />
           </div>
           <div>
@@ -250,7 +250,7 @@ export default function AdminLlmConfigsPage() {
               value={formData.apiKey}
               onChange={(e) => setFormData({ ...formData, apiKey: e.target.value })}
               placeholder="sk-proj-xxxxx"
-              className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500/30"
+              className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
             />
           </div>
           <label className="flex items-center gap-2 cursor-pointer">
@@ -258,7 +258,7 @@ export default function AdminLlmConfigsPage() {
               type="checkbox"
               checked={formData.isDefault}
               onChange={(e) => setFormData({ ...formData, isDefault: e.target.checked })}
-              className="w-4 h-4 rounded border-slate-300 text-violet-600 focus:ring-violet-500/30"
+              className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500/30"
             />
             <span className="text-sm text-slate-700">Establecer como configuración por defecto</span>
           </label>

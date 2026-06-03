@@ -126,7 +126,7 @@ export default function MonitoringPage() {
                         <td className="px-4 py-3 text-sm text-slate-600">{svc.responseTime}ms</td>
                         <td className="px-4 py-3 text-xs text-slate-400">{new Date(svc.lastCheck).toLocaleTimeString()}</td>
                         <td className="px-4 py-3">
-                          <button className="p-1.5 rounded text-slate-400 hover:text-violet-600 hover:bg-violet-50 transition-colors">
+                          <button className="p-1.5 rounded text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors">
                             <RefreshCw size={14} />
                           </button>
                         </td>

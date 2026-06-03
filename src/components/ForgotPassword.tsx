@@ -1,29 +1,11 @@
 import { useState } from 'react';
 import { Mail, ArrowRight, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import api from '../services/api';
-import { GlobeCdn } from './ui/cobe-globe-cdn';
-import { motion } from 'motion/react';
+import AuthLayout from './AuthLayout';
 
 interface Props {
   onBack: () => void;
 }
-
-const stagger = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.07, delayChildren: 0.15 },
-  },
-};
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 16 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] },
-  },
-};
 
 export default function ForgotPassword({ onBack }: Props) {
   const [email, setEmail] = useState('');
@@ -34,7 +16,7 @@ export default function ForgotPassword({ onBack }: Props) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim()) return;
-    
+
     setLoading(true);
     setError(null);
     try {
@@ -48,107 +30,55 @@ export default function ForgotPassword({ onBack }: Props) {
   };
 
   return (
-    <div className="relative min-h-screen flex overflow-hidden" style={{ fontFamily: 'Outfit, sans-serif' }}>
-      {/* Decorative background elements */}
-      <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute -top-40 -left-40 h-[500px] w-[500px] rounded-full bg-gradient-to-br from-[#5741d8]/[0.06] to-transparent blur-3xl" />
-        <div className="absolute bottom-0 left-1/4 h-[300px] w-[300px] rounded-full bg-gradient-to-tr from-[#5741d8]/[0.04] to-transparent blur-2xl" />
-      </div>
+    <AuthLayout title="Recupera el acceso a tu cuenta">
+      <div className="relative bg-[--bg-card] border border-[--border] rounded-2xl p-8 shadow-sm">
+        <button onClick={onBack} className="absolute top-4 left-4 text-[--text-muted] hover:text-[--accent] p-1.5 rounded-lg hover:bg-[--bg-elevated] transition-colors">
+          <ArrowLeft size={16} />
+        </button>
 
-      {/* Left: form */}
-      <div className="relative z-10 w-full lg:w-1/2 flex items-center justify-center p-8 lg:p-16">
-        <div
-          className="pointer-events-none absolute inset-0 -z-10 opacity-[0.25]"
-          style={{
-            backgroundImage: `radial-gradient(circle at 1px 1px, #5741d8 0.5px, transparent 0)`,
-            backgroundSize: '32px 32px',
-            maskImage: 'linear-gradient(to bottom, transparent 0%, black 30%, black 70%, transparent 100%)',
-            WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 30%, black 70%, transparent 100%)',
-          }}
-        />
-
-        <motion.div
-          className="w-full max-w-sm"
-          variants={stagger}
-          initial="hidden"
-          animate="visible"
-        >
-          <motion.div variants={fadeUp} className="mb-10">
-            <div className="text-[11px] font-medium tracking-[0.25em] uppercase text-[#5741d8]/50 mb-4">
-              Data Platform
+        <div className="mt-2">
+          {success ? (
+            <div className="text-center">
+              <div className="mx-auto w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center text-emerald-600 mb-4">
+                <CheckCircle2 size={20} />
+              </div>
+              <h3 className="text-sm font-medium text-[--text-primary] mb-2">Revisa tu correo</h3>
+              <p className="text-sm text-[--text-secondary] mb-7">
+                Si existe una cuenta asociada a {email}, recibirás un enlace para restablecer tu contraseña.
+              </p>
+              <button onClick={onBack}
+                className="w-full rounded-xl bg-[--accent] hover:bg-[--accent-hover] py-3 text-sm font-medium text-white transition-all duration-200 shadow-sm hover:shadow-md active:scale-[0.98]">
+                Volver al Login
+              </button>
             </div>
-            <h1 className="text-[30px] font-semibold tracking-tight text-[#0a0a0a] leading-none">
-              Restablecer Contraseña
-            </h1>
-            <div className="mt-4 h-px w-12 bg-gradient-to-r from-[#5741d8]/30 to-transparent" />
-          </motion.div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <p className="text-sm text-[--text-secondary] mb-6">
+                Ingresa el correo electrónico asociado a tu cuenta y te enviaremos un enlace para restablecer tu contraseña.
+              </p>
 
-          <motion.div
-            variants={fadeUp}
-            className="relative bg-white/90 backdrop-blur-sm border border-[#5741d8]/[0.08] rounded-2xl p-8 shadow-[0_1px_3px_0_rgb(87_65_216/0.04),0_1px_2px_-1px_rgb(87_65_216/0.06)]"
-          >
-            <button onClick={onBack} className="absolute top-4 left-4 text-[#0a0a0a]/30 hover:text-[#5741d8]/60 p-1.5 rounded-lg hover:bg-white/60 transition-colors">
-              <ArrowLeft size={16} />
-            </button>
+              <div>
+                <label htmlFor="email" className="mb-2 block text-[11px] font-medium uppercase tracking-[0.08em] text-[--text-secondary]">
+                  Email
+                </label>
+                <div className="relative">
+                  <Mail className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[--text-muted]" />
+                  <input id="email" type="email" placeholder="email@ejemplo.com" value={email} onChange={(e) => setEmail(e.target.value)} required
+                    className="w-full rounded-xl border border-[--border] bg-[--bg-card] py-3 pl-10 pr-4 text-sm text-[--text-primary] placeholder:text-[--text-muted] outline-none transition-all duration-200 focus:border-[--accent]/40 focus:shadow-[0_0_0_4px_var(--ring)]" />
+                </div>
+              </div>
 
-            <div className="mt-2">
-              {success ? (
-                <motion.div
-                  className="text-center"
-                  variants={stagger}
-                  initial="hidden"
-                  animate="visible"
-                >
-                  <motion.div variants={fadeUp} className="mx-auto w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center text-emerald-600 mb-4">
-                    <CheckCircle2 size={20} />
-                  </motion.div>
-                  <motion.h3 variants={fadeUp} className="text-sm font-medium text-[#0a0a0a] mb-2">Revisa tu correo</motion.h3>
-                  <motion.p variants={fadeUp} className="text-sm text-[#0a0a0a]/50 mb-7">
-                    Si existe una cuenta asociada a {email}, recibirás un enlace para restablecer tu contraseña.
-                  </motion.p>
-                  <motion.button variants={fadeUp} onClick={onBack}
-                    className="w-full rounded-xl bg-gradient-to-b from-[#5741d8] to-[#4635b5] hover:from-[#5d47e0] hover:to-[#4d39c4] py-3 text-sm font-medium text-white/90 transition-all duration-200 shadow-[0_1px_2px_rgb(87_65_216/0.3)] hover:shadow-[0_2px_8px_rgb(87_65_216/0.35)] active:scale-[0.98]">
-                    Volver al Login
-                  </motion.button>
-                </motion.div>
-              ) : (
-                <form onSubmit={handleSubmit} className="space-y-5">
-                  <p className="text-sm text-[#0a0a0a]/50 mb-6">
-                    Ingresa el correo electrónico asociado a tu cuenta y te enviaremos un enlace para restablecer tu contraseña.
-                  </p>
-                  
-                  <div>
-                    <label htmlFor="email" className="mb-2 block text-[11px] font-medium uppercase tracking-[0.08em] text-[#5741d8]/60">
-                      Email
-                    </label>
-                    <div className="relative">
-                      <Mail className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#5741d8]/40" />
-                      <input id="email" type="email" placeholder="email@ejemplo.com" value={email} onChange={(e) => setEmail(e.target.value)} required
-                        className="w-full rounded-xl border border-[#0a0a0a]/[0.08] bg-white py-3 pl-10 pr-4 text-sm text-[#0a0a0a] placeholder:text-[#0a0a0a]/25 outline-none transition-all duration-200 focus:border-[#5741d8]/40 focus:shadow-[0_0_0_4px_rgba(87,65,216,0.08)]" />
-                    </div>
-                  </div>
+              {error && <div className="rounded-xl border border-red-200 bg-red-50/60 px-4 py-2.5 text-[11px] text-red-600 font-medium">{error}</div>}
 
-                  {error && <div className="rounded-xl border border-red-200 bg-red-50/60 px-4 py-2.5 text-[11px] text-red-600 font-medium">{error}</div>}
-
-                  <button type="submit" disabled={loading || !email.trim()}
-                    className="group relative w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-[#5741d8] to-[#4635b5] hover:from-[#5d47e0] hover:to-[#4d39c4] py-3 text-sm font-medium text-white/90 transition-all duration-200 disabled:opacity-50 shadow-[0_1px_2px_rgb(87_65_216/0.3)] hover:shadow-[0_2px_8px_rgb(87_65_216/0.35)] active:scale-[0.98]">
-                    {loading ? 'Enviando…' : 'Enviar Instrucciones'}
-                    {!loading && <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />}
-                  </button>
-                </form>
-              )}
-            </div>
-          </motion.div>
-        </motion.div>
-      </div>
-
-      {/* Right: globe */}
-      <div className="hidden lg:flex items-center justify-center w-1/2 bg-gradient-to-br from-[#5741d8]/[0.03] via-slate-50 to-white overflow-hidden p-12 relative">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(87,65,216,0.03)_0%,transparent_70%)]" />
-        <div className="w-full max-w-lg relative z-10">
-          <GlobeCdn />
+              <button type="submit" disabled={loading || !email.trim()}
+                className="group relative w-full flex items-center justify-center gap-2 rounded-xl bg-[--accent] hover:bg-[--accent-hover] py-3 text-sm font-medium text-white transition-all duration-200 disabled:opacity-50 shadow-sm hover:shadow-md active:scale-[0.98]">
+                {loading ? 'Enviando…' : 'Enviar Instrucciones'}
+                {!loading && <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />}
+              </button>
+            </form>
+          )}
         </div>
       </div>
-    </div>
+    </AuthLayout>
   );
 }

@@ -43,8 +43,8 @@ export default function CreateConnectionModal({ isOpen, onClose, onSubmit }: Pro
 
   const update = (key: string, value: string | boolean) => setFormData(f => ({ ...f, [key]: value }));
 
-  const inputClass = "w-full bg-white border border-[#5741d8]/[0.12] rounded-lg px-3 py-2 text-sm text-[#0a0a0a] placeholder:text-[#0a0a0a]/30 focus:outline-none focus:ring-2 focus:ring-[#5741d8]/20 focus:border-[#5741d8]/40 transition-all";
-  const labelClass = "block text-xs font-medium text-[#0a0a0a]/60 mb-1.5";
+  const inputClass = "w-full bg-white border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)] focus:border-[var(--accent)]/40 transition-all";
+  const labelClass = "block text-xs font-medium text-[var(--text-secondary)] mb-1.5";
 
   return (
     <Modal
@@ -56,12 +56,12 @@ export default function CreateConnectionModal({ isOpen, onClose, onSubmit }: Pro
       footer={
         <div className="flex gap-3 w-full">
           <button type="button" onClick={onClose}
-            className="flex-1 py-2.5 rounded-lg border border-[#5741d8]/[0.12] text-[#0a0a0a]/60 text-sm font-medium hover:bg-[#5741d8]/5 transition-colors">
+            className="flex-1 py-2.5 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] text-sm font-medium hover:bg-[var(--bg-subtle)] transition-colors">
             Cancelar
           </button>
           <button type="submit" form="connection-form"
             disabled={isSubmitting || !formData.url}
-            className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg bg-gradient-to-b from-[#5741d8] to-[#4635b5] hover:from-[#5d47e0] hover:to-[#4d39c4] disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold transition-all shadow-[0_1px_2px_rgb(87_65_216/0.3)] hover:shadow-[0_2px_6px_rgb(87_65_216/0.35)] active:scale-[0.98]">
+            className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-hover)] disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold transition-all shadow-sm active:scale-[0.98]">
             {isSubmitting ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
             {isSubmitting ? 'Guardando...' : 'Guardar'}
           </button>
@@ -129,16 +129,16 @@ export default function CreateConnectionModal({ isOpen, onClose, onSubmit }: Pro
             placeholder='{"key": "value"}' rows={3} className={`${inputClass} font-mono text-xs`} />
         </div>
 
-        <div className="border-t border-[#5741d8]/[0.06] pt-4">
+        <div className="border-t border-[var(--border)] pt-4">
           <label className="flex items-center gap-2 cursor-pointer">
             <input type="checkbox" checked={formData.hasApiAuth}
               onChange={(e) => update('hasApiAuth', e.target.checked)}
-              className="w-4 h-4 rounded border-[#5741d8]/30 text-[#5741d8] focus:ring-[#5741d8]/30" />
+              className="w-4 h-4 rounded border-[var(--border)] text-[var(--accent)] focus:ring-[var(--ring)]" />
             <span className="text-sm text-[#0a0a0a]/60">Configurar Auth API (para obtener token)</span>
           </label>
 
           {formData.hasApiAuth && (
-            <div className="mt-4 p-4 bg-[#5741d8]/5 rounded-lg space-y-4 border border-[#5741d8]/10">
+            <div className="mt-4 p-4 bg-[var(--bg-subtle)] rounded-lg space-y-4 border border-[var(--border)]">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className={labelClass}>Método Auth</label>

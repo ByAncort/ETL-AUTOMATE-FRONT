@@ -5,13 +5,14 @@ import {
 } from 'lucide-react';
 import { ApiConnection } from '../../hooks/useApiConnections';
 import { cn } from '../../lib/utils';
+import { GlowCard } from '../ui/spotlight-card';
 
 const methodColors: Record<string, string> = {
-  GET: 'bg-[#5741d8]/10 text-[#5741d8] border-[#5741d8]/20',
+  GET: 'bg-[--accent]/10 text-[--accent] border-[--accent]/20',
   POST: 'bg-emerald-100 text-emerald-700 border-emerald-200',
   PUT: 'bg-amber-100 text-amber-700 border-amber-200',
   DELETE: 'bg-red-100 text-red-700 border-red-200',
-  PATCH: 'bg-violet-100 text-violet-700 border-violet-200',
+  PATCH: 'bg-blue-100 text-blue-700 border-blue-200',
 };
 
 interface Props {
@@ -40,7 +41,7 @@ export default function ConnectionCard({ connection, onDelete, onTest }: Props) 
 
   return (
     <div
-      className="group relative bg-white border border-[#5741d8]/[0.08] rounded-xl hover:border-[#5741d8]/30 hover:shadow-[0_1px_8px_-2px_rgba(87,65,216,0.08)] transition-all"
+      className="group relative bg-[--bg-card] border border-[--border] rounded-xl hover:border-[--accent]/30 hover:shadow-[0_1px_8px_-2px_var(--accent)/0.08] transition-all"
       role="article"
     >
       <div className="p-5">
@@ -50,10 +51,10 @@ export default function ConnectionCard({ connection, onDelete, onTest }: Props) 
               {connection.method}
             </div>
             <div className="min-w-0 flex-1">
-              <h3 className="text-sm font-semibold text-[#0a0a0a] truncate">
+              <h3 className="text-sm font-semibold text-[--text-primary] truncate">
                 {connection.description || `Conexión ${connection.id}`}
               </h3>
-              <p className="text-xs text-[#0a0a0a]/50 truncate mt-1 font-mono" title={fullUrl}>
+              <p className="text-xs text-[--text-secondary] truncate mt-1 font-mono" title={fullUrl}>
                 {fullUrl.length > 40 ? fullUrl.substring(0, 40) + '...' : fullUrl}
               </p>
             </div>
@@ -62,27 +63,27 @@ export default function ConnectionCard({ connection, onDelete, onTest }: Props) 
           <div className="relative">
             <button
               onClick={() => setShowMenu(!showMenu)}
-              className="p-2 rounded-lg text-[#0a0a0a]/35 hover:text-[#5741d8]/60 hover:bg-[#5741d8]/5 transition-colors"
+              className="p-2 rounded-lg text-[--text-muted] hover:text-[--accent] hover:bg-[--accent]/5 transition-colors"
               aria-label="Más opciones"
             >
               <MoreVertical size={16} />
             </button>
             {showMenu && (
-              <div className="absolute right-0 top-full mt-1 w-44 bg-white border border-[#5741d8]/[0.08] rounded-lg shadow-lg z-20 overflow-hidden animate-in">
+              <div className="absolute right-0 top-full mt-1 w-44 bg-[--bg-card] border border-[--border] rounded-lg shadow-lg z-20 overflow-hidden animate-in">
                 <button
                   onClick={() => { onTest(connection); setShowMenu(false); }}
-                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#0a0a0a]/70 hover:bg-[#5741d8]/5 transition-colors"
+                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[--text-secondary] hover:bg-[--accent]/5 transition-colors"
                 >
                   <Play size={14} /> Probar conexión
                 </button>
                 <button
                   onClick={() => { copyUrl(); setShowMenu(false); }}
-                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#0a0a0a]/70 hover:bg-[#5741d8]/5 transition-colors"
+                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[--text-secondary] hover:bg-[--accent]/5 transition-colors"
                 >
                   {copied ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
                   {copied ? '¡Copiado!' : 'Copiar URL'}
                 </button>
-                <div className="h-px bg-[#5741d8]/[0.06] my-1" />
+                <div className="h-px bg-[--border] my-1" />
                 <button
                   onClick={() => { onDelete(connection.id); setShowMenu(false); }}
                   className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors"
@@ -96,13 +97,13 @@ export default function ConnectionCard({ connection, onDelete, onTest }: Props) 
 
         <div className="flex flex-wrap items-center gap-2 mb-4">
           {connection.authType && (
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-[#5741d8]/5 text-[#5741d8]/70 border border-[#5741d8]/10">
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-[--accent]/5 text-[--accent]/70 border border-[--accent]/10">
               <Key size={12} className="flex-shrink-0" />
               <span>{connection.authType}</span>
             </div>
           )}
           {connection.authHeader && (
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-[#5741d8]/5 text-[#0a0a0a]/50 border border-[#5741d8]/10">
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-[--accent]/5 text-[--text-secondary] border border-[--accent]/10">
               <Globe size={12} className="flex-shrink-0" />
               <span className="truncate max-w-[150px]">{connection.authHeader}</span>
             </div>
@@ -115,15 +116,15 @@ export default function ConnectionCard({ connection, onDelete, onTest }: Props) 
           )}
         </div>
 
-        <div className="flex items-center justify-between pt-3 border-t border-[#5741d8]/[0.06]">
-          <div className="flex items-center gap-2 text-xs text-[#0a0a0a]/40">
-            <div className="flex items-center gap-1.5 bg-[#5741d8]/5 px-2 py-1 rounded-md">
+          <div className="flex items-center justify-between pt-3 border-t border-[--border]">
+          <div className="flex items-center gap-2 text-xs text-[--text-muted]">
+            <div className="flex items-center gap-1.5 bg-[--accent]/5 px-2 py-1 rounded-md">
               <Clock size={11} />
               <span className="font-mono">{formatDate(connection.createdAt)}</span>
             </div>
           </div>
           {connection.authApiId && (
-            <div className="flex items-center gap-1.5 text-xs px-2 py-1 rounded-md bg-[#5741d8]/10 text-[#5741d8]/70 border border-[#5741d8]/15">
+            <div className="flex items-center gap-1.5 text-xs px-2 py-1 rounded-md bg-[--accent]/10 text-[--accent]/70 border border-[--accent]/15">
               <ExternalLink size={11} />
               <span className="font-mono">API #{connection.authApiId}</span>
             </div>

@@ -170,11 +170,11 @@ export default function UsersManagement() {
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input type="text" placeholder="Buscar usuarios..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500/30 focus:border-violet-500" />
+            className="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500" />
         </div>
         <div className="flex items-center gap-4">
           <button onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-white font-medium text-sm transition-colors">
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium text-sm transition-colors">
             <Plus size={16} /> Nuevo Usuario
           </button>
           <span className="text-sm text-slate-400">{filtered.length} usuario{filtered.length !== 1 ? 's' : ''}</span>
@@ -199,8 +199,8 @@ export default function UsersManagement() {
                 <tr key={user.id} className="hover:bg-slate-50 transition-colors">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-violet-50 flex items-center justify-center">
-                        <Users size={14} className="text-violet-600" />
+                      <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center">
+                        <Users size={14} className="text-blue-600" />
                       </div>
                       <div>
                         <span className="font-medium text-slate-900">{user.username}</span>
@@ -228,7 +228,7 @@ export default function UsersManagement() {
                   </td>
                   <td className="px-4 py-3">
                     {user.roles.map((role, idx) => (
-                      <span key={idx} className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-violet-50 text-violet-700 mr-1">
+                      <span key={idx} className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-700 mr-1">
                         <Shield size={10} />{role.replace('ROLE_', '')}
                       </span>
                     ))}
@@ -250,11 +250,11 @@ export default function UsersManagement() {
                         </button>
                       )}
                       <button onClick={() => openRoleModal(user)}
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-violet-500 hover:bg-violet-50 transition-colors" title="Gestionar Roles">
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-blue-500 hover:bg-blue-50 transition-colors" title="Gestionar Roles">
                         <UserCog size={14} />
                       </button>
                       <button onClick={() => { setEditingUser(user); setFormData({ username: user.username, email: user.email, password: '', firstName: user.firstName || '', lastName: user.lastName || '' }); }}
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-violet-500 hover:bg-violet-50 transition-colors" title="Editar">
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-blue-500 hover:bg-blue-50 transition-colors" title="Editar">
                         <Pencil size={14} />
                       </button>
                       <button onClick={() => deleteUser(user.id)}
@@ -288,28 +288,28 @@ export default function UsersManagement() {
               <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">Username</label>
                 <input type="text" value={formData.username} onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                  className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-violet-500/30" />
+                  className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30" />
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">Email</label>
                 <input type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-violet-500/30" />
+                  className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30" />
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">Password (dejar vacío para mantener)</label>
                 <input type="password" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-violet-500/30" />
+                  className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-medium text-slate-600 mb-1">Nombre</label>
                   <input type="text" value={formData.firstName} onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-violet-500/30" />
+                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30" />
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-slate-600 mb-1">Apellido</label>
                   <input type="text" value={formData.lastName} onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-violet-500/30" />
+                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30" />
                 </div>
               </div>
             </div>
@@ -318,7 +318,7 @@ export default function UsersManagement() {
                 className="px-4 py-2 rounded-lg text-sm text-slate-600 hover:bg-slate-50 transition-colors">Cancelar</button>
               <button onClick={async () => { setSaving(true); await updateUser(editingUser.id, formData); setSaving(false); setEditingUser(null); }}
                 disabled={saving}
-                className="px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium disabled:opacity-50 transition-colors flex items-center gap-2">
+                className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium disabled:opacity-50 transition-colors flex items-center gap-2">
                 {saving && <Loader2 size={14} className="animate-spin" />}Guardar
               </button>
             </div>
@@ -342,19 +342,19 @@ export default function UsersManagement() {
                   <input type={field === 'password' ? 'password' : 'text'} value={createData[field]}
                     onChange={(e) => setCreateData({ ...createData, [field]: e.target.value })}
                     placeholder={field === 'email' ? 'email@ejemplo.com' : field === 'password' ? '••••••••' : field}
-                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500/30" />
+                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30" />
                 </div>
               ))}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-medium text-slate-600 mb-1">Nombre</label>
                   <input type="text" value={createData.firstName} onChange={(e) => setCreateData({ ...createData, firstName: e.target.value })}
-                    placeholder="Nombre" className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500/30" />
+                    placeholder="Nombre" className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30" />
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-slate-600 mb-1">Apellido</label>
                   <input type="text" value={createData.lastName} onChange={(e) => setCreateData({ ...createData, lastName: e.target.value })}
-                    placeholder="Apellido" className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500/30" />
+                    placeholder="Apellido" className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30" />
                 </div>
               </div>
             </div>
@@ -363,7 +363,7 @@ export default function UsersManagement() {
                 className="px-4 py-2 rounded-lg text-sm text-slate-600 hover:bg-slate-50 transition-colors">Cancelar</button>
               <button onClick={async () => { setCreating(true); try { const cleanData = { username: createData.username.trim(), email: createData.email.trim(), password: createData.password.trim(), firstName: createData.firstName.trim(), lastName: createData.lastName.trim() }; const r = await api.post('/api/users/register', cleanData); setUsers([r.data, ...users]); setShowCreateModal(false); addNotification('success', 'Usuario creado', `El usuario ${cleanData.username} ha sido registrado`); } catch { setError('No se pudo crear el usuario'); } finally { setCreating(false); } }}
                 disabled={creating || !createData.username || !createData.email || !createData.password}
-                className="px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium disabled:opacity-50 transition-colors flex items-center gap-2">
+                className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium disabled:opacity-50 transition-colors flex items-center gap-2">
                 {creating && <Loader2 size={14} className="animate-spin" />}Crear Usuario
               </button>
             </div>
@@ -377,7 +377,7 @@ export default function UsersManagement() {
           <div className="bg-white rounded-xl border border-slate-200 w-full max-w-md shadow-xl">
             <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200">
               <div className="flex items-center gap-2">
-                <UserCog size={16} className="text-violet-600" />
+                <UserCog size={16} className="text-blue-600" />
                 <h3 className="text-sm font-semibold text-slate-900">Roles de {roleUser.username}</h3>
               </div>
               <button onClick={() => setRoleUser(null)} className="p-1 rounded text-slate-400 hover:text-slate-600"><X size={18} /></button>
@@ -408,11 +408,11 @@ export default function UsersManagement() {
                     <label key={role.id}
                       className={`flex items-center justify-between px-3 py-2.5 rounded-lg cursor-pointer transition-colors
                         ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
-                        ${checked ? 'bg-violet-50' : disabled ? '' : 'hover:bg-slate-50'}`}>
+                        ${checked ? 'bg-blue-50' : disabled ? '' : 'hover:bg-slate-50'}`}>
                       <div className="flex items-center gap-3">
-                        <Shield size={14} className={checked ? 'text-violet-600' : disabled ? 'text-slate-200' : 'text-slate-300'} />
+                        <Shield size={14} className={checked ? 'text-blue-600' : disabled ? 'text-slate-200' : 'text-slate-300'} />
                         <div>
-                          <span className={`text-sm font-medium ${checked ? 'text-violet-900' : 'text-slate-600'}`}>
+                          <span className={`text-sm font-medium ${checked ? 'text-blue-900' : 'text-slate-600'}`}>
                             {role.name.replace('ROLE_', '')}
                             {role.levelRole != null && (
                               <span className="text-xs text-slate-400 ml-1 font-normal">(Nvl {role.levelRole})</span>
@@ -427,7 +427,7 @@ export default function UsersManagement() {
                       <input type="checkbox" checked={checked}
                         disabled={disabled}
                         onChange={() => toggleUserRole(role.id)}
-                        className="w-4 h-4 rounded border-slate-300 text-violet-600 focus:ring-violet-500/30 disabled:opacity-40" />
+                        className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500/30 disabled:opacity-40" />
                     </label>
                   );
                 })

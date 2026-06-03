@@ -71,7 +71,7 @@ export default function EtlExecutionPanel({ integrationId, hasApprovedMatches, o
               className="h-full rounded-full transition-all duration-500 ease-out"
               style={{
                 width: `${progress}%`,
-                background: phase === 'error' ? '#dc2626' : 'linear-gradient(90deg, #8b5cf6, #3b82f6)',
+                background: phase === 'error' ? '#dc2626' : 'linear-gradient(90deg, #2563eb, #3b82f6)',
               }}
             />
           </div>

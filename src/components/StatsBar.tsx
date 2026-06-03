@@ -7,7 +7,7 @@ const stats = [
   { icon: <Cpu size={15} />, label: 'Confianza Promedio ML', value: '87.9%', sub: 'Record Linkage' },
 ];
 
-const iconColors = ['text-[#5741d8]', 'text-emerald-600', 'text-amber-600', 'text-violet-600'];
+const iconColors = ['text-[--accent]', 'text-emerald-600', 'text-amber-600', 'text-blue-600'];
 
 export default function StatsBar() {
   return (
@@ -15,9 +15,9 @@ export default function StatsBar() {
       {stats.map((stat, i) => (
         <div
           key={stat.label}
-          className="flex items-center gap-3 bg-white border border-[#5741d8]/[0.08] rounded-xl px-4 py-3.5 hover:border-[#5741d8]/25 hover:shadow-[0_1px_6px_-2px_rgba(87,65,216,0.08)] transition-all"
+          className="flex items-center gap-3 bg-[--bg-card] border border-[--border] rounded-xl px-4 py-3.5 hover:border-[--accent]/25 hover:shadow-[0_1px_6px_-2px_var(--accent)/0.08] transition-all"
         >
-          <div className={`flex items-center justify-center w-9 h-9 rounded-lg bg-[#5741d8]/5 border border-[#5741d8]/10 flex-shrink-0 ${iconColors[i]}`}>
+          <div className={`flex items-center justify-center w-9 h-9 rounded-lg bg-[--accent]/5 border border-[--accent]/10 flex-shrink-0 ${iconColors[i]}`}>
             {stat.icon}
           </div>
           <div>

@@ -20,7 +20,7 @@ export default function AdminPanel() {
   }, []);
 
   const stats = [
-    { icon: <Users size={16} className="text-violet-600" />, label: 'Usuarios Activos', value: users.length },
+    { icon: <Users size={16} className="text-blue-600" />, label: 'Usuarios Activos', value: users.length },
     { icon: <GitMerge size={16} className="text-blue-600" />, label: 'Integraciones', value: integrations.length },
     { icon: <Activity size={16} className="text-emerald-600" />, label: 'Registros Sincronizados', value: '0' },
     { icon: <AlertCircle size={16} className="text-red-500" />, label: 'Errores (24h)', value: '0' },
@@ -33,9 +33,9 @@ export default function AdminPanel() {
           <h1 className="text-xl font-bold text-slate-900">Panel de Administración</h1>
           <p className="text-slate-500 text-sm mt-1">Gestión completa del sistema</p>
         </div>
-        <div className="flex items-center gap-2 px-3 py-1.5 bg-violet-50 border border-violet-200 rounded-lg">
-          <Shield size={14} className="text-violet-600" />
-          <span className="text-violet-700 text-xs font-semibold">ADMIN</span>
+        <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 border border-blue-200 rounded-lg">
+          <Shield size={14} className="text-blue-600" />
+          <span className="text-blue-700 text-xs font-semibold">ADMIN</span>
         </div>
       </div>
 
@@ -56,7 +56,7 @@ export default function AdminPanel() {
       <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
         <div className="px-4 py-3 border-b border-slate-200">
           <h3 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
-            <Users size={14} className="text-violet-600" />
+            <Users size={14} className="text-blue-600" />
             Gestión de Usuarios
           </h3>
         </div>
@@ -82,7 +82,7 @@ export default function AdminPanel() {
                     <td className="px-4 py-3 text-slate-700">{user.username}</td>
                     <td className="px-4 py-3 text-slate-600">{user.email}</td>
                     <td className="px-4 py-3">
-                      <span className="px-2 py-1 bg-violet-50 text-violet-700 rounded text-xs font-medium">
+                      <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded text-xs font-medium">
                         {user.roles && user.roles.length > 0 ? user.roles[0].replace('ROLE_', '') : 'Usuario'}
                       </span>
                     </td>

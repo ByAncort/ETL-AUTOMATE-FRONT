@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
+import { mapApiError } from '../lib/apiError';
 
 export interface ApiConnection {
   id: number;
@@ -53,7 +54,7 @@ export function useApiConnections() {
       setError(null);
     } catch (err: any) {
       console.error('Error fetching connections:', err);
-      setError(err.response?.data?.message || 'No se pudieron cargar las conexiones');
+      setError(mapApiError(err));
     } finally {
       setLoading(false);
     }
@@ -70,7 +71,7 @@ export function useApiConnections() {
       return { success: true };
     } catch (err: any) {
       console.error('Error deleting connection:', err);
-      return { success: false, error: err.response?.data?.message || 'Error al eliminar' };
+      return { success: false, error: mapApiError(err) };
     }
   };
 
@@ -81,7 +82,7 @@ export function useApiConnections() {
       return { success: true, data: response.data };
     } catch (err: any) {
       console.error('Error creating connection:', err);
-      return { success: false, error: err.response?.data?.message || 'Error al crear conexión' };
+      return { success: false, error: mapApiError(err) };
     }
   };
 

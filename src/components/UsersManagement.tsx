@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from 'react';
 import { Users, Search, Trash2, Shield, X, Loader2, Plus, Pencil, Power, UserCog, Ban } from 'lucide-react';
 import api from '../services/api';

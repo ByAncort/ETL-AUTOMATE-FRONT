@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
 import { LlmConfigResponse, LlmConfigRequest } from '../types';

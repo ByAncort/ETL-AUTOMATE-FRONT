@@ -33,6 +33,7 @@ export default function Register({ onToggleForm }: Props) {
   const onSubmit = async (data: RegisterForm) => {
     setError(null); setSuccess(null); setLoading(true);
     try {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { confirmPassword, ...payload } = data;
       await api.post('/api/users/register', payload);
       setSuccess('Usuario creado exitosamente. Tu cuenta está pendiente de ser activada por un administrador. Redirigiendo...');

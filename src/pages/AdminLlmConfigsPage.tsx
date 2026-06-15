@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Brain, Plus, Pencil, Trash2, Star, X, Loader2 } from 'lucide-react';
+import { Brain, Plus, Pencil, Trash2, Star, Loader2 } from 'lucide-react';
 import { useLlmConfigs } from '../hooks/useLlmConfigs';
-import { LlmConfigRequest } from '../types';
+import type { LlmConfigRequest, LlmConfigResponse } from '../types';
 import { addNotification } from '../services/notificationService';
 import PageHeader from '../components/ui/PageHeader';
 import LoadingState from '../components/ui/LoadingState';

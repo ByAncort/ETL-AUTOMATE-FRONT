@@ -3,11 +3,15 @@ import { runEtl, runEtlById } from '../etlService';
 jest.mock('axios');
 
 import axios from 'axios';
-const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 beforeEach(() => {
   jest.clearAllMocks();
 });
+
+function mockAxiosPost() {
+  const instance = (axios.create as jest.Mock)();
+  return instance.post as jest.Mock;
+}
 
 describe('etlService', () => {
   describe('runEtl', () => {
@@ -17,18 +21,18 @@ describe('etlService', () => {
         integrationId: 1, sourceApiId: 1, targetApiId: 2,
         totalRecords: 100, transformedRecords: 95, loadedRecords: 95, errors: [],
       };
-      const axiosInstance = mockedAxios.create();
-      axiosInstance.post.mockResolvedValueOnce({ data: etlResponse });
+      const mockPost = mockAxiosPost();
+      mockPost.mockResolvedValueOnce({ data: etlResponse });
 
       const result = await runEtl(etlRequest);
 
-      expect(axiosInstance.post).toHaveBeenCalledWith('/api/etl/run', etlRequest);
+      expect(mockPost).toHaveBeenCalledWith('/api/etl/run', etlRequest);
       expect(result).toEqual(etlResponse);
     });
 
     it('should propagate errors', async () => {
-      const axiosInstance = mockedAxios.create();
-      axiosInstance.post.mockRejectedValueOnce(new Error('Network error'));
+      const mockPost = mockAxiosPost();
+      mockPost.mockRejectedValueOnce(new Error('Network error'));
 
       await expect(runEtl({ integrationId: 1 })).rejects.toThrow('Network error');
     });
@@ -40,12 +44,12 @@ describe('etlService', () => {
         integrationId: 1, sourceApiId: 1, targetApiId: 2,
         totalRecords: 50, transformedRecords: 50, loadedRecords: 50, errors: [],
       };
-      const axiosInstance = mockedAxios.create();
-      axiosInstance.post.mockResolvedValueOnce({ data: etlResponse });
+      const mockPost = mockAxiosPost();
+      mockPost.mockResolvedValueOnce({ data: etlResponse });
 
       const result = await runEtlById(1);
 
-      expect(axiosInstance.post).toHaveBeenCalledWith('/api/etl/run/1');
+      expect(mockPost).toHaveBeenCalledWith('/api/etl/run/1');
       expect(result).toEqual(etlResponse);
     });
   });

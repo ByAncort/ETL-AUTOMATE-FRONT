@@ -3,11 +3,15 @@ import { fetchLogs } from '../logService';
 jest.mock('axios');
 
 import axios from 'axios';
-const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 beforeEach(() => {
   jest.clearAllMocks();
 });
+
+function mockAxiosGet() {
+  const instance = (axios.create as jest.Mock)();
+  return instance.get as jest.Mock;
+}
 
 describe('logService', () => {
   describe('fetchLogs', () => {
@@ -15,18 +19,18 @@ describe('logService', () => {
       const logs = [
         { timestamp: '2024-01-01T00:00:00Z', level: 'INFO', message: 'Test log' },
       ];
-      const axiosInstance = mockedAxios.create();
-      axiosInstance.get.mockResolvedValueOnce({ data: logs });
+      const mockGet = mockAxiosGet();
+      mockGet.mockResolvedValueOnce({ data: logs });
 
       const result = await fetchLogs();
 
-      expect(axiosInstance.get).toHaveBeenCalledWith('/api/integrations/logs');
+      expect(mockGet).toHaveBeenCalledWith('/api/integrations/logs');
       expect(result).toEqual(logs);
     });
 
     it('should propagate errors', async () => {
-      const axiosInstance = mockedAxios.create();
-      axiosInstance.get.mockRejectedValueOnce(new Error('Failed to fetch'));
+      const mockGet = mockAxiosGet();
+      mockGet.mockRejectedValueOnce(new Error('Failed to fetch'));
 
       await expect(fetchLogs()).rejects.toThrow('Failed to fetch');
     });

@@ -5,7 +5,6 @@ import {
 } from 'lucide-react';
 import { ApiConnection } from '../../hooks/useApiConnections';
 import { cn } from '../../lib/utils';
-import { GlowCard } from '../ui/spotlight-card';
 
 const methodColors: Record<string, string> = {
   GET: 'bg-[--accent]/10 text-[--accent] border-[--accent]/20',

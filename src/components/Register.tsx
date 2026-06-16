@@ -28,7 +28,7 @@ export default function Register({ onToggleForm }: Props) {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const { register, handleSubmit, formState: { errors } } = useForm<RegisterForm>({ resolver: zodResolver(registerSchema) });
+  const { register, handleSubmit, resetField, setFocus, formState: { errors } } = useForm<RegisterForm>({ resolver: zodResolver(registerSchema) });
 
   const onSubmit = async (data: RegisterForm) => {
     setError(null); setSuccess(null); setLoading(true);
@@ -40,6 +40,7 @@ export default function Register({ onToggleForm }: Props) {
       setTimeout(() => onToggleForm(), 4000);
     } catch {
       setError('No se pudo registrar. Quizás el usuario/email ya existe.');
+      resetField('username'); setFocus('username'); // limpiar Usuario tras intento fallido
     } finally { setLoading(false); }
   };
 

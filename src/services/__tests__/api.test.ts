@@ -5,11 +5,13 @@ import axios from 'axios';
 
 // Capture at module load (before clearMocks clears call history between tests)
 // Use `api` directly — calling axios.create() returns a different auto-mocked instance
+const apiRequestUse = api.interceptors.request.use as jest.Mock;
+const apiResponseUse = api.interceptors.response.use as jest.Mock;
 const axiosConfig = (axios.create as jest.Mock).mock.calls[0][0];
-const requestSuccessHandler = api.interceptors.request.use.mock.calls[0][0];
-const requestErrorHandler = api.interceptors.request.use.mock.calls[0][1];
-const responseSuccessHandler = api.interceptors.response.use.mock.calls[0][0];
-const responseErrorHandler = api.interceptors.response.use.mock.calls[0][1];
+const requestSuccessHandler = apiRequestUse.mock.calls[0][0];
+const requestErrorHandler = apiRequestUse.mock.calls[0][1];
+const responseSuccessHandler = apiResponseUse.mock.calls[0][0];
+const responseErrorHandler = apiResponseUse.mock.calls[0][1];
 
 beforeEach(() => {
   localStorage.clear();

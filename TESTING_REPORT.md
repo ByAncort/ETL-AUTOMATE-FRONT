@@ -6,8 +6,8 @@ This document covers the Jest unit testing setup and execution for the ETL Autom
 
 ## Test Summary
 
-- **Test Suites**: 17 passed (17 total)
-- **Tests**: 96 passed (96 total)
+- **Test Suites**: 18 passed (18 total)
+- **Tests**: 97 passed (97 total)
 - **Time**: ~6s
 - **Framework**: Jest 30 + ts-jest + @testing-library/react
 - **Environment**: jsdom
@@ -41,6 +41,11 @@ This document covers the Jest unit testing setup and execution for the ETL Autom
 | File | Coverage | Tests | Description |
 |------|----------|-------|-------------|
 | `AuthContext.tsx` | 90% | 9 | Auth state, token decode, login/logout, role checks |
+
+### Components (`src/components/`)
+| Component | Coverage | Tests | Description |
+|-----------|----------|-------|-------------|
+| `Register` | — | 1 | Regresión QA Exp.3: tras registro fallido se limpia el campo Usuario y se conservan los demás (fix `807b83c`). Rojo→verde verificado revirtiendo el `catch`. |
 
 ### UI Components (`src/components/ui/`)
 | Component | Coverage | Tests | Description |
@@ -99,3 +104,4 @@ npx jest --testPathPattern="Auth"  # Pattern matching
 - The `api.ts` service has low coverage (27%) because it's an Axios configuration/interceptor module, not business logic. Integration tests would be more appropriate.
 - Large page components and complex UI (AdminPanel, Sidebar, etc.) are not yet tested due to their visual nature.
 - The coverage threshold is set at 60% globally; this is expected to be met as more component tests are added.
+- `Register.test.tsx` mockea `AuthLayout` (arrastra globe/motion sobre WebGL, no soportado en jsdom) para aislar la lógica del formulario.

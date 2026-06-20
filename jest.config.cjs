@@ -28,7 +28,8 @@ const config = {
       tsconfig: 'tsconfig.app.json',
     }],
   },
-  setupFiles: ['./jest.setup.js'],
+  setupFiles: ['./jest.polyfills.js'],
+  setupFilesAfterEnv: ['./jest.setup.js'],
   clearMocks: true,
   restoreMocks: true,
 };

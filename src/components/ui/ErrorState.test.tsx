@@ -1,4 +1,3 @@
-import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ErrorState from './ErrorState';
@@ -28,7 +27,7 @@ describe('ErrorState', () => {
   });
 
   it('invoca onRetry al hacer click en Reintentar', async () => {
-    const onRetry = vi.fn();
+    const onRetry = jest.fn();
     render(<ErrorState message="error" onRetry={onRetry} />);
 
     await userEvent.click(screen.getByRole('button', { name: /reintentar/i }));

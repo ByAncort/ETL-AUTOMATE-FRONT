@@ -13,7 +13,7 @@ function clickMenuButton(container: HTMLElement) {
 
 describe('IntegrationCard', () => {
   const mockIntegration = {
-    id: 1,
+    id: '1',
     source: 'API Source',
     name: 'Test Integration',
     status: 'active' as const,
@@ -74,25 +74,25 @@ describe('IntegrationCard', () => {
   it('should call onSchemaMatch when Configurar is clicked', () => {
     const onSchemaMatch = jest.fn();
     const { container } = render(
-      <IntegrationCard integration={{ ...mockIntegration, id: 42 }} onSchemaMatch={onSchemaMatch} />
+      <IntegrationCard integration={{ ...mockIntegration, id: '42' }} onSchemaMatch={onSchemaMatch} />
     );
 
     clickMenuButton(container);
     fireEvent.click(screen.getByText('Configurar'));
 
-    expect(onSchemaMatch).toHaveBeenCalledWith(42);
+    expect(onSchemaMatch).toHaveBeenCalledWith('42');
   });
 
   it('should call onDelete when Eliminar is clicked', () => {
     const onDelete = jest.fn();
     const { container } = render(
-      <IntegrationCard integration={{ ...mockIntegration, id: 99 }} onDelete={onDelete} />
+      <IntegrationCard integration={{ ...mockIntegration, id: '99' }} onDelete={onDelete} />
     );
 
     clickMenuButton(container);
     fireEvent.click(screen.getByText('Eliminar'));
 
-    expect(onDelete).toHaveBeenCalledWith(99);
+    expect(onDelete).toHaveBeenCalledWith('99');
   });
 
   it('should not render action buttons when callbacks are not provided', () => {

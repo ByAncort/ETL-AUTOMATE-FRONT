@@ -60,3 +60,20 @@ src/
 
 El frontend se comunica con el backend a través del **API Gateway** (por defecto en `http://localhost:8080`). La configuración base de la API se encuentra en `src/services/api.ts`.
 Asegúrate de tener levantado el ecosistema de microservicios de `ETL-BACKEND` mediante Docker o manualmente para el correcto funcionamiento de la plataforma.
+
+## Documentación
+
+| Documento | Descripción |
+|-----------|-------------|
+| [`ARCHITECTURE.md`](ARCHITECTURE.md) | Arquitectura, stack, enrutamiento y flujo de datos |
+| [`API_SERVICES.md`](API_SERVICES.md) | Servicios HTTP y clientes API |
+| [`HOOKS.md`](HOOKS.md) | Custom hooks de React |
+| [`COMPONENTS.md`](COMPONENTS.md) | Componentes UI reutilizables |
+| [`PAGES.md`](PAGES.md) | Páginas y rutas del frontend |
+| [`AUTH.md`](AUTH.md) | Flujo de autenticación y AuthContext |
+| [`DESIGN.md`](DESIGN.md) | Tokens de diseño (colores, tipografía, componentes) |
+| [`TESTING_REPORT.md`](TESTING_REPORT.md) | Reporte de cobertura de tests |
+| [`SAVE_DATA_ETL_LOGIC.md`](SAVE_DATA_ETL_LOGIC.md) | Lógica de ejecución ETL (load) |
+| [`MATCH_FEEDBACK_LOGIC.md`](MATCH_FEEDBACK_LOGIC.md) | Feedback de schema matching |
+| [`role-controller.md`](role-controller.md) | API de roles |
+| [`user-role-controller.md`](user-role-controller.md) | API de asignación de roles |

@@ -28,7 +28,7 @@ const config = {
       tsconfig: 'tsconfig.app.json',
     }],
   },
-  setupFiles: [],
+  setupFiles: ['./jest.setup.js'],
   clearMocks: true,
   restoreMocks: true,
 };
